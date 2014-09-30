@@ -1,0 +1,9 @@
+fs        = require 'fs'
+path      = require 'path'
+HOMEDIR   = path.join __dirname, '..'
+LIB_COV   = path.join HOMEDIR, 'lib-cov'
+LIB       = path.join HOMEDIR, 'lib'
+LIB_DIR   = if fs.existsSync(LIB_COV) then LIB_COV else LIB
+exports.Util      = require(path.join(LIB_DIR,'util')).Util
+exports.Sequencer = require(path.join(LIB_DIR,'util')).Sequencer
+exports.Stopwatch = require(path.join(LIB_DIR,'stopwatch')).Stopwatch

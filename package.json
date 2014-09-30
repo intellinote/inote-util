@@ -1,0 +1,26 @@
+{
+  "name"        : "inote-util",
+  "version"     : "0.0.1",
+  "description" : "A collection of utility functions and classes.",
+  "repository"  : { "type": "git", "url": "git@bitbucket.org:intellinote/inote-util.git" },
+  "bugs"        : { "url": "https://github.com/intellinote/inote-util/issues" },
+  "private"     : true,
+  "license"     : "MIT",
+  "author"      : "Intellinote <https://www.intellinote.net/>",
+  "dependencies": {
+    "node-uuid"             : "latest"
+  },
+  "devDependencies": {
+    "coffee-coverage"       : "latest",
+    "coffee-script"         : "latest",
+    "docco"                 : "latest",
+    "highlight.js"          : "latest",
+    "marked"                : "latest",
+    "marked-toc"            : "latest",
+    "mocha"                 : "latest",
+    "should"                : "latest"
+  },
+  "main": "lib/index.js",
+  "scripts": { },
+  "engines": { "node": ">=0.10"  }
+}
