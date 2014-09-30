@@ -23,22 +23,102 @@ describe "Stopwatch",->
       @method_finished = true
     done()
 
-  it "can be used for timing 'inline'.", (done)->
+  it "can be used for timing \"inline\".", (done)->
+    # start the timer
     timer = Stopwatch.start()
+    # validate the initial state
     timer.should.exist
     timer.start_time.should.exist
     should.not.exist timer.finish_time
     should.not.exist timer.elapsed_time
+    # run some method
     @a_slow_method()
+    # stop the timer
     timer.stop()
+    # validate the end state
     timer.start_time.should.exist
     timer.finish_time.should.exist
     timer.elapsed_time.should.exist
     timer.finish_time.should.be.above timer.start_time
     timer.elapsed_time.should.be.above 0
     should.not.exist timer.stop
+    # validate that the method was executed
     @method_started.should.be.ok
     @method_finished.should.be.ok
+    # done
+    done()
+
+  it "can be used to track \"lap\" times.", (done)->
+    # start the timer
+    timer = Stopwatch.start()
+    # validate the initial state
+    timer.start_time.should.exist
+    should.not.exist timer.finish_time
+    should.not.exist timer.elapsed_time
+    should.not.exist timer.laps
+    # run some method
+    @a_slow_method()
+    # mark the lap time
+    timer.lap()
+    # validate the intermediate state
+    should.not.exist timer.finish_time
+    should.not.exist timer.elapsed_time
+    timer.laps.should.exist
+    timer.laps.length.should.equal 1
+    timer.laps[0].lap_start_time.should.equal timer.start_time
+    timer.laps[0].lap_finish_time.should.exist
+    timer.laps[0].lap_finish_time.should.be.above timer.laps[0].lap_start_time
+    timer.laps[0].lap_time.should.equal (timer.laps[0].lap_finish_time - timer.laps[0].lap_start_time)
+    timer.laps[0].lap_elapsed_time.should.equal (timer.laps[0].lap_finish_time - timer.start_time)
+    # run some method
+    @a_slow_method()
+    # mark the lap time
+    timer.lap()
+    # validate the intermediate state
+    should.not.exist timer.finish_time
+    should.not.exist timer.elapsed_time
+    timer.laps.should.exist
+    timer.laps.length.should.equal 2
+    timer.laps[1].lap_start_time.should.equal timer.laps[0].lap_finish_time
+    timer.laps[1].lap_finish_time.should.exist
+    timer.laps[1].lap_finish_time.should.be.above timer.laps[1].lap_start_time
+    timer.laps[1].lap_time.should.equal (timer.laps[1].lap_finish_time - timer.laps[1].lap_start_time)
+    timer.laps[1].lap_elapsed_time.should.equal (timer.laps[1].lap_finish_time - timer.start_time)
+    # run some method
+    @a_slow_method()
+    # mark the lap time
+    timer.lap()
+    # validate the intermediate state
+    should.not.exist timer.finish_time
+    should.not.exist timer.elapsed_time
+    timer.laps.should.exist
+    timer.laps.length.should.equal 3
+    timer.laps[2].lap_start_time.should.equal timer.laps[1].lap_finish_time
+    timer.laps[2].lap_finish_time.should.exist
+    timer.laps[2].lap_finish_time.should.be.above timer.laps[2].lap_start_time
+    timer.laps[2].lap_time.should.equal (timer.laps[2].lap_finish_time - timer.laps[2].lap_start_time)
+    timer.laps[2].lap_elapsed_time.should.equal (timer.laps[2].lap_finish_time - timer.start_time)
+    # run some method
+    @a_slow_method()
+    # stop the timer
+    timer.stop()
+    # validate the end state
+    timer.start_time.should.exist
+    timer.finish_time.should.exist
+    timer.elapsed_time.should.exist
+    timer.finish_time.should.be.above timer.start_time
+    timer.elapsed_time.should.be.above 0
+    timer.laps.should.exist
+    timer.laps.length.should.equal 4
+    timer.laps[3].lap_start_time.should.equal timer.laps[2].lap_finish_time
+    timer.laps[3].lap_finish_time.should.exist
+    timer.laps[3].lap_finish_time.should.be.above timer.laps[3].lap_start_time
+    timer.laps[3].lap_finish_time.should.equal timer.finish_time
+    timer.laps[3].lap_time.should.equal (timer.laps[3].lap_finish_time - timer.laps[3].lap_start_time)
+    timer.laps[3].lap_elapsed_time.should.equal (timer.laps[3].lap_finish_time - timer.start_time)
+    timer.laps[3].lap_elapsed_time.should.equal timer.elapsed_time
+    should.not.exist timer.stop
+    should.not.exist timer.lap
     done()
 
   it "doesn't always give the same time.", (done)->

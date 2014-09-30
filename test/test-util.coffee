@@ -29,23 +29,74 @@ describe 'Util',->
         should.not.exist found
     done()
 
+  it "can identify blank and non-blank strings",(done)->
+    tests = [
+      [ null, true ]
+      [ "", true ]
+      [ "   ", true]
+      [ "\t \t", true]
+      [ "\tfoo\t", false]
+      [ "  \tfoo\t\t", false]
+      [ "  foo", false]
+      [ " foo\tbar ", false]
+      [ "foo bar", false]
+    ]
+    for [value,blank] in tests
+      Util.is_blank(value).should.equal blank
+      Util.isnt_blank(value).should.equal not blank
+    done()
+
+  it "can escape strings for regular expressions",(done)->
+    tests = [
+      [ "", "" ]
+      [ "\\", "\\\\"] # note this is `\` and `\\`
+      [ "/", "\\/"]  # note this is `/` and `\/`
+      [ "[{|}]", "\\[\\{\\|\\}\\]"]
+    ]
+    for [str,expected] in tests
+      Util.escape_for_regexp(str).should.equal expected
+    done()
+
   it "can truncate in a smartish way",(done)->
    tests = [
-     [ 'The quick brown fox jumped over the lazy dogs.', 50, 'The quick brown fox jumped over the lazy dogs.' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 47, 'The quick brown fox jumped over the lazy dogs.' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 46, 'The quick brown fox jumped over the lazy dogs.' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 45, 'The quick brown fox jumped over the lazy…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 44, 'The quick brown fox jumped over the lazy…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 43, 'The quick brown fox jumped over the lazy…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 40, 'The quick brown fox jumped over the…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 39, 'The quick brown fox jumped over the…' ]
-     [ 'The quick brown foxjumpedoverthelazydogs.', 39, 'The quick brown foxjumpedoverthelazydo…' ]
-     [ 'The quick brown foxjumpedoverthelazydogs.', 38, 'The quick brown foxjumpedoverthelazyd…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 25, 'The quick brown fox…' ]
+     [ '123456789', 11, null, '123456789' ]
+     [ '123456789', 10, null, '123456789' ]
+     [ '123456789', 9, null, '123456789' ]
+     [ '123456789', 8, null, '1234567…' ]
+     [ '123456789', 7, null, '123456…' ]
+     [ '123456789', 11, '...','123456789' ]
+     [ '123456789', 10, '...','123456789' ]
+     [ '123456789', 9, '...', '123456789' ]
+     [ '123456789', 8, '...', '12345...' ]
+     [ '123456789', 7, '...',  '1234...' ]
+     [ '123456789', 11, '','123456789' ]
+     [ '123456789', 10, '','123456789' ]
+     [ '123456789', 9, '', '123456789' ]
+     [ '123456789', 8, '', '12345678' ]
+     [ '123456789', 7, '', '1234567' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 50, null, 'The quick brown fox jumped over the lazy dogs.' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 47, null, 'The quick brown fox jumped over the lazy dogs.' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 46, null, 'The quick brown fox jumped over the lazy dogs.' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 45, null, 'The quick brown fox jumped over the lazy…' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 44, null, 'The quick brown fox jumped over the lazy…' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 43, null, 'The quick brown fox jumped over the lazy…' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 40, null, 'The quick brown fox jumped over the…' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 39, null, 'The quick brown fox jumped over the…' ]
+     [ 'The quick brown foxjumpedoverthelazydogs.', 39, null, 'The quick brown foxjumpedoverthelazydo…' ]
+     [ 'The quick brown foxjumpedoverthelazydogs.', 38, null, 'The quick brown foxjumpedoverthelazyd…' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 25, null, 'The quick brown fox…' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 45, '...', 'The quick brown fox jumped over the lazy...' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 44, '...', 'The quick brown fox jumped over the lazy...' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 43, '...', 'The quick brown fox jumped over the lazy...' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 40, '...', 'The quick brown fox jumped over the...' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 39, '...', 'The quick brown fox jumped over the...' ]
+     [ 'The quick brown foxjumpedoverthelazydogs.', 39, '...', 'The quick brown foxjumpedoverthelazy...' ]
+     [ 'The quick brown foxjumpedoverthelazydogs.', 38, '...', 'The quick brown foxjumpedoverthelaz...' ]
+     [ 'The quick brown fox jumped over the lazy dogs.', 25, '...', 'The quick brown fox...' ]
    ]
-   for test in tests
-     Util.truncate(test[0],test[1]).should.equal test[2]
-     Util.truncate(test[0],test[1]).length.should.not.be.above test[1]
+   for [text,width,marker,expected] in tests
+     Util.truncate(text,width,marker).should.equal expected
+     Util.truncate(text,width,marker).length.should.not.be.above width
    done()
 
 
@@ -766,7 +817,7 @@ describe 'Util',->
       steps_executed[2] = true
       steps_executed[3].should.not.be.ok
       next()
-    proc.last ()->
+    proc.finally ()->
       steps_executed[0].should.be.ok
       steps_executed[1].should.be.ok
       steps_executed[2].should.be.ok

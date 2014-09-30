@@ -1,6 +1,8 @@
-# # Stopwatch
-#
-# A simple timer.
+# <i style="color:#666;font-size:80%">(Note: If you are viewing the [docco](http://jashkenas.github.io/docco/)-generated HTML version of this file, use the "Jump To..." menu in the upper right corner to navigate to the annotated versions of other source files.)</i>
+
+# `Stopwatch` is a simple utility that can be used to track and
+# report the time it takes to do some thing in your JavaScript
+# code.
 #
 # ## Importing
 #
@@ -32,6 +34,11 @@
 #     console.log(timer.label,"Finish Time: ",timer.finish_time);
 #     console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 #
+
+# ## The Implementation
+
+# **Stopwatch** - *a simple timer.*
+
 class Stopwatch
 
   # ## Methods
@@ -49,19 +56,61 @@ class Stopwatch
   #
   # Any properties of the optional `base` object will also be
   # availble in the returned timer.
+
+  # The `start` method generates a new timer object.
   start:(base={})->
-    data = {}
+
+    timer = {}
+
+    # If any `base` object was provided, copy its properties into the timer.
     if base?
       for n,v of base
-        if base.hasOwnProperty n
-          data[n] = v
-    data.start_time = new Date()
-    data.stop = ()->
-      data.finish_time = new Date()
-      data.elapsed_time = data.finish_time - data.start_time
-      delete data.stop
-      return data
-    return data
+        timer[n] = v
+
+    # `timer.start_time` contains the initial start time.
+    timer.start_time = new Date()
+
+    # `timer.stop()` stops the timer; it can only be stopped once.
+    # Once stopped, the `finish_time` and `elapsed_time` value are calculated.
+    timer.stop = ()->
+      # If any lap times have been taken, add one final lap
+      # (and make sure to reuse the *exact* same finish time as the final lap).
+      if timer.laps?
+        timer.lap()
+        timer.finish_time = timer.laps[timer.laps.length-1].lap_finish_time
+      # Otherwise use the current time.
+      else
+        timer.finish_time = new Date()
+
+      # Elapsed time is simply the duration from start to finish.
+      timer.elapsed_time = timer.finish_time - timer.start_time
+
+      # Remove the `stop` and `lap` methods, this timer is done.
+      delete timer.stop
+      delete timer.lap
+
+      return timer
+
+    # `timer.lap()` records a lap-time in a (newly created) `timer.laps` array.
+    # Each lap descriptor inclues `lap_start_time`, `lap_finish_time`,
+    # `lap_time` and `lap_elapsed_time` (where `lap_time` is the duration of the
+    # lap itself and `lap_elapsed_time` is the duration from the start of the
+    # overall timer to the end of the lap).
+    timer.lap = ()->
+      lap_finish = new Date()
+      if timer.laps?
+        lap_start = timer.laps[timer.laps.length-1].lap_finish_time
+      else
+        lap_start = timer.start_time
+      timer.laps ?= []
+      timer.laps.push {
+        lap_start_time: lap_start
+        lap_finish_time: lap_finish
+        lap_time: lap_finish - lap_start
+        lap_elapsed_time: lap_finish - timer.start_time
+      }
+      return timer
+    return timer
 
   # **time** - *time a synchronous method*
   #

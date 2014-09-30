@@ -8,6 +8,11 @@ jscov-tmp
 cov-tmp
 hold
 .hold
+*.tar.gz
+*.tgz
+*.tar
+inote-util-v*
+.npmrc
 # GENERAL
 #---------------------------------------------------------------------
 $RECYCLE.BIN/
