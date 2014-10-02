@@ -4,10 +4,10 @@ A collection of utility functions and classes for Node.js.
 
 ## Installing
 
-The source code and documentation for inote-util is available on GitHub at [intellionte/inote-util](https://github.com/intellionte/inote-util).  You can clone the repository via:
+The source code and documentation for inote-util is available on GitHub at [intellinote/inote-util](https://github.com/intellinote/inote-util).  You can clone the repository via:
 
 ```bash
-git clone git@github.com:intellionte/inote-util
+git clone git@github.com:intellinote/inote-util
 ```
 
 inote-util is deployed as an [npm module](https://npmjs.org/) under the name [`inote-util`](https://npmjs.org/package/inote-util). Hence you can install a pre-packaged version with the command:
