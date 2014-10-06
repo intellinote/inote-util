@@ -1,0 +1,5 @@
+{
+  "mock-config": {
+    "source": "test/mock-config.json"
+  }
+}

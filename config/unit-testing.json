@@ -1,0 +1,18 @@
+{
+  "mock-config": {
+    "bool-value": true,
+    "int-value": 17,
+    "float-value": 3.14159,
+    "string-value": "Lorem Ipsum",
+    "null-value": null,
+    "array-value": [ true, 17, 3.14159, "Lorem Ipsum", null ],
+    "map-value": {
+      "bool-value": false,
+      "int-value": 19,
+      "float-value": 2.71828,
+      "string-value": "Non-nummy num",
+      "null-value": null
+    },
+    "source": "config/unit-testing.json"
+  }
+}

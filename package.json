@@ -7,7 +7,8 @@
   "license"     : "MIT",
   "author"      : "Intellinote <https://www.intellinote.net/>",
   "dependencies": {
-    "node-uuid"             : "latest"
+    "node-uuid"             : "latest",
+    "nconf"                 : "latest"
   },
   "devDependencies": {
     "coffee-coverage"       : "latest",

@@ -25,6 +25,7 @@ LIB_DIR   = if fs.existsSync(LIB_COV) then LIB_COV else LIB
 sources = [
   'util'
   'stopwatch'
+  'config'
 ]
 
 # Now we simply load (`require`) the requisite files and pass along whatever

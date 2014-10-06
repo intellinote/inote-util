@@ -17,3 +17,7 @@ describe "index",->
   it "exports Stopwatch", (done)->
     index.Stopwatch.should.exist
     done()
+
+  it "exports config", (done)->
+    index.config.should.exist
+    done()
