@@ -61,7 +61,7 @@ guidelines can help streamline the process for everyone.
     - If you've never submitted a pull-request, here's one way to go
       about it:
 
-        1. Fork or clone the Stew repository.
+        1. Fork or clone the repository.
         2. Create a local branch to contain your changes (`git
            checkout -b my-new-branch`).
         3. Make your changes and commit them to your local repository.
