@@ -166,6 +166,7 @@ module: js test docs coverage
 	cp -r docs $(MODULE_DIR)
 	cp -r lib $(MODULE_DIR)
 	cp -r test $(MODULE_DIR)
+	cp -r config $(MODULE_DIR)
 	cp $(PACKAGE_JSON) $(MODULE_DIR)
 	cp Makefile $(MODULE_DIR)
 	cp LICENSE.txt $(MODULE_DIR)
@@ -175,7 +176,7 @@ module: js test docs coverage
 	find module -type f -name "*.x" -exec rm -f {} \;
 
 test-module-install: clean-test-module-install js test docs coverage module
-	mkdir -p $(TEST_MODULE_INSTALL_DIR); cd $(TEST_MODULE_INSTALL_DIR); npm install "$(CURDIR)/module"; node -e "require('assert').ok(require('inote-util').Util);" && cd $(CURDIR) && rm -rf $(TEST_MODULE_INSTALL_DIR) && echo "It worked!"
+	mkdir -p $(TEST_MODULE_INSTALL_DIR); cd $(TEST_MODULE_INSTALL_DIR); npm install "$(CURDIR)/module"; node -e "require('assert').ok(require('inote-util').Util);" && cd $(CURDIR) && rm -rf $(TEST_MODULE_INSTALL_DIR) && echo "\n\nIT WORKED!\n\n"
 
 $(NODE_MODULES): $(PACKAGE_JSON)
 	$(NPM_EXE) $(NPM_ARGS) prune
