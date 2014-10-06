@@ -264,4 +264,3 @@ docco: $(COFFEE_SRCS) $(NODE_MODULES)
 .SUFFIXES: .coffee
 .coffee:
 	$(COFFEE_EXE) $< >  $@
-$(SWAGGER_OBJ): $(SWAGGER_SRCS)
