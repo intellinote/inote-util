@@ -295,7 +295,6 @@ class Util
     else
       return null
 
-
   # **subset_of** - *check whether on array contains another arrays as if they are sets *
   #
   # Given two arrays `a` and `b`, returns `true` if every element of
@@ -414,7 +413,6 @@ class Util
 
   # ## Random Bytes and Strings
 
-
   # **random_bytes** - *generate a string of random bytes*
   #
   # Generates a string of `count` pseudo-random bytes in the specified encoding.
@@ -422,7 +420,12 @@ class Util
   #
   # Note that `count` specifies the number of *bytes* to be generated. The encoded
   # string may be more or less than `count` *characters*.
-  @random_bytes:(count=32,enc='hex')=>crypto.randomBytes(count).toString(enc)
+  @random_bytes:(count=32,enc='hex')=>
+    bytes = crypto.randomBytes(count)
+    if /buffer/i.test enc
+      return bytes
+    else
+      return bytes.toString(enc)
 
   # **random_hex** - *generate a string of random hexadecimal characters*
   #
@@ -446,6 +449,33 @@ class Util
     return str
 
   # ## Comparators and Sorting
+
+  # **slow_equals** - *constant-time comparison of two buffers for equality*
+  # Performs a byte by byte comparision of the given buffers
+  # but does it in *constant* time (rather than aborting as soon
+  # as a delta is discovered). `a^b` (`a xor b`) would be better
+  # if supported.
+  #
+  # To prevent optimizations from short-cutting this process, an array
+  # containing `[ equal?, number-of-identical-bytes, number-of-different-bytes ]`
+  # is returned.
+  #
+  # For equality tests, you'll want something like `if(Util.slow_equals(a,b)[0])`.
+  #
+  @slow_equals:(a,b)=>
+    same_count = delta_count = 0
+    if b.length > a.length
+      [a,b] = [b,a]
+    for i in [0...a.length]
+      if a[i] isnt b[i]
+        delta_count += 1
+      else
+        same_count += 1
+    if (delta_count is 0 and a.length is b.length)
+      return [true,same_count,delta_count]
+    else
+      return [false,same_count,delta_count]
+
 
   # **compare** - *a basic comparator function*
   #

@@ -157,6 +157,12 @@ describe 'Util',->
     hex.length.should.equal 2*byte_count
     done()
 
+  it "random_bytes(n,'buffer') returns a buffer rather than a string ",(done)->
+    byte_count = 25
+    bytes = Util.random_bytes(byte_count,'buffer')
+    bytes.length.should.equal byte_count
+    done()
+
   it "random_hex returns random hex digits",(done)->
     hex = Util.random_hex(63)
     hex.length.should.equal 63
@@ -168,6 +174,65 @@ describe 'Util',->
       str = Util.random_alphanumeric(c)
       (/^[0-9a-z]*$/.test str).should.be.ok
       str.length.should.equal c
+    done()
+
+  it "slow_equals compares two buffers for equality",(done)->
+    a = Util.random_bytes(2048)
+    b = Util.random_bytes(2048)
+    c = b.slice(0,2040)
+    Util.slow_equals(a,a)[0].should.be.ok
+    Util.slow_equals(a,b)[0].should.not.be.ok
+    Util.slow_equals(b,a)[0].should.not.be.ok
+    Util.slow_equals(b,b)[0].should.be.ok
+    Util.slow_equals(b,c)[0].should.not.be.ok
+    Util.slow_equals(c,b)[0].should.not.be.ok
+    Util.slow_equals(c,c)[0].should.be.ok
+    done()
+
+  it "slow_equals takes a similar amount of time whether buffers are equal or not equal",(done)->
+    reps = 3000
+    length = 4096
+    a = Util.random_bytes(length)
+    b = Util.random_bytes(length)
+    Util.std_equals = (a,b)->[(a is b),b.length,(if (a is b) then 0 else a.length)]
+    # compute time to compare with the standard `==` function
+    start = Date.now()
+    for i in [0...reps]
+      Util.std_equals(a,a)[2].should.equal 0
+      Util.std_equals(b,b)[2].should.equal 0
+    std_equal = Date.now() - start
+    start = Date.now()
+    for i in [0...reps]
+      Util.std_equals(a,b)[2].should.not.equal 0
+      Util.std_equals(b,a)[2].should.not.equal 0
+    std_not_equal = Date.now() - start
+    # compute time to compare with the slow_equals function
+    start = Date.now()
+    for i in [0...reps]
+      Util.slow_equals(a,a)[2].should.equal 0
+      Util.slow_equals(b,b)[2].should.equal 0
+    slow_equal = Date.now() - start
+    start = Date.now()
+    for i in [0...reps]
+      Util.slow_equals(a,b)[2].should.not.equal 0
+      Util.slow_equals(b,a)[2].should.not.equal 0
+    slow_not_equal = Date.now() - start
+    # calculate ratio of equal vs. not-equal times
+    std_equal = 1 if std_equal is 0
+    std_not_equal = 1 if std_not_equal is 0
+    if std_not_equal > std_equal
+      std = std_equal / std_not_equal
+    else
+      std = std_not_equal / std_equal
+    slow_equal = 1 if slow_equal is 0
+    slow_not_equal = 1 if slow_not_equal is 0
+    if slow_not_equal > slow_equal
+      slow = slow_equal / slow_not_equal
+    else
+      slow = slow_not_equal / slow_equal
+    # slow version should be closer to 1 than the standard
+    # console.log Math.abs(1-slow),Math.abs(1-std)
+    Math.abs(1-slow).should.be.below Math.abs(1-std)
     done()
 
   it "shallow_clone returns null for null",(done)->
