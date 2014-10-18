@@ -55,7 +55,7 @@ guidelines can help streamline the process for everyone.
       [./test/](https://github.com/intellinote/inote-util/tree/master/test)), but
       your report is welcome with or without that.
 
- * Our preferered channel for contributions or changes to the
+ * Our preferred channel for contributions or changes to the
    source code and documentation is as a Git "patch" or "pull-request".
 
     - If you've never submitted a pull-request, here's one way to go
@@ -106,4 +106,4 @@ For more information about Intellinote, visit
 
 Interested in working for Intellinote?  Visit
 [the careers section of our website](https://www.intellinote.net/careers/)
-to see our latest techincal (and non-technical) openings.
+to see our latest technical (and non-technical) openings.
