@@ -163,6 +163,17 @@ describe 'Util',->
     bytes.length.should.equal byte_count
     done()
 
+  it "random_bytes(enc,count) also works",(done)->
+    hex = Util.random_bytes('hex')
+    (/^[0-9a-f]+$/.test hex).should.be.ok
+    hex = Util.random_bytes(20,'hex')
+    hex.length.should.equal 40
+    (/^[0-9a-f]+$/.test hex).should.be.ok
+    hex = Util.random_bytes('hex',20)
+    hex.length.should.equal 40
+    (/^[0-9a-f]+$/.test hex).should.be.ok
+    done()
+
   it "random_hex returns random hex digits",(done)->
     hex = Util.random_hex(63)
     hex.length.should.equal 63
@@ -233,6 +244,92 @@ describe 'Util',->
     # slow version should be closer to 1 than the standard
     # console.log Math.abs(1-slow),Math.abs(1-std)
     Math.abs(1-slow).should.be.below Math.abs(1-std)
+    done()
+
+  it "can hash passwords (basic case)",(done)->
+    [salt,hash] = Util.hash_password('password')
+    Buffer.isBuffer(salt).should.be.ok
+    Buffer.isBuffer(hash).should.be.ok
+    done()
+
+  it "can hash passwords (known salt case)",(done)->
+    [salt,hash] = Util.hash_password('password')
+    Buffer.isBuffer(salt).should.be.ok
+    Buffer.isBuffer(hash).should.be.ok
+    [salt2,hash2] = Util.hash_password('password',salt)
+    salt2.toString('hex').should.equal salt.toString('hex')
+    hash2.toString('hex').should.equal hash.toString('hex')
+    [salt3,hash3] = Util.hash_password('different',salt)
+    salt3.toString('hex').should.equal salt.toString('hex')
+    hash3.toString('hex').should.not.equal hash.toString('hex')
+    done()
+
+  it "can hash passwords (salt as number case)",(done)->
+    [salt,hash] = Util.hash_password('password',12)
+    Buffer.isBuffer(salt).should.be.ok
+    salt.length.should.equal 12
+    Buffer.isBuffer(hash).should.be.ok
+    [salt,hash] = Util.hash_password('password',128)
+    Buffer.isBuffer(salt).should.be.ok
+    salt.length.should.equal 128
+    Buffer.isBuffer(hash).should.be.ok
+    done()
+
+  it "can hash passwords (salt as string case)",(done)->
+    [salt,hash] = Util.hash_password('password','salt')
+    Buffer.isBuffer(salt).should.be.ok
+    salt.toString().should.equal 'salt'
+    Buffer.isBuffer(hash).should.be.ok
+    done()
+
+  it "can hash passwords (with pepper case)",(done)->
+    [salt,hash] = Util.hash_password('password',null,'pepper')
+    Buffer.isBuffer(salt).should.be.ok
+    Buffer.isBuffer(hash).should.be.ok
+    [salt2,hash2] = Util.hash_password('password',salt,'pepper')
+    salt2.toString('hex').should.equal salt.toString('hex')
+    hash2.toString('hex').should.equal hash.toString('hex')
+    [salt3,hash3] = Util.hash_password('different',salt,'pepper')
+    salt3.toString('hex').should.equal salt.toString('hex')
+    hash3.toString('hex').should.not.equal hash.toString('hex')
+    done()
+
+  it "can hash passwords (specifying hash type case)",(done)->
+    pepper = Util.random_bytes('buffer')
+    [salt,hash] = Util.hash_password('password',null,pepper,'md5')
+    Buffer.isBuffer(salt).should.be.ok
+    Buffer.isBuffer(hash).should.be.ok
+    [salt2,hash2] = Util.hash_password('password',salt,pepper,'md5')
+    salt2.toString('hex').should.equal salt.toString('hex')
+    hash2.toString('hex').should.equal hash.toString('hex')
+    [salt3,hash3] = Util.hash_password('password',salt,'pepper')
+    salt3.toString('hex').should.equal salt.toString('hex')
+    hash3.toString('hex').should.not.equal hash.toString('hex')
+    done()
+
+  it "can hash passwords (map parameter case)",(done)->
+    pepper = Util.random_bytes('buffer')
+    [salt,hash] = Util.hash_password({password:'password',pepper:pepper,hash:'md5'})
+    Buffer.isBuffer(salt).should.be.ok
+    Buffer.isBuffer(hash).should.be.ok
+    [salt2,hash2] = Util.hash_password({password:'password',salt:salt,pepper:pepper,hash:'md5'})
+    salt2.toString('hex').should.equal salt.toString('hex')
+    hash2.toString('hex').should.equal hash.toString('hex')
+    done()
+
+  it "requires a password to hash",(done)->
+    try
+      [salt,hash] = Util.hash_password()
+      "execption not thrown".is.not.ok
+    catch err
+      should.exist err
+    done()
+
+  it "can validate hashed passwords",(done)->
+    [salt,hash] = Util.hash_password('password')
+    Util.validate_hashed_password(hash,'password',salt).should.be.ok
+    Util.validate_hashed_password(hash,'other',salt).should.not.be.ok
+    Util.validate_hashed_password(hash,'password',salt,'pepper').should.not.be.ok
     done()
 
   it "shallow_clone returns null for null",(done)->

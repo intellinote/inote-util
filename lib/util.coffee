@@ -421,6 +421,12 @@ class Util
   # Note that `count` specifies the number of *bytes* to be generated. The encoded
   # string may be more or less than `count` *characters*.
   @random_bytes:(count=32,enc='hex')=>
+    if typeof count is 'string'
+      if typeof enc is 'number'
+        [count,enc] = [enc,count]
+      else
+        enc = count
+        count = 32
     bytes = crypto.randomBytes(count)
     if /buffer/i.test enc
       return bytes
@@ -476,6 +482,46 @@ class Util
     else
       return [false,same_count,delta_count]
 
+  # Compare the `expected_digest` with the hash computed from the remaining
+  # parameters.
+  @validate_hashed_password:(expected_digest,password,salt,pepper,hash_type)=>
+    [salt,digest] = @hash_password(password,salt,pepper,hash_type)
+    return Util.slow_equals(expected_digest,digest)[0]
+
+  # Hash the given `password`, optionally using the given `salt`.
+  # If no `salt` is provided a new random salt will be generated.
+  # Returns `[salt,digest]`.
+  # options := { password, salt, pepper, hash_type }
+  @hash_password:(password,salt,pepper,hash_type)=>
+    # parse input parameters
+    if typeof password is 'object'
+      hash_type = password.hash_type
+      pepper = password.pepper
+      salt = password.salt
+      password = password.password
+    # set defaults
+    hash_type ?= 'sha512'
+    salt ?= 64
+    # convert types
+    password = new Buffer(password) if password? and not Buffer.isBuffer(password)
+    pepper = new Buffer(pepper) if pepper? and not Buffer.isBuffer(pepper)
+    if typeof salt is 'number'
+      salt = Util.random_bytes(salt,'buffer')
+    else unless Buffer.isBuffer(salt)
+      salt = new Buffer(salt)
+    # validate inputs
+    if not password?
+      throw new Error("password parameter is required")
+    else
+      # calculate hash
+      hash = crypto.createHash(hash_type)
+      hash.update salt
+      if pepper?
+        hash.update pepper
+      hash.update password
+      digest = hash.digest()
+      # retult generated salt and calculated hash
+      return [salt,digest]
 
   # **compare** - *a basic comparator function*
   #
