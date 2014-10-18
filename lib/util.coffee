@@ -11,7 +11,7 @@ class Util
   @trim:(str)=>str?.replace /(^\s+)|(\s+$)/ig, ""
 
   # **isnt_blank** - *returns `true` iff the given string is not `null` and contains at least one non-whitespace character.*
-  @isnt_blank:(str)=>(str? and /\w/.test(str))
+  @isnt_blank:(str)=>(str? and /[^\s]/.test(str))
 
   # **is_blank** - *returns `true` iff the given string is `null`, empty or only contains whitespace characters.*
   @is_blank:(str)=>not(@isnt_blank(str))

@@ -33,6 +33,7 @@ describe 'Util',->
     tests = [
       [ null, true ]
       [ "", true ]
+      [ "/", false ]
       [ "   ", true]
       [ "\t \t", true]
       [ "\tfoo\t", false]
