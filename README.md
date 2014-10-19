@@ -1,9 +1,6 @@
-<div style="text-align:right;
-width:100%;">
 [![NPM](https://nodei.co/npm/inote-util.png?downloads=true&downloadRank=true)](https://npmjs.org/package/inote-util)
-<p>
+
 [![Build Status](https://travis-ci.org/intellinote/inote-util.svg?branch=master)](https://travis-ci.org/intellinote/inote-util)
-</div>
 
 # inote-util
 
