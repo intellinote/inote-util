@@ -486,6 +486,7 @@ class Util
   # parameters.
   @validate_hashed_password:(expected_digest,password,salt,pepper,hash_type)=>
     [salt,digest] = @hash_password(password,salt,pepper,hash_type)
+    password = undefined # forget password when no longer needed
     return Util.slow_equals(expected_digest,digest)[0]
 
   # Hash the given `password`, optionally using the given `salt`.
@@ -519,6 +520,7 @@ class Util
       if pepper?
         hash.update pepper
       hash.update password
+      password = undefined # forget password when no longer needed
       digest = hash.digest()
       # retult generated salt and calculated hash
       return [salt,digest]
