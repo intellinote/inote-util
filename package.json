@@ -22,7 +22,7 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "test":"./node_modules/.bin/mocha -t 2000  -R list --compilers coffee:coffee-script/register ./test/test-*.coffee"
+    "test":"./node_modules/.bin/mocha -t 5000  -R list --compilers coffee:coffee-script/register ./test/test-*.coffee"
   },
   "engines": { "node": ">=0.10"  }
 }
