@@ -1,4 +1,4 @@
-# inote-util [![NPM](https://nodei.co/npm/inote-util.png?downloads=true&downloadRank=true)](https://npmjs.org/package/inote-util) [![NPM version](https://badge.fury.io/js/inote-util.svg)](http://badge.fury.io/js/inote-util)
+# inote-util [![Build Status](https://travis-ci.org/intellinote/inote-util.svg?branch=master)](https://travis-ci.org/intellinote/inote-util) [![NPM version](https://badge.fury.io/js/inote-util.svg)](http://badge.fury.io/js/inote-util)
 
 A collection of utility functions and classes for Node.js.
 
