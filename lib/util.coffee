@@ -522,7 +522,7 @@ class Util
       hash.update password
       password = undefined # forget password when no longer needed
       digest = hash.digest()
-      # retult generated salt and calculated hash
+      # return generated salt and calculated hash
       return [salt,digest]
 
   # **compare** - *a basic comparator function*
