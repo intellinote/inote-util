@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/intellinote/inote-util.svg?branch=master)](https://travis-ci.org/intellinote/inote-util)
+
 # inote-util
 
 A collection of utility functions and classes for Node.js.
