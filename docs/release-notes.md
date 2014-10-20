@@ -10,7 +10,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
  * Added `Util.blank_to_null`.
 
- * Added option to `Util.handle_error` for throwing an error rather than inovking a callback.
+ * Added option to `Util.handle_error` for throwing an error rather than invoking a callback.
 
 ## Release 0.3.1 - 18 October 2014
 
