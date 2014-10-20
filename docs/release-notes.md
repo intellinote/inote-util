@@ -4,6 +4,13 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+
+## Release 0.3.3 - 20 October 2014
+
+### Enhancements
+
+ * Enhanced `Util.blank_to_null` to convert blank object attributes to `null`.
+
 ## Release 0.3.2 - 20 October 2014
 
 ### Enhancements
