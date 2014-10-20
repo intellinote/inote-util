@@ -16,6 +16,13 @@ class Util
   # **is_blank** - *returns `true` iff the given string is `null`, empty or only contains whitespace characters.*
   @is_blank:(str)=>not(@isnt_blank(str))
 
+  # **blank_to_null** - *returns `null` iff the given string `is_blank`, and the original string otherwise.*
+  @blank_to_null:(str)=>
+    if Util.is_blank(str)
+      return null
+    else
+      return str
+
   # **truncate** - *a minimally "smart" truncation that attempts to truncate a string at a word boundarie*
   #
   # Truncates `text` to at most `width` characters, appending the specified
@@ -632,10 +639,29 @@ class Util
 
   # ## Various Other Utilities
 
+  # Identifies the "client IP" for the given request in various circumstances
+  @remote_ip:(req)=>
+    req?.get?('x-forwarded-for') ?
+    req?.headers?['x-forwarded-for'] ?
+    req?.connection?.remoteAddress ?
+    req?.socket?.remoteAddress ?
+    req?.connection?.socket?.remoteAddress
+
   # **handle_error** - *invoke a callback on error*
   #
-  # If `err` is not `null`, invokes `callback(err)`
-  # and returns `true`.  Otherwise returns `false`.
+  # If `err` is `null` (or `undefined`), returns
+  # `false`.
+  #
+  # If `err` is not `null`, and `callback` exists,
+  # invokes `callback(err)` and returns `true`.
+  #
+  # If `err` is not `null`, `callback` does not
+  # exist and `thrown_when_no_callback` is `true`
+  # (the default), `throws` the given error.
+  #
+  # If `err` is not `null`, `callback` does not
+  # exist and `thrown_when_no_callback` is `false`,
+  # prints the `err` to STDERR and returns `true`.
   #
   # Particularly useful for the CoffeeScript idiom:
   #
@@ -651,10 +677,15 @@ class Util
   #       else
   #         # ...continue processing...
   #
-  @handle_error:(err,callback)=>
+  @handle_error:(err,callback,throw_when_no_callback=true)=>
     if err?
-      callback(err)
-      return true
+      if callback?
+        callback(err)
+        return true
+      else if throw_when_no_callback
+        throw err
+      else
+        console.error "ERROR",err
     else
       return false
 

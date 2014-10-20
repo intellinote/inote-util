@@ -45,6 +45,10 @@ describe 'Util',->
     for [value,blank] in tests
       Util.is_blank(value).should.equal blank
       Util.isnt_blank(value).should.equal not blank
+      if blank
+        should.not.exist Util.blank_to_null(value)
+      else
+        Util.blank_to_null(value).should.equal value
     done()
 
   it "can escape strings for regular expressions",(done)->
@@ -618,9 +622,44 @@ describe 'Util',->
     should.not.exist Util.escape_for_json(null)
     done()
 
-  it "handle_error invokes the callback method on error",(done)=>
+  it "remote_ip returns the remote ip associated with a request",(done)=>
+    should.not.exist Util.remote_ip(null)
+    should.not.exist Util.remote_ip({})
+    Util.remote_ip({headers:{'x-forwarded-for':'127.0.0.1'}}).should.equal '127.0.0.1'
+    done()
+
+  it "handle_error returns false if there is no error",(done)=>
     Util.handle_error(null,()->throw new Error("should not be invoked")).should.equal false
+    done()
+
+  it "handle_error invokes the callback method on error",(done)=>
     Util.handle_error("ERROR",((x)->x.should.equal "ERROR"; done())).should.equal true
+
+  it "handle_error throws the error when the callback method is null",(done)=>
+    Util.handle_error(null,null).should.equal false
+    try
+      Util.handle_error("THE ERROR")
+      "Expected an error to be thrown.".should.not.exist
+    catch err
+      err.should.equal "THE ERROR"
+      done()
+
+  it "handle_error logs the error when the callback method is null and throw_on_error parameter is false",(done)=>
+    Util.handle_error(null,null).should.equal false
+    original_console_error = console.error
+    after_handle_error = false
+    error_logged = false
+    try
+      console.error = (args...)=>
+        console.error = original_console_error
+        error_logged = true
+        args[1].should.equal "THE ERROR"
+      (Util.handle_error("THE ERROR",null,false)).should.be.ok
+      error_logged.should.be.ok
+      done()
+    finally
+      console.error = original_console_error
+
 
   it "can convert between rgb and hex color definitions",(done)->
     should.not.exist Util.rgb_to_hex(null)
