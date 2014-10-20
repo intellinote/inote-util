@@ -51,6 +51,21 @@ describe 'Util',->
         Util.blank_to_null(value).should.equal value
     done()
 
+  it "can nullify blank attributes of an object",(done)->
+    obj = {
+      foo: null
+      bar: "xyzzy"
+      abc: '    '
+      xyz: ''
+    }
+    result = Util.blank_to_null(obj)
+    should.exist result
+    should.not.exist result.foo
+    should.not.exist result.abc
+    should.not.exist result.xyz
+    result.bar.should.equal 'xyzzy'
+    done()
+
   it "can escape strings for regular expressions",(done)->
     tests = [
       [ "", "" ]

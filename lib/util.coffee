@@ -16,12 +16,17 @@ class Util
   # **is_blank** - *returns `true` iff the given string is `null`, empty or only contains whitespace characters.*
   @is_blank:(str)=>not(@isnt_blank(str))
 
-  # **blank_to_null** - *returns `null` iff the given string `is_blank`, and the original string otherwise.*
-  @blank_to_null:(str)=>
-    if Util.is_blank(str)
-      return null
+  # **blank_to_null**
+  @blank_to_null:(data)=>
+    if typeof data is 'string'
+      if Util.is_blank(data)
+        return null
     else
-      return str
+      for k,v of data
+        if Util.is_blank(v)
+          delete data[k]
+          data[k] = undefined
+    return data
 
   # **truncate** - *a minimally "smart" truncation that attempts to truncate a string at a word boundarie*
   #
