@@ -12,6 +12,8 @@ Once generated, this directory should contain:
 
  * A [test coverage report](./coverage.html).
 
+ * [Release notes](./release-notes.html) ([md](./release-notes.md)).
+
 # Generating
 
 You can use the [`Makefile`](../Makefile) targets to generate the
