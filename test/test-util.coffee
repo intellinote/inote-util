@@ -169,6 +169,36 @@ describe 'Util',->
       m.f.should.equal 'vi'
     done()
 
+  it "merge skips null objects",(done)->
+    list = [
+      {
+        a: 1
+        b: 2
+        c: 3
+        e: 5
+      },
+      null,
+      {
+        b: "two"
+        c: "three"
+        d: "four"
+        e: "five"
+      },
+      {
+        c: "iii"
+        f: "vi"
+      },
+      null
+    ]
+    for m in [Util.merge(list),Util.merge(list...)]
+      m.a.should.equal 1
+      m.b.should.equal 'two'
+      m.c.should.equal 'iii'
+      m.d.should.equal 'four'
+      m.e.should.equal 'five'
+      m.f.should.equal 'vi'
+    done()
+
   it "random_bytes returns random bytes in the specified encoding",(done)->
     byte_count = 25
     hex = Util.random_bytes(byte_count,'hex')
