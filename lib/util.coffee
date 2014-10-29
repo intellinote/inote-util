@@ -276,6 +276,28 @@ class Util
   # Given a list (array), returns the sublist defined by `offset` and `limit`.
   @paginate_list:(list,offset=0,limit=20)=>list[offset...(offset+limit)]
 
+  # **remove_falsey** - *`delete` any attribute whose value evaluates to false*
+  # Returns a new map or array, with "falsey" values removed.
+  @remove_falsey:(map)=>
+    unless map?
+      return map
+    else if Array.isArray(map)
+      new_array = []
+      for elt in map
+        if elt
+          new_array.push elt
+      return new_array
+    else if typeof map is 'object'
+      new_map = {}
+      for n,v of map
+        if v
+          new_map[n] = v
+      return new_map
+    else unless  map
+      return null
+    else
+      return map
+
   # **merge** - *merge multiple maps into a new, combined map*
   #
   # Given two (or more) maps, `a` and `b`, creates a new map containing the

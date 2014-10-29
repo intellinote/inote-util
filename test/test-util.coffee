@@ -381,6 +381,76 @@ describe 'Util',->
     Util.validate_hashed_password(hash,'password',salt,'pepper').should.not.be.ok
     done()
 
+  it "remove_falsey returns null for null",(done)->
+    should.not.exist (Util.remove_falsey(null))
+    done()
+
+  it "remove_falsey strips null values from arrays",(done)->
+    tests = [
+      {in:[1,2,3],out:[1,2,3]}
+      {in:[],out:[]}
+      {in:[null,null,null],out:[]}
+      {in:[null],out:[]}
+      {in:[null,1,2,null],out:[1,2]}
+      {in:[null,1,null,2,null,null,3],out:[1,2,3]}
+    ]
+    for test in tests
+      found = Util.remove_falsey(test.in)
+      found.length.should.equal test.out.length
+      for e,i in found
+        e.should.equal test.out[i]
+    done()
+
+  it "remove_falsey strips falsey values from arrays",(done)->
+    tests = [
+      {in:[1,2,3],out:[1,2,3]}
+      {in:[],out:[]}
+      {in:[null,null,null],out:[]}
+      {in:[null],out:[]}
+      {in:[null,1,2,null],out:[1,2]}
+      {in:[null,1,null,2,null,null,3],out:[1,2,3]}
+      {in:[null,'',0,false],out:[]}
+      {in:[false],out:[]}
+      {in:['',1,2,0],out:[1,2]}
+      {in:[0,1,null,2,false,'',3],out:[1,2,3]}
+    ]
+    for test in tests
+      found = Util.remove_falsey(test.in)
+      found.length.should.equal test.out.length
+      for e,i in found
+        e.should.equal test.out[i]
+    done()
+
+  it "remove_falsey strips falsey values from maps",(done)->
+    tests = [
+      {in:{a:1,b:2,c:3},out:{a:1,b:2,c:3}}
+      {in:{},out:{}}
+      {in:{a:null,b:null,c:null},out:{}}
+      {in:{a:null},out:{}}
+      {in:{a:null,b:1,c:2,d:null},out:{b:1,c:2}}
+      {in:{a:null,b:1,c:null,d:2,e:null,f:null,g:3},out:{b:1,d:2,g:3}}
+      {in:{a:false,b:0,c:null},out:{}}
+      {in:{a:0},out:{}}
+      {in:{a:false,b:1,c:2,d:0},out:{b:1,c:2}}
+      {in:{a:0,b:1,c:false,d:2,e:null,f:'',g:3},out:{b:1,d:2,g:3}}
+    ]
+    for test in tests
+      found = Util.remove_falsey(test.in)
+      Object.keys(found).length.should.equal Object.keys(test.out).length
+      for n,v of found
+        v.should.equal test.out[n]
+    done()
+
+  it "remove_falsey returns input value for scalar types",(done)->
+    for value in [ 1, 3.14, 'string', true ]
+      Util.remove_falsey(value).should.equal value
+    done()
+
+  it "remove_falsey returns null for falsey scalar types",(done)->
+    for value in [ 0, false, '' ]
+      should.not.exist Util.remove_falsey(value)
+    done()
+
   it "shallow_clone returns null for null",(done)->
     should.not.exist (Util.shallow_clone(null))
     done()
