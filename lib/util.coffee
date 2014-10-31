@@ -16,7 +16,7 @@ class Util
   # **is_blank** - *returns `true` iff the given string is `null`, empty or only contains whitespace characters.*
   @is_blank:(str)=>not(@isnt_blank(str))
 
-  # **blank_to_null**
+  # **blank_to_null** - converts blank strings or attribute values to `null`.
   @blank_to_null:(data)=>
     if typeof data is 'string'
       if Util.is_blank(data)
@@ -749,7 +749,7 @@ class Util
     else
       return null
 
-  # **b64e** - *encodes a Base65-encoded buffer*
+  # **b64e** - *encodes a buffer as Base64*
   #
   # Base64-encodes the given Buffer or string, returning a string.
   # When a string value is provided, the optional `output_encoding` attribute
@@ -762,7 +762,7 @@ class Util
         buf = new Buffer(buf.toString(),output_encoding)
       return buf.toString('base64')
 
-  # **b64d** - *decodes a Base65-encoded string*
+  # **b64d** - *decodes a Base64-encoded string*
   #
   # Base64-decodes the given Buffer or string, returning a string.
   # The optional `output_encoding` attribute specifies the encoding to use
