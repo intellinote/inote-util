@@ -49,7 +49,7 @@ MOCHA_COV_ARGS  ?= --require $(LIB_COV)/coffee-coverage-init.js --globals "_\$$j
 
 # MARKDOWN #####################################################################
 MARKDOWN_TOC ?= ./node_modules/.bin/toc
-MARKDOWN_SRCS ?= $(shell find . -type f -name '*.md' | grep -v node_modules | grep -v module | grep -v .hold)
+MARKDOWN_SRCS ?= $(shell find . -type f -name '*.md' | grep -v node_modules | grep -v module | grep -v .hold | grep -v "inote-util-v.*")
 MARKDOWN_TOCED ?= ${MARKDOWN_SRCS:.md=.md-toc}
 MARKDOWN_PROCESSOR ?= node -e "var h=require('highlight.js'),m=require('marked'),c='';process.stdin.on('data',function(b){c+=b.toString();});process.stdin.on('end',function(){m.setOptions({gfm:true,highlight:function(x,l){if(l){return h.highlight(l,x).value;}else{return x;}}});console.log(m(c))});process.stdin.resume();"
 MARKDOWN_HTML ?= ${MARKDOWN_TOCED:.md-toc=.html}
