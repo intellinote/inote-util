@@ -8,6 +8,8 @@ meta-information.
 
 Once generated, this directory should contain:
 
+ * Partial [API documentation](./api.html) ([md](./api.md)) (a work in progress).
+
  * Complete [annotated source code](./docco/index.html).
 
  * A [test coverage report](./coverage.html).

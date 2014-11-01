@@ -27,8 +27,8 @@ to the `dependencies` or `devDependencies` part of your `package.json` file.
 
 ## Using
 
-Please see the commented source files in the [`lib` directory](./lib)
-for details.
+Please see [docs/api.md](./docs/api.md) or the commented source files
+in the [`lib` directory](./lib) for details.
 
 If you're viewing a packaged version of this module, you can find an
 HTML rendering of the annotated source code in the
