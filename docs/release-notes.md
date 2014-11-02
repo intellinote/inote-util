@@ -4,7 +4,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
-## Release 0.3.4 - 2 Novemver 2014
+## Release 0.3.5 - 2 Novemver 2014
 
 ### Enhancements
 
