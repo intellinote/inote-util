@@ -4,6 +4,13 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.3.4 - 2 Novemver 2014
+
+### Enhancements
+
+ * Added `Util.remove_falsey`.
+
+ * Added documention.
 
 ## Release 0.3.3 - 20 October 2014
 
