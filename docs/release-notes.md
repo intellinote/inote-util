@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.4.0 - 14 Novemver 2014
+
+### Enhancements
+
+ * Added `arrays_are_equal`, `uniquify`, `object_array_to_map`, `truthy_string` and `falsey_string` to `Util`..
+
 ## Release 0.3.5 - 2 Novemver 2014
 
 ### Enhancements
