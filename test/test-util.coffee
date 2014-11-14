@@ -9,6 +9,71 @@ Util    = require(path.join(LIB_DIR,'util')).Util
 
 describe 'Util',->
 
+  it "can recognize truthy strings",(done)->
+    tests = [
+      [ null,       false ]
+      [ "",         false ]
+      [ " ",        false ]
+      [ true,       true ]
+      [ false,      false ]
+      [ new Date(), false ]
+      [ 1,          true ]
+      [ 0,          false ]
+      [ -1,         false ]
+      [ 2,          false ]
+      [ "true",     true ]
+      [ "TRUE",     true ]
+      [ "tRuE",     true ]
+      [ "t",        true ]
+      [ "T",        true ]
+      [ "Yes",      true ]
+      [ "yes",      true ]
+      [ "y",        true ]
+      [ "Y",        true ]
+      [ "on",       true ]
+      [ "oN",       true ]
+      [ "off",      false ]
+      [ "1",        true ]
+    ]
+    for [value,expected] in tests
+      found = Util.truthy_string(value)
+      found.should.equal expected
+    done()
+
+  it "can recognize falsey strings",(done)->
+    tests = [
+      [ null,       false ]
+      [ "",         false ]
+      [ " ",        false ]
+      [ true,       false ]
+      [ false,      true ]
+      [ new Date(), false ]
+      [ 1,          false ]
+      [ 0,          true ]
+      [ -1,         false ]
+      [ 2,          false ]
+      [ "true",     false ]
+      [ "false",    true ]
+      [ "False",    true ]
+      [ "FALSE",    true ]
+      [ "t",        false ]
+      [ "F",        true ]
+      [ "f",        true ]
+      [ "No" ,      true ]
+      [ "no",       true ]
+      [ "n",        true ]
+      [ "N",        true ]
+      [ "off",      true ]
+      [ "oFF",      true ]
+      [ "on",       false ]
+      [ "1",        false ]
+      [ "0",        true ]
+    ]
+    for [value,expected] in tests
+      found = Util.falsey_string(value)
+      found.should.equal expected
+    done()
+
   it "can trim leading and trailing whitespace from a possibly null string",(done)->
     tests = [
       [ null, null ]
@@ -502,6 +567,84 @@ describe 'Util',->
     finally
       should.exist err
       done()
+
+  it "arrays_are_equal compares arrays as sequences",(done)->
+    for [a,b,result] in [
+      [[1],[1],true]
+      [[1,1],[1,1,1],false]
+      [[1],[2],false]
+      [[1,2],[1,2],true]
+      [[2,1],[1,2],false]
+      [[1,2,2],[1,2,2],true]
+      [[1,null,2],[1,null,2],true]
+    ]
+      Util.arrays_are_equal(a,b).should.equal result
+    done()
+
+  it "object_array_to_map creates a map using the specified key",(done)->
+    for [input,key,options,expected] in [
+      [ [ {a:'X', b:'X'}, {a:'Y',b:'Y'}, {a:'X', b:'Z'} ], 'a', null, { X:{a:'X',b:'Z'}, Y:{a:'Y',b:'Y'} } ]
+      [ [ {a:'X', b:'X'}, {a:'Y',b:'Y'}, {a:'X', b:'Z', c:'C'} ], 'a', {duplicates:'skip'}, { X:{a:'X',b:'X'}, Y:{a:'Y',b:'Y'} } ]
+      [ [ {a:'X', b:'X'}, {a:'Y',b:'Y'}, {a:'X', c:'C'} ], 'a', {duplicates:'merge'}, { X:{a:'X',b:'X',c:'C'}, Y:{a:'Y',b:'Y'} } ]
+      [ [ {a:'X', b:'X'}, {a:'Y',b:'Y'}, {a:'X', c:'C'} ], 'a', {duplicates:'stack'}, { X:[{a:'X',b:'X'},{a:'X',c:'C'}], Y:{a:'Y',b:'Y'} } ]
+      [ [ {a:'X', b:'X'}, {a:'Y',b:'Y'}, {a:'X', c:'C'},  {a:'X', d:'D'} ], 'a', {duplicates:'stack'}, { X:[{a:'X',b:'X'},{a:'X',c:'C'},{a:'X',d:'D'}], Y:{a:'Y',b:'Y'} } ]
+    ]
+      found = Util.object_array_to_map(input,key,options)
+      for k,v of expected
+        if Array.isArray(v)
+          for elt,i in v
+            for k2,v2 of elt
+              found[k][i][k2].should.equal v2
+        else
+          for k2,v2 of v
+            found[k][k2].should.equal v2
+    done()
+
+  it "object_array_to_map throws error on unrecognzied duplicates policy",(done)->
+    try
+      Util.object_array_to_map [{a:'X'}], 'a', duplicates:'foo'
+      "Expected error".should.not.exist
+    catch err
+      done()
+
+  it "arrays_are_equal throws error on non-array parameters",(done)->
+    try
+      Util.arrays_are_equal(2,{foo:'bar'})
+      "Expected error".should.not.exist
+    catch err
+      done()
+
+  it "uniquify strips duplicate values from an array",(done)->
+    for [input,expected] in [
+      [[],[]]
+      [[1],[1]]
+      [[null],[null]]
+      [[null,null],[null]]
+      [[1,1],[1]]
+      [[1,2,2,3,3,3,4,4,4,4],[1,2,3,4]]
+      [[1,2,3,4,2,3,4,3,4,4],[1,2,3,4]]
+      [[1,null,2,3,4,2,null,3,4,3,4,4],[1,null,2,3,4]]
+    ]
+      Util.arrays_are_equal(Util.uniquify(input),expected).should.be.ok
+    done()
+
+  it "uniquify strips duplicate keys from an array of maps",(done)->
+    for [input,expected] in [
+      [[],[]]
+      [[{key:1}],[{key:1}]]
+      [[{key:null}],[{key:null}]]
+      [[{key:null},{key:null}],[{key:null}]]
+      [[{key:1},{key:null}],[{key:1},{key:null}]]
+      [[{key:1},{key:2}],[{key:1},{key:2}]]
+      [[{key:2},{key:1},{key:2}],[{key:2},{key:1}]]
+      [[{key:1},{key:2},{key:1}],[{key:1},{key:2}]]
+      [[{key:1},{key:1}],[{key:1}]]
+      [[{key:1},{key:2},{key:2},{key:3},{key:3},{key:3}],[{key:1},{key:2},{key:3}]]
+    ]
+      console.log input,Util.uniquify(input,'key'),expected
+      get_key = (x)->x?.key
+      Util.arrays_are_equal(Util.uniquify(input,'key').map(get_key),expected.map(get_key)).should.be.ok
+    done()
 
   it "sets_are_equal compares arrays as sets",(done)->
     for [a,b,result] in [
