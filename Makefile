@@ -26,7 +26,7 @@ NPM_ARGS ?= --silent
 PACKAGE_VERSION ?= $(shell $(NODE_EXE) -e "console.log(require('./$(PACKAGE_JSON)').version)")
 PACKAGE_NAME ?= $(shell $(NODE_EXE) -e "console.log(require('./$(PACKAGE_JSON)').name)")
 TMP_PACKAGE_DIR ?= packaging-$(PACKAGE_NAME)-$(PACKAGE_VERSION)-tmp
-PACKAGE_DIR ?= $(PACKAGE_NAME)-$(PACKAGE_VERSION)
+PACKAGE_DIR ?= $(PACKAGE_NAME)-v$(PACKAGE_VERSION)
 TEST_MODULE_INSTALL_DIR ?= ../testing-module-install
 
 # MOCHA ########################################################################
@@ -131,6 +131,8 @@ clean-test-module-install:
 
 clean-module:
 	rm -rf $(MODULE_DIR)
+	rm -rf $(PACKAGE_DIR)
+	rm -rf $(PACKAGE_DIR).tgz
 
 clean-node-modules:
 	$(NPM_EXE) $(NPM_ARGS) prune &
@@ -159,14 +161,13 @@ clean-markdown:
 ################################################################################
 # NPM TARGETS
 
-# TODO - confirm that all JSON files in config directory are valid when packaging
-
 module: js test docs coverage
 	mkdir -p $(MODULE_DIR)
 	cp -r docs $(MODULE_DIR)
+	cp -r config $(MODULE_DIR)
+	rm -rf $(MODULE_DIR)/docs/docco
 	cp -r lib $(MODULE_DIR)
 	cp -r test $(MODULE_DIR)
-	cp -r config $(MODULE_DIR)
 	cp $(PACKAGE_JSON) $(MODULE_DIR)
 	cp Makefile $(MODULE_DIR)
 	cp LICENSE.txt $(MODULE_DIR)
@@ -174,9 +175,11 @@ module: js test docs coverage
 	find module -type f -name "*.md-toc" -exec rm -f {} \;
 	find module -type f -name "*.litcoffee-toc" -exec rm -f {} \;
 	find module -type f -name "*.x" -exec rm -f {} \;
+	mv module $(PACKAGE_DIR)
+	tar -czf $(PACKAGE_DIR).tgz $(PACKAGE_DIR)
 
-test-module-install: clean-test-module-install js test docs coverage module
-	mkdir -p $(TEST_MODULE_INSTALL_DIR); cd $(TEST_MODULE_INSTALL_DIR); npm install "$(CURDIR)/module"; node -e "require('assert').ok(require('inote-util').Util);" && cd $(CURDIR) && rm -rf $(TEST_MODULE_INSTALL_DIR) && echo "\n\nIT WORKED!\n\n"
+test-module-install: clean-test-module-install js test docs coverage module $(PACKAGE_DIR).tgz
+	mkdir -p $(TEST_MODULE_INSTALL_DIR); cd $(TEST_MODULE_INSTALL_DIR); npm install "$(CURDIR)/$(PACKAGE_DIR).tgz"; node -e "require('assert').ok(require('inote-util').Util);" && cd $(CURDIR) && rm -rf $(TEST_MODULE_INSTALL_DIR) && echo "\n\nIT WORKED!\n\n"
 
 $(NODE_MODULES): $(PACKAGE_JSON)
 	$(NPM_EXE) $(NPM_ARGS) prune
