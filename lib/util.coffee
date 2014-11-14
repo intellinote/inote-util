@@ -73,9 +73,15 @@ class Util
     else
       return null
 
-
   # **escape_for_regexp** - *escapes a string for use as literal characters in regular expression.*
   @escape_for_regexp:(str)=>str?.replace(/([.?*+^$[\]\/\\(){}|-])/g, "\\$1")
+
+
+  # Returns true if the given string is `t`, `true`, `y`, `yes`, `on`, `1`, etc.
+  @truthy_string:(s)=>/^((T(rue)?)|(Y(es)?)|(ON)|1)$/i.test("#{s}")
+
+  # Returns true if the given string is `f`, `false`, `no`, `off`, `0`, etc.
+  @falsey_string:(s)=>/^((F(alse)?)|(No?)|(OFF)|0)$/i.test("#{s}")
 
   # ## Padding (of Strings and Arrays)
 
@@ -385,6 +391,73 @@ class Util
         unless e in a
           return false
       return true
+
+  # Returns `true` iff the given arrays contain equal (`===`) elements in the
+  # exact same order.  (Also see `sets_are_equal`).
+  @arrays_are_equal:(a,b)=>
+    unless a? and Array.isArray(a) and b? and Array.isArray(b)
+      throw new Error("Expected arrays.")
+    else
+      unless a.length is b.length
+        return false
+      else
+        for elt,i in a
+          unless elt is b[i]
+            return false
+        return true
+
+  # Returns a clone of `array` with duplicate values removed
+  # When `key` is specified, elements of the array are treated as maps, and the
+  # specified key field is used to test for equality
+  @uniquify:(array,key)=>
+    clone = []
+    if key?
+      keys = []
+      for elt in array
+        unless elt[key] in keys
+          clone.push elt
+          keys.push elt[key]
+    else
+      for elt in array
+        console.log elt
+        unless elt in clone
+          clone.push elt
+          console.log "pushed"
+    return clone
+
+  # Given a list of objects, creates a map from `elt[key_field]` to `elt`.
+  #
+  # The `options` map may contain:
+  #
+  #  * `transform` - a function used to transform the value of
+  #    `elt[key_field]` before using it as the map key.
+  #
+  #  * `duplicates` - a string indicating how to handle duplicate keys:
+  #     * `duplicates="overwrite"` - replace the old value with the new value (the default)
+  #     * `duplicates="stack"` - create an array containing both values (in sequecne)
+  #     * `duplicates="merge"` - merge the objects using `Util.merge(old,new)`
+  #     * `duplicates="skip"` - keep the old value and ignore the new one
+  @object_array_to_map:(array,key_field,options={})=>
+    xform = options?.transform ? ((x)->x)
+    duplicates = options?.duplicates ? "overwrite"
+    unless duplicates in ["overwrite","stack","merge","skip"]
+     throw new Error("Unrecognized value for duplicates option. Found \"#{duplicates}\". Expected \"overwrite\", \"stack\", \"skip\", \"merge\" or null.")
+    map = {}
+    for elt in array
+      key = xform(elt[key_field])
+      if map[key]? and duplicates isnt "overwrite"
+        if duplicates is 'stack'
+          if Array.isArray(map[key])
+            map[key].push elt
+          else
+            map[key] = [map[key],elt]
+        else if duplicates is 'merge'
+          map[key] = @merge(map[key],elt)
+        # else if duplicates is 'skip'
+        #   # do nothing
+      else
+        map[key] = elt
+    return map
 
   # ## Colors
 
