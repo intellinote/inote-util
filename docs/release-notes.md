@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.4.1 - 11 December 2014
+
+### Enhancements
+
+ * `Util.compare` now (a) compares strings using `String.prototype.localeComparer` when available and (b) folds string case together such that `a` sorts before `B` and so on.  (Previously both `['B','a','A','b'].sort()` and `['B','a','A','b'].sort(Util.compare)` yielded `['A','B','a','b']`. Now `['B','a','A','b'].sort(Util.compare)` yields `['A','a','B','b']`.)
+
 ## Release 0.4.0 - 14 Novemver 2014
 
 ### Enhancements

@@ -641,7 +641,7 @@ describe 'Util',->
       [[{key:1},{key:1}],[{key:1}]]
       [[{key:1},{key:2},{key:2},{key:3},{key:3},{key:3}],[{key:1},{key:2},{key:3}]]
     ]
-      console.log input,Util.uniquify(input,'key'),expected
+      # console.log input,Util.uniquify(input,'key'),expected
       get_key = (x)->x?.key
       Util.arrays_are_equal(Util.uniquify(input,'key').map(get_key),expected.map(get_key)).should.be.ok
     done()
@@ -971,6 +971,28 @@ describe 'Util',->
       Util.rgb_to_hex(r).should.equal h
     done()
 
+  it "compare sorts strings smartly", (done)->
+    list = [
+      "Omega"
+      "beta"
+      "Gamma"
+      "Beta"
+      "omega"
+      "alpha"
+      "Alpha"
+      "gamma"
+    ]
+    list = list.sort(Util.compare)
+    list[0].should.equal "Alpha"
+    list[1].should.equal "alpha"
+    list[2].should.equal "Beta"
+    list[3].should.equal "beta"
+    list[4].should.equal "Gamma"
+    list[5].should.equal "gamma"
+    list[6].should.equal "Omega"
+    list[7].should.equal "omega"
+    done()
+
   it "compare compares elements", (done)->
     Util.compare(0,0).should.equal 0
     Util.compare(1,0).should.be.above 0
@@ -982,7 +1004,7 @@ describe 'Util',->
     Util.compare("ABCE","ABCD").should.be.above 0
     Util.compare("ABCD","ABCE").should.be.below 0
     Util.compare("z","A").should.be.above 0
-    Util.compare("Z","a").should.be.below 0
+    Util.compare("Z","a").should.be.above 0
     Util.compare("a","A").should.be.above 0
     Util.compare("A","a").should.be.below 0
     done()

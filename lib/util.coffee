@@ -419,10 +419,8 @@ class Util
           keys.push elt[key]
     else
       for elt in array
-        console.log elt
         unless elt in clone
           clone.push elt
-          console.log "pushed"
     return clone
 
   # Given a list of objects, creates a map from `elt[key_field]` to `elt`.
@@ -634,8 +632,14 @@ class Util
 
   # **compare** - *a basic comparator function*
   #
-  # A basic comparator, using JavaScript's default `<` and `>` operators.
-  # Allows `null` values, which are sorted before any non-null values.
+  # A basic comparator.
+  #
+  # When `a` and `b` are strings, they are compared in a case-folded
+  # sort (`a` before `B`) using `String.prototype.localeCompare`.
+  #
+  # Otherwise JavaScript's default `<` and `>` operators are used.
+  #
+  # This method `null` values, which are sorted before any non-null values.
   #
   # Returns:
   #  - a positive integer when `a > b`, or when `a` is not `null` and `b` is `null`
@@ -643,7 +647,16 @@ class Util
   #  - zero (`0`) otherwise (when `!(a > b) && !(a < b)` or when both `a` and `b` are `null`).
   @compare:(a,b)=>
     if a? and b?
-      return  (if a > b then 1 else (if a < b then -1 else 0))
+      if a.localeCompare? and b.localeCompare? and a.toUpperCase? and b.toUpperCase?
+        A = a.toUpperCase()
+        B = b.toUpperCase()
+        val = A.localeCompare(B)
+        if val is 0
+          return a.localeCompare(b)
+        else
+          return val
+      else
+        return  (if a > b then 1 else (if a < b then -1 else 0))
     else if a? and not b?
       return 1
     else if b? and not a?
