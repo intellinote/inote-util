@@ -213,7 +213,18 @@ class Util
     unless v?
       return false
     else
-      return /^-?[1-9][0-9]*$/.test "#{v}"
+      return /^-?((0)|([1-9][0-9]*))$/.test "#{v}"
+
+  # **to_int** - *returns a valid integer or null*
+  @to_int:(v)=>
+    if v? and Util.is_int(v)
+      v = parseInt(v)
+      if isNaN(v)
+        return null
+      else
+        return v
+    else
+      return null
 
   # ## Objects and Arrays
 
@@ -281,6 +292,28 @@ class Util
   #
   # Given a list (array), returns the sublist defined by `offset` and `limit`.
   @paginate_list:(list,offset=0,limit=20)=>list[offset...(offset+limit)]
+
+  # **remove_null** - *`delete` any attribute whose value evaluates to null*
+  # Returns a new map or array, with `null` values removed.
+  @remove_null:(map)=>
+    unless map?
+      return map
+    else if Array.isArray(map)
+      new_array = []
+      for elt in map
+        if elt?
+          new_array.push elt
+      return new_array
+    else if typeof map is 'object'
+      new_map = {}
+      for n,v of map
+        if v?
+          new_map[n] = v
+      return new_map
+    else unless  map
+      return null
+    else
+      return map
 
   # **remove_falsey** - *`delete` any attribute whose value evaluates to false*
   # Returns a new map or array, with "falsey" values removed.

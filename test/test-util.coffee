@@ -859,6 +859,28 @@ describe 'Util',->
     Util.is_int(-3).should.be.ok
     Util.is_int("3").should.be.ok
     Util.is_int("-3").should.be.ok
+    Util.is_int("0").should.be.ok
+    Util.is_int(0).should.be.ok
+    Util.is_int("-0").should.be.ok
+    done()
+
+  it "to_int converts integers",(done)->
+    should.not.exist Util.to_int(null)
+    should.not.exist Util.to_int("foo")
+    should.not.exist Util.to_int("")
+    should.not.exist Util.to_int("-")
+    should.not.exist Util.to_int("3-5")
+    should.not.exist Util.to_int("-3-5")
+    should.not.exist Util.to_int("-3.5.5")
+    should.not.exist Util.to_int(3.14159)
+    Util.to_int("0").should.equal(0)
+    Util.to_int("-0").should.equal(0)
+    Util.to_int("1").should.equal(1)
+    Util.to_int("2").should.equal(2)
+    Util.to_int(0).should.equal(0)
+    Util.to_int(-0).should.equal(0)
+    Util.to_int(1).should.equal(1)
+    Util.to_int(2).should.equal(2)
     done()
 
   it "escape_for_json escapes a json substring",(done)->
