@@ -4,6 +4,16 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.4.2 - 12 December 2014
+
+### Enhancements
+
+ * Added `Util.remove_null` and `Util.to_int`.
+
+### Bug Fixes
+
+ * Fixed issue with `Util.is_int(0)` returning `false`.
+
 ## Release 0.4.1 - 11 December 2014
 
 ### Enhancements
