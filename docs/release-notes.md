@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.4.3 - 17 December 2014
+
+### Enhancements
+
+ * Added `Util.read_stdin_sync`,  `Util.load_json_file_sync` and `Util.load_json_stdin_sync`.
+
 ## Release 0.4.2 - 12 December 2014
 
 ### Enhancements

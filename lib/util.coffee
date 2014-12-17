@@ -1,6 +1,7 @@
 # <i style="color:#666;font-size:80%">(Note: If you are viewing the [docco](http://jashkenas.github.io/docco/)-generated HTML version of this file, use the "Jump To..." menu in the upper right corner to navigate to the annotated versions of other source files.)</i>
 uuid    = require 'node-uuid'
 crypto  = require 'crypto'
+fs      = require 'fs'
 
 # **Util** - *collects assorted utility functions*
 class Util
@@ -19,11 +20,11 @@ class Util
   # **blank_to_null** - converts blank strings or attribute values to `null`.
   @blank_to_null:(data)=>
     if typeof data is 'string'
-      if Util.is_blank(data)
+      if @is_blank(data)
         return null
     else
       for k,v of data
-        if Util.is_blank(v)
+        if @is_blank(v)
           delete data[k]
           data[k] = undefined
     return data
@@ -217,7 +218,7 @@ class Util
 
   # **to_int** - *returns a valid integer or null*
   @to_int:(v)=>
-    if v? and Util.is_int(v)
+    if v? and @is_int(v)
       v = parseInt(v)
       if isNaN(v)
         return null
@@ -286,7 +287,7 @@ class Util
   #       a = args[0]; b = args[1]; c = args[2]; d = args[3];
   #     }
   #
-  @right_shift_args: (values...)=>@lpad(Util.trim_trailing_null(values),values.length,null)
+  @right_shift_args: (values...)=>@lpad(@trim_trailing_null(values),values.length,null)
 
   # **paginate_list** - *extract a sub-array based on offset and limit*
   #
@@ -574,12 +575,12 @@ class Util
   # **random_hex** - *generate a string of random hexadecimal characters*
   #
   # Generates a string of `count` pseudo-random hexadecimal digits.
-  @random_hex:(count=32)=>Util._random_digits(count,16)
+  @random_hex:(count=32)=>@_random_digits(count,16)
 
   # **random_alphanumeric** - *generate a string of random numbers and letters*
   #
   # Generates a string of `count` pseudo-random characters from the set `[a-z0-9]`.
-  @random_alphanumeric:(count=32)=>Util._random_digits(count,36)
+  @random_alphanumeric:(count=32)=>@_random_digits(count,36)
 
   # **_random_digits** - *generate a string of random bytes in the specfied base number system*
   #
@@ -625,7 +626,7 @@ class Util
   @validate_hashed_password:(expected_digest,password,salt,pepper,hash_type)=>
     [salt,digest] = @hash_password(password,salt,pepper,hash_type)
     password = undefined # forget password when no longer needed
-    return Util.slow_equals(expected_digest,digest)[0]
+    return @slow_equals(expected_digest,digest)[0]
 
   # Hash the given `password`, optionally using the given `salt`.
   # If no `salt` is provided a new random salt will be generated.
@@ -645,7 +646,7 @@ class Util
     password = new Buffer(password) if password? and not Buffer.isBuffer(password)
     pepper = new Buffer(pepper) if pepper? and not Buffer.isBuffer(pepper)
     if typeof salt is 'number'
-      salt = Util.random_bytes(salt,'buffer')
+      salt = @random_bytes(salt,'buffer')
     else unless Buffer.isBuffer(salt)
       salt = new Buffer(salt)
     # validate inputs
@@ -712,9 +713,9 @@ class Util
       B = b.toUpperCase()
     else
       B = b
-    result = Util.compare(A,B)
+    result = @compare(A,B)
     if result is 0
-      result = Util.compare(a,b)
+      result = @compare(a,b)
     return result
 
   # **field_comparator** - *compares objects based on an attribute*
@@ -783,6 +784,47 @@ class Util
           return r
       return 0
 
+  # ## File Utilities
+
+  @read_stdin_sync:(end_byte="\x04",buffer_size=512)->
+    read_buf = new Buffer(buffer_size)
+    bytes_read = 0
+    all_buf = new Buffer(buffer_size)
+    all_bytes_read = 0
+    end_byte_read = false
+    fd = process?.stdin?.fd
+    unless fd?
+      throw new Error("Unable to obtain stdin.fd")
+    else
+      while true
+        try
+          bytes_read = fs.readSync fd, read_buf, 0, buffer_size, null
+          temp_buf = new Buffer(all_bytes_read + bytes_read)
+          all_buf.copy temp_buf, 0, 0, all_bytes_read
+          read_buf.copy temp_buf, all_bytes_read, 0, bytes_read
+          all_buf = temp_buf
+          all_bytes_read += bytes_read
+          for b in bytes_read
+            if b is end_byte
+              end_byte_read = true
+              break
+          if end_byte_read
+            break
+        catch err
+          if err.code is 'EOF'
+            break
+          else
+            throw err
+        if bytes_read is 0
+          break
+      return all_buf
+
+  @load_json_file_sync:(file)->
+    JSON.parse(fs.readFileSync(file).toString())
+
+  @load_json_stdin_sync:(end_byte="\x04",buffer_size=512)=>
+    JSON.parse(@read_stdin_sync(end_byte,buffer_size))
+
   # ## Various Other Utilities
 
   # Identifies the "client IP" for the given request in various circumstances
@@ -845,7 +887,7 @@ class Util
   @uuid:(v,generate=false)=>
     unless v?
       if generate
-        v = Util.uuid(uuid.v1())
+        v = @uuid(uuid.v1())
       else
         return null
     else unless v.replace?
@@ -951,7 +993,7 @@ class Util
     cond = ()-> (i < list.length)
     incr = ()-> i += 1
     act  = (next)-> action(list[i],i,list,next)
-    Util.for_async(init, cond, act, incr, whendone)
+    @for_async(init, cond, act, incr, whendone)
 
   # **procedure** - *generates a new `Sequencer` object, as described below.*
   @procedure:()=>(new Sequencer())
@@ -1072,3 +1114,10 @@ class Sequencer
 
 exports.Util = Util
 exports.Sequencer = Sequencer
+
+# (TESTS FOR STDIN METHODS)
+# if require.main is module
+#   if /^-?-?read(-|_)?stdin$/.test process.argv[2]
+#     console.log Util.read_stdin_sync().toString()
+#   else if /^-?-?read(-|_)?stdin(-|_)?json$/.test process.argv[2]
+#     console.log Util.load_json_stdin_sync()
