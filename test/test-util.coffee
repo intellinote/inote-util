@@ -9,6 +9,23 @@ Util    = require(path.join(LIB_DIR,'util')).Util
 
 describe 'Util',->
 
+  it "can match ISO8601 dates",(done)->
+    Util.iso_8601_regexp().test((new Date()).toISOString()).should.be.ok
+    matches = "2014-12-17T23:55:22.192Z".match Util.iso_8601_regexp()
+    matches[0].should.equal "2014-12-17T23:55:22.192Z" # full string
+    matches[1].should.equal "2014-12-17"               # full date
+    matches[2].should.equal "2014"                     # year
+    matches[3].should.equal "12"                       # month
+    matches[4].should.equal "17"                       # day
+    matches[5].should.equal "23:55:22.192Z"            # full time
+    matches[6].should.equal "23"                       # hours
+    matches[7].should.equal "55"                       # minutes
+    matches[8].should.equal "22.192"                   # seconds.millis
+    matches[9].should.equal "22"                       # seconds (no millis)
+    matches[10].should.equal "192"                     # milliseconds
+    matches[11].should.equal "Z"                       # timezone
+    done()
+
   it "can recognize truthy strings",(done)->
     tests = [
       [ null,       false ]

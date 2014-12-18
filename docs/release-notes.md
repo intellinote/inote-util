@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.4.4 - 17 December 2014
+
+### Enhancements
+
+ * Added `Util.iso_8601_regexp`.
+
 ## Release 0.4.3 - 17 December 2014
 
 ### Enhancements

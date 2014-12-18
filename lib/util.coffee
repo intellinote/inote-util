@@ -8,6 +8,10 @@ class Util
 
   # ## String Manipulation and Formatting
 
+  # **iso_8601_regexp** - *returns a regular expression that can be used to validate an ISO 8601 format date*
+  # Note that currently only the fully-specified datetime format is supported (not dates without times or durations).
+  @iso_8601_regexp:()=>/^((\d{4})-(\d{2})-(\d{2}))T((\d{2})\:(\d{2})\:((\d{2})(?:\.(\d{3}))?)((?:[A-Z]+)|(?:[+-]\d{2}\:\d{2})))$/
+
   # **trim** - *removes leading and trailing whitespace from a (possibly `null`) string.*
   @trim:(str)=>str?.replace /(^\s+)|(\s+$)/ig, ""
 
