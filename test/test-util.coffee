@@ -9,6 +9,43 @@ Util    = require(path.join(LIB_DIR,'util')).Util
 
 describe 'Util',->
 
+  it "smart_join can join arrays in flexible ways",(done)->
+    array = [ "Tom", "Dick", "Harry" ]
+    (Util.smart_join(array)).should.equal "Tom,Dick,Harry"
+    (Util.smart_join(array,{})).should.equal "Tom,Dick,Harry"
+    (Util.smart_join(array, ", ")).should.equal "Tom, Dick, Harry"
+    (Util.smart_join(array, {delimiter:", "})).should.equal "Tom, Dick, Harry"
+    (Util.smart_join(array, ", ", " and ")).should.equal "Tom, Dick and Harry"
+    (Util.smart_join(array, {delimiter:", ",last:" and "})).should.equal "Tom, Dick and Harry"
+    (Util.smart_join(array, {delimiter:", ",first:" and "})).should.equal "Tom and Dick, Harry"
+    (Util.smart_join(array, {delimiter:", ",first:" and ",last:" & "})).should.equal "Tom and Dick & Harry"
+    (Util.smart_join(array, {delimiter:", ",before:"Every ",first:" and ",last:" & ",after:"."})).should.equal "Every Tom and Dick & Harry."
+    done()
+
+  it "smart_join can handle degenerate cases",(done)->
+    options =
+      before: "B"
+      first: "F"
+      delimiter: "D"
+      last: "L"
+      after: "A"
+    tests = [
+      { input:null, expected: null }
+      { input:[], expected: "BA" }
+      { input:[1], expected: "B1A" }
+      { input:[1,2], expected: "B1F2A" }
+      { input:[1,2,3], expected: "B1F2L3A" }
+      { input:[1,2,3,4], expected: "B1F2D3L4A" }
+      { input:[1,2,3,4,5], expected: "B1F2D3D4L5A" }
+    ]
+    for test in tests
+      found = Util.smart_join test.input, options
+      if test.expected?
+        found.should.equal test.expected
+      else
+        should.not.exist found
+    done()
+
   it "can match ISO8601 dates",(done)->
     Util.iso_8601_regexp().test((new Date()).toISOString()).should.be.ok
     matches = "2014-12-17T23:55:22.192Z".match Util.iso_8601_regexp()

@@ -233,6 +233,72 @@ class Util
 
   # ## Objects and Arrays
 
+  # ***smart_join*** - *like `Array.prototype.join` but with an optional final delimiter*
+  #
+  # E.g., `smart_join(["Tom","Dick","Harry"],", "," and ")` yields `Tom, Dick and Harry`.
+  #
+  # Alternatively, the `delimiter` parameter can be a map of options:
+  #
+  #  * `before` - appears before the list
+  #  * `first` - appears between the first and second element
+  #  * `last` - appears between the next-to-last and last element
+  #  * `delimiter` - appears between other elements (if any)
+  #  * `after` - appears after the list
+  #
+  # E.g., given:
+  #
+  #      var options = {
+  #        before: "B",
+  #        first: "F",
+  #        delimiter: "D",
+  #        last: "L",
+  #        after: "A"
+  #      }
+  #
+  # and
+  #
+  #      var a = [1,2,3,4,5]
+  #
+  # then `smart_join(a,options)` yields `"B1F2D3D4L5A"`.
+  @smart_join:(array,delimiter,last)=>
+    unless array?
+      return null
+    else
+      if typeof delimiter is 'object'
+        options = delimiter
+        before = options.before
+        first = options.first
+        delimiter = options.delimiter
+        last = options.last
+        after = options.after
+      if first? and last?
+        [head,middle...,tail] = array
+      else if first? and not last?
+        [head,middle...] = array
+      else if last? and not first?
+        [middle...,tail] = array
+      else
+        middle = array
+      if tail? and middle.length is 0
+        middle = [tail]
+        tail = undefined
+      buffer = []
+      if before?
+        buffer.push before
+      if head?
+        buffer.push head
+        if middle?.length > 0
+          buffer.push first
+      if middle?
+        buffer.push middle.join(delimiter)
+      if tail?
+        if last?
+          buffer.push last
+        buffer.push tail
+      if after?
+        buffer.push after
+      return buffer.join("")
+
   # **trim_trailing_null** - *remove trailing `null` values from an array*
   #
   # Removes any trailing `null` values from the given array.
