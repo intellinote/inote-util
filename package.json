@@ -1,6 +1,6 @@
 {
   "name"        : "inote-util",
-  "version"     : "0.4.4",
+  "version"     : "0.4.5",
   "description" : "A collection of utility functions and classes.",
   "repository"  : { "type": "git", "url": "https://github.com/intellinote/inote-util.git" },
   "bugs"        : { "url": "https://github.com/intellinote/inote-util/issues" },
