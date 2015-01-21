@@ -4,6 +4,10 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.4.7 - 21 January 2015
+
+This release is identical to Version 0.4.6.  I've updated the release number in an attempt to work around an issue with `npm publish`.
+
 ## Release 0.4.6 - 21 January 2015
 
 ### Enhancements
