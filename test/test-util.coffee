@@ -9,6 +9,51 @@ Util    = require(path.join(LIB_DIR,'util')).Util
 
 describe 'Util',->
 
+  it "to_unit uses singular or plural as appropriate",(done)->
+    tests = [
+      [ -3, "singular", "plurals", "-3 plurals" ]
+      [ -1, "singular", "plurals", "-1 singular" ]
+      [ 0, "singular", "plurals", "0 plurals" ]
+      [ 1, "singular", "plurals", "1 singular" ]
+      [ 3, "singular", "plurals", "3 plurals" ]
+      [ -3, "foo", null, "-3 foos" ]
+      [ -1, "foo", null, "-1 foo" ]
+      [ 0, "foo", null, "0 foos" ]
+      [ 1, "foo", null, "1 foo" ]
+      [ 3, "foo", null, "3 foos" ]
+    ]
+    for test in tests
+      found = Util.to_unit(test[0...3]...)
+      found.should.equal test[3]
+    done()
+
+  it "duration can parse a duration in various human-readable forms",(done)->
+    tests = [
+      [ 123, "123m" ]
+      [ 3*1000 + 123, "3s 123m" ]
+      [ 2*60*1000 + 3*1000 + 123, "2m 3s 123m" ]
+      [ 6*60*60*1000 + 2*60*1000 + 3*1000 + 123, "6h 2m 3s 123m" ]
+      [ 5*24*60*60*1000 + 6*60*60*1000 + 2*60*1000 + 3*1000 + 123, "5d 6h 2m 3s 123m" ]
+      [ 3*7*24*60*60*1000 + 5*24*60*60*1000 + 6*60*60*1000 + 2*60*1000 + 3*1000 + 123, "3w 5d 6h 2m 3s 123m" ]
+      [ 9*52*7*24*60*60*1000 + 3*7*24*60*60*1000 + 5*24*60*60*1000 + 6*60*60*1000 + 2*60*1000 + 3*1000 + 123, "9y 3w 5d 6h 2m 3s 123m" ]
+    ]
+    for test in tests
+      found = Util.duration(test[0],0)
+      found.string.brief.short.should.equal test[1]
+    tests = [
+      [ 123, "123 millis" ]
+      [ 3*1000, "3 seconds" ]
+      [ 1*60*1000, "1 minute" ]
+      [ 6*60*60*1000, "6 hours" ]
+      [ 5*24*60*60*1000, "5 days" ]
+      [ 3*7*24*60*60*1000, "3 weeks" ]
+      [ 9*52*7*24*60*60*1000, "9 years" ]
+    ]
+    for test in tests
+      found = Util.duration(test[0],0)
+      found.string.min.long.should.equal test[1]
+    done()
+
   it "smart_join can join arrays in flexible ways",(done)->
     array = [ "Tom", "Dick", "Harry" ]
     (Util.smart_join(array)).should.equal "Tom,Dick,Harry"
