@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.4.6 - 21 January 2015
+
+### Enhancements
+
+ * Added `Util.to_unit` and `Util.duration`.
+
 ## Release 0.4.5 - 18 December 2014
 
 ### Enhancements

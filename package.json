@@ -1,6 +1,6 @@
 {
   "name"        : "inote-util",
-  "version"     : "0.4.5",
+  "version"     : "0.4.6",
   "description" : "A collection of utility functions and classes.",
   "repository"  : { "type": "git", "url": "https://github.com/intellinote/inote-util.git" },
   "bugs"        : { "url": "https://github.com/intellinote/inote-util/issues" },
@@ -22,7 +22,7 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "test":"./node_modules/.bin/mocha -t 12000  -R list --compilers coffee:coffee-script/register ./test/test-*.coffee"
+    "test":"./node_modules/.bin/mocha -t 6000  -R list --compilers coffee:coffee-script/register ./test/test-*.coffee"
   },
   "engines": { "node": ">=0.10"  }
 }
