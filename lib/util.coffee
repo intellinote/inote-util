@@ -3,8 +3,174 @@ uuid    = require 'node-uuid'
 crypto  = require 'crypto'
 fs      = require 'fs'
 
+
 # **Util** - *collects assorted utility functions*
 class Util
+
+  @to_unit:(value,singular,plural)=>
+    unless plural?
+      plural = "#{singular}s"
+    if value is 1 or value is -1
+      return "#{value} #{singular}"
+    else
+      return "#{value} #{plural}"
+
+  @START_TIME: Date.now()
+
+  @duration:(now,start)=>
+    start ?= @START_TIME
+    now ?= Date.now()
+    if start instanceof Date
+      start = start.getTime()
+    if now instanceof Date
+      now = now.getTime()
+    #
+    result       = {}
+    result.begin = start
+    result.end   = now
+    result.delta = now - start
+    #
+    duration                 = result.delta
+    result.in_millis         = {}
+    result.in_millis.millis  = duration % (1000)
+    duration                -= result.in_millis.millis
+    result.in_millis.seconds = duration % (1000 * 60)
+    duration                -= result.in_millis.seconds
+    result.in_millis.minutes = duration % (1000 * 60 * 60)
+    duration                -= result.in_millis.minutes
+    result.in_millis.hours   = duration % (1000 * 60 * 60 * 24)
+    duration                -= result.in_millis.hours
+    result.in_millis.days    = duration % (1000 * 60 * 60 * 24 * 7)
+    duration                -= result.in_millis.days
+    result.in_millis.weeks   = duration % (1000 * 60 * 60 * 24 * 7 * 52)
+    duration                -= result.in_millis.weeks
+    result.in_millis.years   = duration
+    #
+    result.raw         = {}
+    result.raw.millis  = result.in_millis.millis
+    result.raw.seconds = result.in_millis.seconds / (1000)
+    result.raw.minutes = result.in_millis.minutes / (1000 * 60)
+    result.raw.hours   = result.in_millis.hours   / (1000 * 60 * 60)
+    result.raw.days    = result.in_millis.days    / (1000 * 60 * 60 * 24)
+    result.raw.weeks   = result.in_millis.weeks   / (1000 * 60 * 60 * 24 * 7)
+    result.raw.years   = result.in_millis.years   / (1000 * 60 * 60 * 24 * 7 * 52)
+    #
+    result.whole         = {}
+    result.whole.millis  = Math.round(result.raw.millis)
+    result.whole.seconds = Math.round(result.raw.seconds)
+    result.whole.minutes = Math.round(result.raw.minutes)
+    result.whole.hours   = Math.round(result.raw.hours)
+    result.whole.days    = Math.round(result.raw.days)
+    result.whole.weeks   = Math.round(result.raw.weeks)
+    result.whole.years   = Math.round(result.raw.years)
+    #
+    result.array = {}
+    result.array.full = {}
+    result.array.full.values = [
+      result.whole.years
+      result.whole.weeks
+      result.whole.days
+      result.whole.hours
+      result.whole.minutes
+      result.whole.seconds
+      result.whole.millis
+    ]
+    result.array.full.short  = [
+      "#{result.whole.years}y"
+      "#{result.whole.weeks}w"
+      "#{result.whole.days}d"
+      "#{result.whole.hours}h"
+      "#{result.whole.minutes}m"
+      "#{result.whole.seconds}s"
+      "#{result.whole.millis}m"
+    ]
+    result.array.full.long  = [
+      Util.to_unit(result.whole.years,"year")
+      Util.to_unit(result.whole.weeks,"week")
+      Util.to_unit(result.whole.days,"day")
+      Util.to_unit(result.whole.hours,"hour")
+      Util.to_unit(result.whole.minutes,"minute")
+      Util.to_unit(result.whole.seconds,"second")
+      Util.to_unit(result.whole.millis,"milli")
+    ]
+    result.array.full.no_millis = {}
+    result.array.full.no_millis.values = [].concat(result.array.full.values[0...-1])
+    result.array.full.no_millis.short = [].concat(result.array.full.short[0...-1])
+    result.array.full.no_millis.long = [].concat(result.array.full.long[0...-1])
+    #
+    values = [].concat(result.array.full.values)
+    values.shift() while values.length > 0 and values[0] is 0
+    result.array.brief = {}
+    result.array.brief.values = values
+    result.array.brief.short = []
+    result.array.brief.long  = []
+    result.array.brief.no_millis = {}
+    result.array.brief.no_millis.values = values[0...-1]
+    result.array.brief.no_millis.short = []
+    result.array.brief.no_millis.long  = []
+    values = [].concat(values)
+    for unit in [ 'milli','second','minute','hour','day','week','year' ]
+      v = values.pop()
+      if v?
+        result.array.brief.short.unshift "#{v}#{unit.substring(0,1)}"
+        result.array.brief.long.unshift Util.to_unit(v,unit)
+        unless unit is 'milli'
+          result.array.brief.no_millis.short.unshift "#{v}#{unit.substring(0,1)}"
+          result.array.brief.no_millis.long.unshift Util.to_unit(v,unit)
+      else
+        break
+    #
+    result.array.min = {}
+    result.array.min.units = []
+    result.array.min.short = []
+    result.array.min.long  = []
+    result.array.min.no_millis = {}
+    result.array.min.no_millis.units = []
+    result.array.min.no_millis.short = []
+    result.array.min.no_millis.long  = []
+    for unit, i in [ 'year','week','day','hour','minute','second','milli']
+      v = result.array.full.values[i]
+      unless v is 0
+        result.array.min.short.push "#{v}#{unit.substring(0,1)}"
+        result.array.min.long.push Util.to_unit(v,unit)
+        result.array.min.units.push unit
+        unless unit is 'milli'
+          result.array.min.no_millis.short.push "#{v}#{unit.substring(0,1)}"
+          result.array.min.no_millis.long.push Util.to_unit(v,unit)
+          result.array.min.no_millis.units.push unit
+    #
+    result.string = {}
+    result.string.full = {}
+    result.string.full.micro = result.array.full.short.join('')
+    result.string.full.short = result.array.full.short.join(' ')
+    result.string.full.long = result.array.full.long.join(' ')
+    result.string.full.verbose = Util.smart_join(result.array.full.long, ", ", " and ")
+    result.string.full.no_millis = {}
+    result.string.full.no_millis.micro = result.array.full.no_millis.short.join('')
+    result.string.full.no_millis.short = result.array.full.no_millis.short.join(' ')
+    result.string.full.no_millis.long = result.array.full.no_millis.long.join(' ')
+    result.string.full.no_millis.verbose = Util.smart_join(result.array.full.no_millis.long, ", ", " and ")
+    result.string.brief = {}
+    result.string.brief.micro = result.array.brief.short.join('')
+    result.string.brief.short = result.array.brief.short.join(' ')
+    result.string.brief.long = result.array.brief.long.join(' ')
+    result.string.brief.verbose = Util.smart_join(result.array.brief.long, ", ", " and ")
+    result.string.brief.no_millis = {}
+    result.string.brief.no_millis.micro = result.array.brief.no_millis.short.join('')
+    result.string.brief.no_millis.short = result.array.brief.no_millis.short.join(' ')
+    result.string.brief.no_millis.long = result.array.brief.no_millis.long.join(' ')
+    result.string.brief.no_millis.verbose = Util.smart_join(result.array.brief.no_millis.long, ", ", " and ")
+    result.string.min = {}
+    result.string.min.micro = result.array.min.short.join('')
+    result.string.min.short = result.array.min.short.join(' ')
+    result.string.min.long = result.array.min.long.join(' ')
+    result.string.min.verbose = Util.smart_join(result.array.min.long, ", ", " and ")
+    result.string.min.no_millis = {}
+    result.string.min.no_millis.micro = result.array.min.no_millis.short.join('')
+    result.string.min.no_millis.short = result.array.min.no_millis.short.join(' ')
+    result.string.min.no_millis.long = result.array.min.no_millis.long.join(' ')
+    result.string.min.no_millis.verbose = Util.smart_join(result.array.min.no_millis.long, ", ", " and ")
+    return result
 
   # ## String Manipulation and Formatting
 
