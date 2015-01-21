@@ -9,6 +9,13 @@ Util    = require(path.join(LIB_DIR,'util')).Util
 
 describe 'Util',->
 
+
+  it "remove_null ignores non-array, non-map objects",(done)->
+    Util.remove_null("foo").should.equal "foo"
+    Util.remove_null(8).should.equal 8
+    should.not.exist Util.remove_null(null)
+    done()
+
   it "remove_null removes null values from maps",(done)->
     input = {
       foo:null
@@ -1018,6 +1025,7 @@ describe 'Util',->
     Util.to_int(-0).should.equal(0)
     Util.to_int(1).should.equal(1)
     Util.to_int(2).should.equal(2)
+    should.not.exist Util.to_int("xyzzy")
     done()
 
   it "escape_for_json escapes a json substring",(done)->

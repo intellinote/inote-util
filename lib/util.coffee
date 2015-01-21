@@ -534,7 +534,7 @@ class Util
   # Returns a new map or array, with `null` values removed.
   @remove_null:(map)=>
     unless map?
-      return map
+      return null
     else if Array.isArray(map)
       new_array = []
       for elt in map
@@ -547,8 +547,6 @@ class Util
         if v?
           new_map[n] = v
       return new_map
-    else unless  map
-      return null
     else
       return map
 
