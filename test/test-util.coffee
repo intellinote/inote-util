@@ -9,6 +9,35 @@ Util    = require(path.join(LIB_DIR,'util')).Util
 
 describe 'Util',->
 
+  it "remove_null removes null values from maps",(done)->
+    input = {
+      foo:null
+      undef:undefined
+      bar:0
+    }
+    output =  Util.remove_null(input)
+    should.not.exist output.foo
+    should.not.exist output.undef
+    output.bar.should.equal 0
+    done()
+
+  it "remove_null removes null values from arrays",(done)->
+    input = [
+      1
+      null
+      2
+      undefined
+      3
+      0
+    ]
+    output =  Util.remove_null(input)
+    output.length.should.equal 4
+    output[0].should.equal 1
+    output[1].should.equal 2
+    output[2].should.equal 3
+    output[3].should.equal 0
+    done()
+
   it "to_unit uses singular or plural as appropriate",(done)->
     tests = [
       [ -3, "singular", "plurals", "-3 plurals" ]
@@ -25,6 +54,15 @@ describe 'Util',->
     for test in tests
       found = Util.to_unit(test[0...3]...)
       found.should.equal test[3]
+    done()
+
+  it "duration accepts times as Dates or millis",(done)->
+    now = new Date()
+    later = new Date(now.getTime() + 6*60*60*1000 + 2*60*1000 + 3*1000 + 123)
+    Util.duration(later,now).string.brief.short.should.equal "6h 2m 3s 123m"
+    Util.duration(later.getTime(),now).string.brief.short.should.equal "6h 2m 3s 123m"
+    Util.duration(later,now.getTime()).string.brief.short.should.equal "6h 2m 3s 123m"
+    Util.duration(later.getTime(),now.getTime()).string.brief.short.should.equal "6h 2m 3s 123m"
     done()
 
   it "duration can parse a duration in various human-readable forms",(done)->
