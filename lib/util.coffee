@@ -3,9 +3,9 @@ uuid    = require 'node-uuid'
 crypto  = require 'crypto'
 fs      = require 'fs'
 
+################################################################################
 
-# **Util** - *collects assorted utility functions*
-class Util
+class DateUtil
 
   @to_unit:(value,singular,plural)=>
     unless plural?
@@ -15,10 +15,10 @@ class Util
     else
       return "#{value} #{plural}"
 
-  @START_TIME: Date.now()
+  @start_time: Date.now()
 
   @duration:(now,start)=>
-    start ?= @START_TIME
+    start ?= @start_time
     now ?= Date.now()
     if start instanceof Date
       start = start.getTime()
@@ -85,13 +85,13 @@ class Util
       "#{result.whole.millis}m"
     ]
     result.array.full.long  = [
-      Util.to_unit(result.whole.years,"year")
-      Util.to_unit(result.whole.weeks,"week")
-      Util.to_unit(result.whole.days,"day")
-      Util.to_unit(result.whole.hours,"hour")
-      Util.to_unit(result.whole.minutes,"minute")
-      Util.to_unit(result.whole.seconds,"second")
-      Util.to_unit(result.whole.millis,"milli")
+      @to_unit(result.whole.years,"year")
+      @to_unit(result.whole.weeks,"week")
+      @to_unit(result.whole.days,"day")
+      @to_unit(result.whole.hours,"hour")
+      @to_unit(result.whole.minutes,"minute")
+      @to_unit(result.whole.seconds,"second")
+      @to_unit(result.whole.millis,"milli")
     ]
     result.array.full.no_millis = {}
     result.array.full.no_millis.values = [].concat(result.array.full.values[0...-1])
@@ -113,10 +113,10 @@ class Util
       v = values.pop()
       if v?
         result.array.brief.short.unshift "#{v}#{unit.substring(0,1)}"
-        result.array.brief.long.unshift Util.to_unit(v,unit)
+        result.array.brief.long.unshift @to_unit(v,unit)
         unless unit is 'milli'
           result.array.brief.no_millis.short.unshift "#{v}#{unit.substring(0,1)}"
-          result.array.brief.no_millis.long.unshift Util.to_unit(v,unit)
+          result.array.brief.no_millis.long.unshift @to_unit(v,unit)
       else
         break
     #
@@ -132,11 +132,11 @@ class Util
       v = result.array.full.values[i]
       unless v is 0
         result.array.min.short.push "#{v}#{unit.substring(0,1)}"
-        result.array.min.long.push Util.to_unit(v,unit)
+        result.array.min.long.push @to_unit(v,unit)
         result.array.min.units.push unit
         unless unit is 'milli'
           result.array.min.no_millis.short.push "#{v}#{unit.substring(0,1)}"
-          result.array.min.no_millis.long.push Util.to_unit(v,unit)
+          result.array.min.no_millis.long.push @to_unit(v,unit)
           result.array.min.no_millis.units.push unit
     #
     result.string = {}
@@ -144,39 +144,42 @@ class Util
     result.string.full.micro = result.array.full.short.join('')
     result.string.full.short = result.array.full.short.join(' ')
     result.string.full.long = result.array.full.long.join(' ')
-    result.string.full.verbose = Util.smart_join(result.array.full.long, ", ", " and ")
+    result.string.full.verbose = ArrayUtil.smart_join(result.array.full.long, ", ", " and ")
     result.string.full.no_millis = {}
     result.string.full.no_millis.micro = result.array.full.no_millis.short.join('')
     result.string.full.no_millis.short = result.array.full.no_millis.short.join(' ')
     result.string.full.no_millis.long = result.array.full.no_millis.long.join(' ')
-    result.string.full.no_millis.verbose = Util.smart_join(result.array.full.no_millis.long, ", ", " and ")
+    result.string.full.no_millis.verbose = ArrayUtil.smart_join(result.array.full.no_millis.long, ", ", " and ")
     result.string.brief = {}
     result.string.brief.micro = result.array.brief.short.join('')
     result.string.brief.short = result.array.brief.short.join(' ')
     result.string.brief.long = result.array.brief.long.join(' ')
-    result.string.brief.verbose = Util.smart_join(result.array.brief.long, ", ", " and ")
+    result.string.brief.verbose = ArrayUtil.smart_join(result.array.brief.long, ", ", " and ")
     result.string.brief.no_millis = {}
     result.string.brief.no_millis.micro = result.array.brief.no_millis.short.join('')
     result.string.brief.no_millis.short = result.array.brief.no_millis.short.join(' ')
     result.string.brief.no_millis.long = result.array.brief.no_millis.long.join(' ')
-    result.string.brief.no_millis.verbose = Util.smart_join(result.array.brief.no_millis.long, ", ", " and ")
+    result.string.brief.no_millis.verbose = ArrayUtil.smart_join(result.array.brief.no_millis.long, ", ", " and ")
     result.string.min = {}
     result.string.min.micro = result.array.min.short.join('')
     result.string.min.short = result.array.min.short.join(' ')
     result.string.min.long = result.array.min.long.join(' ')
-    result.string.min.verbose = Util.smart_join(result.array.min.long, ", ", " and ")
+    result.string.min.verbose = ArrayUtil.smart_join(result.array.min.long, ", ", " and ")
     result.string.min.no_millis = {}
     result.string.min.no_millis.micro = result.array.min.no_millis.short.join('')
     result.string.min.no_millis.short = result.array.min.no_millis.short.join(' ')
     result.string.min.no_millis.long = result.array.min.no_millis.long.join(' ')
-    result.string.min.no_millis.verbose = Util.smart_join(result.array.min.no_millis.long, ", ", " and ")
+    result.string.min.no_millis.verbose = ArrayUtil.smart_join(result.array.min.no_millis.long, ", ", " and ")
     return result
 
-  # ## String Manipulation and Formatting
 
-  # **iso_8601_regexp** - *returns a regular expression that can be used to validate an ISO 8601 format date*
-  # Note that currently only the fully-specified datetime format is supported (not dates without times or durations).
-  @iso_8601_regexp:()=>/^((\d{4})-(\d{2})-(\d{2}))T((\d{2})\:(\d{2})\:((\d{2})(?:\.(\d{3}))?)((?:[A-Z]+)|(?:[+-]\d{2}\:\d{2})))$/
+  # **iso_8601_regexp** - *returns a regular expression that can be used to validate an iso 8601 format date*
+  # note that currently only the fully-specified datetime format is supported (not dates without times or durations).
+  @iso_8601_regexp:()=>/^((\d{4})-(\d{2})-(\d{2}))T((\d{2})\:(\d{2})\:((\d{2})(?:\.(\d{3}))?)((?:[A-Za-z]+)|(?:[+-]\d{2}\:\d{2})))$/
+
+################################################################################
+
+class StringUtil
 
   # **trim** - *removes leading and trailing whitespace from a (possibly `null`) string.*
   @trim:(str)=>str?.replace /(^\s+)|(\s+$)/ig, ""
@@ -199,15 +202,16 @@ class Util
           data[k] = undefined
     return data
 
+
   # **truncate** - *a minimally "smart" truncation that attempts to truncate a string at a word boundarie*
   #
-  # Truncates `text` to at most `width` characters, appending the specified
-  # `marker` when an actual truncation occurred.  (Pass an empty string--`''`--to
+  # truncates `text` to at most `width` characters, appending the specified
+  # `marker` when an actual truncation occurred.  (pass an empty string--`''`--to
   # prevent a marker from being added to the truncated string.)
   #
-  # The returned string will be *at most* `width` characters wide (including the
+  # the returned string will be *at most* `width` characters wide (including the
   # `marker`), but it may be less if the method can find a more suitable breaking
-  # point near the end of the string.  (Specifically, the algorithm tries to avoid
+  # point near the end of the string.  (specifically, the algorithm tries to avoid
   # truncating a string in the middle of a "word".)
   @truncate:(text,width,marker='…')=>
     if not text? or not text.length? or text.length <= width
@@ -223,6 +227,7 @@ class Util
         else
           short_width--
       return "#{text.substring(0,max_width)}#{marker}"
+
 
   # **escape_for_json** - *escapes a string for use as literal characters in a JSON string.*
   #
@@ -244,17 +249,15 @@ class Util
     else
       return null
 
+
   # **escape_for_regexp** - *escapes a string for use as literal characters in regular expression.*
   @escape_for_regexp:(str)=>str?.replace(/([.?*+^$[\]\/\\(){}|-])/g, "\\$1")
-
 
   # Returns true if the given string is `t`, `true`, `y`, `yes`, `on`, `1`, etc.
   @truthy_string:(s)=>/^((T(rue)?)|(Y(es)?)|(ON)|1)$/i.test("#{s}")
 
   # Returns true if the given string is `f`, `false`, `no`, `off`, `0`, etc.
   @falsey_string:(s)=>/^((F(alse)?)|(No?)|(OFF)|0)$/i.test("#{s}")
-
-  # ## Padding (of Strings and Arrays)
 
   # **lpad** - *left-pad a string or array.*
   #
@@ -265,19 +268,10 @@ class Util
       throw new Error("value must not be null")
     else
       if Array.isArray(value)
-        return @lpad_array(value,width,pad)
+        return Util.lpad_array(value,width,pad)
       else
         return @lpad_string(value,width,pad)
 
-  # **lpad_array** - *left-pad an array.*
-  #
-  # Returns an array of at least `width` elements generated
-  # by prepending the specified `pad_elt` to (a copy of) the
-  # given `value`.
-  @lpad_array:(value=[],width=8,pad_elt=null)=>
-    while value.length < width
-      value = [pad_elt].concat value
-    return value
 
   # **lpad_string** - *left-pad a string.*
   #
@@ -294,6 +288,7 @@ class Util
       value = pad_char + value
     return value
 
+
   # **rpad** - *right-pad a string or array.*
   #
   # When `value` is an array, this method invokes `rpad_array`.
@@ -303,19 +298,9 @@ class Util
       throw new Error("value must not be null")
     else
       if Array.isArray(value)
-        return @rpad_array(value,width,pad)
+        return Util.rpad_array(value,width,pad)
       else
         return @rpad_string(value,width,pad)
-
-  # **rpad_array** - *right-pad an array.*
-  #
-  # Returns an array of at least `width` elements generated
-  # by appending the specified `pad_elt` to (a copy of) the
-  # given `value`.
-  @rpad_array:(value=[],width=8,pad_elt=null)=>
-    while value.length < width
-      value.push pad_elt
-    return value
 
   # **rpad_string** - *right-pad a string.*
   #
@@ -333,71 +318,144 @@ class Util
         value += pad_char
       return value
 
-  # ## Numbers
+################################################################################
 
-  # **round_decimal** - *round a number to the specified precision*
-  #
-  # Formats the given `value` as a decimal string with `digits` signficant
-  # digits to the right of the decimal point.
-  #
-  # For example, given `v = 1234.567` then:
-  #
-  #  - `round_decimal(v,0)` yields `"1235"`
-  #  - `round_decimal(v,1)` yields `"1234.6"`
-  #  - `round_decimal(v,2)` yields `"1234.57"`
-  #  - `round_decimal(v,3)` yields `"1234.567"`
-  #  - `round_decimal(v,4)` yields `"1234.5670"`
-  #  - `round_decimal(v,5)` yields `"1234.56700"`
-  #  - `round_decimal(v,-1)` yields `"1230"`
-  #  - `round_decimal(v,-2)` yields `"1200"`
-  #  - `round_decimal(v,-3)` yields `"1000"`
-  #  - `round_decimal(v,-4)` yields `"0"`
-  #
-  # Returns `null` if `value` is not a number and cannot
-  # be coerced into one.  (Note that this method uses a less
-  # permissive form of coercion that `parseInt` and `parseFloat`.
-  # The input value must be a decimal string in standard (non-scientific)
-  # notation.)
-  @round_decimal:(value,digits=0)=>
-    unless value?
+class MapUtil
+
+  # **remove_null** - *`delete` any attribute whose value evaluates to null*
+  # Returns a new map or array, with `null` values removed.
+  @remove_null:(map)=>
+    unless map?
+      return null
+    else if Array.isArray(map)
+      new_array = []
+      for elt in map
+        if elt?
+          new_array.push elt
+      return new_array
+    else if typeof map is 'object'
+      new_map = {}
+      for n,v of map
+        if v?
+          new_map[n] = v
+      return new_map
+    else
+      return map
+
+  # **remove_falsey** - *`delete` any attribute whose value evaluates to false*
+  # Returns a new map or array, with "falsey" values removed.
+  @remove_falsey:(map)=>
+    unless map?
+      return map
+    else if Array.isArray(map)
+      new_array = []
+      for elt in map
+        if elt
+          new_array.push elt
+      return new_array
+    else if typeof map is 'object'
+      new_map = {}
+      for n,v of map
+        if v
+          new_map[n] = v
+      return new_map
+    else unless  map
       return null
     else
-      unless typeof value is 'number'
-        if /^\s*-?(([0-9]+(\.[0-9]+))|(\.[0-9]+))\s*$/.test "#{value}"
-          value = parseFloat(value)
-        else
-          return null
-      if isNaN(value)
-        return null
-      else if digits >= 0
-        return value.toFixed(digits)
-      else
-        factor = Math.pow(10,Math.abs(digits))
-        return "#{(Math.round(value/factor))*factor}"
+      return map
 
-  # **is_int** - *check if the given object is an (optionally signed) simple integer value*
+  # **merge** - *merge multiple maps into a new, combined map*
   #
-  # Returns `true` if the given value is (or can be converted to) a
-  # valid integer (without any rounding).  E.g., `is_int(3)` and `is_int("3")`
-  # yield `true` but `is_int(3.14159)` and `is_int("3.0")` yield `false`.
-  @is_int:(v)=>
-    unless v?
-      return false
-    else
-      return /^-?((0)|([1-9][0-9]*))$/.test "#{v}"
+  # Given two (or more) maps, `a` and `b`, creates a new map containing the
+  # elements of each. If `a` and `b` share a key, the value in `b` will
+  # overwrite the value in `a`.
+  @merge:(args...)=>
+    map = {}
+    if args.length is 1 and Array.isArray(args[0])
+      args = args[0]
+    for m in args
+      for n,v of m
+        map[n] = v
+    return map
 
-  # **to_int** - *returns a valid integer or null*
-  @to_int:(v)=>
-    if v? and @is_int(v)
-      v = parseInt(v)
-      if isNaN(v)
-        return null
-      else
-        return v
+  # **shallow_clone** - *create a "shallow" copy of an object*
+  #
+  # Creates an independent map with the same keys as `map`.
+  # Any object-valued entry in `map` will *not* be cloned.
+  # The new map will contain a reference to the same underlying object
+  # as the original map.
+  #
+  # If `map` is `null`, the value `null` is returned.
+  @shallow_clone:(map)=>
+    if map?
+      new_map = {}
+      for k,v of map
+        new_map[k] = v
+      return new_map
     else
       return null
 
-  # ## Objects and Arrays
+  # Given a list of objects, creates a map from `elt[key_field]` to `elt`.
+  #
+  # The `options` map may contain:
+  #
+  #  * `transform` - a function used to transform the value of
+  #    `elt[key_field]` before using it as the map key.
+  #
+  #  * `duplicates` - a string indicating how to handle duplicate keys:
+  #     * `duplicates="overwrite"` - replace the old value with the new value (the default)
+  #     * `duplicates="stack"` - create an array containing both values (in sequecne)
+  #     * `duplicates="merge"` - merge the objects using `Util.merge(old,new)`
+  #     * `duplicates="skip"` - keep the old value and ignore the new one
+  @object_array_to_map:(array,key_field,options={})=>
+    xform = options?.transform ? ((x)->x)
+    duplicates = options?.duplicates ? "overwrite"
+    unless duplicates in ["overwrite","stack","merge","skip"]
+     throw new Error("Unrecognized value for duplicates option. Found \"#{duplicates}\". Expected \"overwrite\", \"stack\", \"skip\", \"merge\" or null.")
+    map = {}
+    for elt in array
+      key = xform(elt[key_field])
+      if map[key]? and duplicates isnt "overwrite"
+        if duplicates is 'stack'
+          if Array.isArray(map[key])
+            map[key].push elt
+          else
+            map[key] = [map[key],elt]
+        else if duplicates is 'merge'
+          map[key] = @merge(map[key],elt)
+        # else if duplicates is 'skip'
+        #   # do nothing
+      else
+        map[key] = elt
+    return map
+
+################################################################################
+
+class ArrayUtil
+
+  @lpad:StringUtil.lpad
+
+  # **lpad_array** - *left-pad an array.*
+  #
+  # Returns an array of at least `width` elements generated
+  # by prepending the specified `pad_elt` to (a copy of) the
+  # given `value`.
+  @lpad_array:(value=[],width=8,pad_elt=null)=>
+    while value.length < width
+      value = [pad_elt].concat value
+    return value
+
+  @rpad:StringUtil.rpad
+
+  # **rpad_array** - *right-pad an array.*
+  #
+  # Returns an array of at least `width` elements generated
+  # by appending the specified `pad_elt` to (a copy of) the
+  # given `value`.
+  @rpad_array:(value=[],width=8,pad_elt=null)=>
+    while value.length < width
+      value.push pad_elt
+    return value
 
   # ***smart_join*** - *like `Array.prototype.join` but with an optional final delimiter*
   #
@@ -481,7 +539,6 @@ class Util
         b.unshift v
     return b
 
-
   # **right_shift_args** - *convert trailing `null` values to leading `null` values*
   #
   # Given a list of arguments that might contain trailing `null` values, returns an array
@@ -529,79 +586,6 @@ class Util
   #
   # Given a list (array), returns the sublist defined by `offset` and `limit`.
   @paginate_list:(list,offset=0,limit=20)=>list[offset...(offset+limit)]
-
-  # **remove_null** - *`delete` any attribute whose value evaluates to null*
-  # Returns a new map or array, with `null` values removed.
-  @remove_null:(map)=>
-    unless map?
-      return null
-    else if Array.isArray(map)
-      new_array = []
-      for elt in map
-        if elt?
-          new_array.push elt
-      return new_array
-    else if typeof map is 'object'
-      new_map = {}
-      for n,v of map
-        if v?
-          new_map[n] = v
-      return new_map
-    else
-      return map
-
-  # **remove_falsey** - *`delete` any attribute whose value evaluates to false*
-  # Returns a new map or array, with "falsey" values removed.
-  @remove_falsey:(map)=>
-    unless map?
-      return map
-    else if Array.isArray(map)
-      new_array = []
-      for elt in map
-        if elt
-          new_array.push elt
-      return new_array
-    else if typeof map is 'object'
-      new_map = {}
-      for n,v of map
-        if v
-          new_map[n] = v
-      return new_map
-    else unless  map
-      return null
-    else
-      return map
-
-  # **merge** - *merge multiple maps into a new, combined map*
-  #
-  # Given two (or more) maps, `a` and `b`, creates a new map containing the
-  # elements of each. If `a` and `b` share a key, the value in `b` will
-  # overwrite the value in `a`.
-  @merge:(args...)=>
-    map = {}
-    if args.length is 1 and Array.isArray(args[0])
-      args = args[0]
-    for m in args
-      for n,v of m
-        map[n] = v
-    return map
-
-  # **shallow_clone** - *create a "shallow" copy of an object*
-  #
-  # Creates an independent map with the same keys as `map`.
-  # Any object-valued entry in `map` will *not* be cloned.
-  # The new map will contain a reference to the same underlying object
-  # as the original map.
-  #
-  # If `map` is `null`, the value `null` is returned.
-  @shallow_clone:(map)=>
-    if map?
-      new_map = {}
-      for k,v of map
-        new_map[k] = v
-      return new_map
-    else
-      return null
 
   # **subset_of** - *check whether on array contains another arrays as if they are sets *
   #
@@ -691,41 +675,75 @@ class Util
           clone.push elt
     return clone
 
-  # Given a list of objects, creates a map from `elt[key_field]` to `elt`.
-  #
-  # The `options` map may contain:
-  #
-  #  * `transform` - a function used to transform the value of
-  #    `elt[key_field]` before using it as the map key.
-  #
-  #  * `duplicates` - a string indicating how to handle duplicate keys:
-  #     * `duplicates="overwrite"` - replace the old value with the new value (the default)
-  #     * `duplicates="stack"` - create an array containing both values (in sequecne)
-  #     * `duplicates="merge"` - merge the objects using `Util.merge(old,new)`
-  #     * `duplicates="skip"` - keep the old value and ignore the new one
-  @object_array_to_map:(array,key_field,options={})=>
-    xform = options?.transform ? ((x)->x)
-    duplicates = options?.duplicates ? "overwrite"
-    unless duplicates in ["overwrite","stack","merge","skip"]
-     throw new Error("Unrecognized value for duplicates option. Found \"#{duplicates}\". Expected \"overwrite\", \"stack\", \"skip\", \"merge\" or null.")
-    map = {}
-    for elt in array
-      key = xform(elt[key_field])
-      if map[key]? and duplicates isnt "overwrite"
-        if duplicates is 'stack'
-          if Array.isArray(map[key])
-            map[key].push elt
-          else
-            map[key] = [map[key],elt]
-        else if duplicates is 'merge'
-          map[key] = @merge(map[key],elt)
-        # else if duplicates is 'skip'
-        #   # do nothing
-      else
-        map[key] = elt
-    return map
+################################################################################
 
-  # ## Colors
+class NumberUtil
+
+  # **round_decimal** - *round a number to the specified precision*
+  #
+  # Formats the given `value` as a decimal string with `digits` signficant
+  # digits to the right of the decimal point.
+  #
+  # For example, given `v = 1234.567` then:
+  #
+  #  - `round_decimal(v,0)` yields `"1235"`
+  #  - `round_decimal(v,1)` yields `"1234.6"`
+  #  - `round_decimal(v,2)` yields `"1234.57"`
+  #  - `round_decimal(v,3)` yields `"1234.567"`
+  #  - `round_decimal(v,4)` yields `"1234.5670"`
+  #  - `round_decimal(v,5)` yields `"1234.56700"`
+  #  - `round_decimal(v,-1)` yields `"1230"`
+  #  - `round_decimal(v,-2)` yields `"1200"`
+  #  - `round_decimal(v,-3)` yields `"1000"`
+  #  - `round_decimal(v,-4)` yields `"0"`
+  #
+  # Returns `null` if `value` is not a number and cannot
+  # be coerced into one.  (Note that this method uses a less
+  # permissive form of coercion that `parseInt` and `parseFloat`.
+  # The input value must be a decimal string in standard (non-scientific)
+  # notation.)
+  @round_decimal:(value,digits=0)=>
+    unless value?
+      return null
+    else
+      unless typeof value is 'number'
+        if /^\s*-?(([0-9]+(\.[0-9]+))|(\.[0-9]+))\s*$/.test "#{value}"
+          value = parseFloat(value)
+        else
+          return null
+      if isNaN(value)
+        return null
+      else if digits >= 0
+        return value.toFixed(digits)
+      else
+        factor = Math.pow(10,Math.abs(digits))
+        return "#{(Math.round(value/factor))*factor}"
+
+  # **is_int** - *check if the given object is an (optionally signed) simple integer value*
+  #
+  # Returns `true` if the given value is (or can be converted to) a
+  # valid integer (without any rounding).  E.g., `is_int(3)` and `is_int("3")`
+  # yield `true` but `is_int(3.14159)` and `is_int("3.0")` yield `false`.
+  @is_int:(v)=>
+    unless v?
+      return false
+    else
+      return /^-?((0)|([1-9][0-9]*))$/.test "#{v}"
+
+  # **to_int** - *returns a valid integer or null*
+  @to_int:(v)=>
+    if v? and @is_int(v)
+      v = parseInt(v)
+      if isNaN(v)
+        return null
+      else
+        return v
+    else
+      return null
+
+################################################################################
+
+class ColorUtil
 
   # **hex_to_rgb_triplet** - *convert a hex-based `#rrggbb` string to decimal `[r,g,b]` values*
   #
@@ -757,7 +775,6 @@ class Util
     else
       return null
 
-
   # **rgb_string_to_triplet** - *extract the `[r,g,b]` values from an `rgb(r,g,b)` string*
   @rgb_string_to_triplet:(rgb)=>
     result = /^\s*rgb\s*\(\s*([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\s*\)\s*$/i.exec(rgb)
@@ -784,7 +801,9 @@ class Util
         return if h.length is 1 then "0#{h}" else h
       return "##{i2h(r)}#{i2h(g)}#{i2h(b)}"
 
-  # ## Random Bytes and Strings
+################################################################################
+
+class RandomUtil
 
   # **random_bytes** - *generate a string of random bytes*
   #
@@ -827,7 +846,56 @@ class Util
       str = str.substring(0,count)
     return str
 
-  # ## Comparators and Sorting
+################################################################################
+
+class PasswordUtil
+
+  # Compare the `expected_digest` with the hash computed from the remaining
+  # parameters.
+  @validate_hashed_password:(expected_digest,password,salt,pepper,hash_type)=>
+    [salt,digest] = @hash_password(password,salt,pepper,hash_type)
+    password = undefined # forget password when no longer needed
+    return Util.slow_equals(expected_digest,digest)[0]
+
+  # Hash the given `password`, optionally using the given `salt`.
+  # If no `salt` is provided a new random salt will be generated.
+  # Returns `[salt,digest]`.
+  # options := { password, salt, pepper, hash_type }
+  @hash_password:(password,salt,pepper,hash_type)=>
+    # parse input parameters
+    if typeof password is 'object'
+      hash_type = password.hash_type
+      pepper = password.pepper
+      salt = password.salt
+      password = password.password
+    # set defaults
+    hash_type ?= 'sha512'
+    salt ?= 64
+    # convert types
+    password = new Buffer(password) if password? and not Buffer.isBuffer(password)
+    pepper = new Buffer(pepper) if pepper? and not Buffer.isBuffer(pepper)
+    if typeof salt is 'number'
+      salt = RandomUtil.random_bytes(salt,'buffer')
+    else unless Buffer.isBuffer(salt)
+      salt = new Buffer(salt)
+    # validate inputs
+    if not password?
+      throw new Error("password parameter is required")
+    else
+      # calculate hash
+      hash = crypto.createHash(hash_type)
+      hash.update salt
+      if pepper?
+        hash.update pepper
+      hash.update password
+      password = undefined # forget password when no longer needed
+      digest = hash.digest()
+      # return generated salt and calculated hash
+      return [salt,digest]
+
+################################################################################
+
+class ComparatorUtil
 
   # **slow_equals** - *constant-time comparison of two buffers for equality*
   # Performs a byte by byte comparision of the given buffers
@@ -855,48 +923,6 @@ class Util
     else
       return [false,same_count,delta_count]
 
-  # Compare the `expected_digest` with the hash computed from the remaining
-  # parameters.
-  @validate_hashed_password:(expected_digest,password,salt,pepper,hash_type)=>
-    [salt,digest] = @hash_password(password,salt,pepper,hash_type)
-    password = undefined # forget password when no longer needed
-    return @slow_equals(expected_digest,digest)[0]
-
-  # Hash the given `password`, optionally using the given `salt`.
-  # If no `salt` is provided a new random salt will be generated.
-  # Returns `[salt,digest]`.
-  # options := { password, salt, pepper, hash_type }
-  @hash_password:(password,salt,pepper,hash_type)=>
-    # parse input parameters
-    if typeof password is 'object'
-      hash_type = password.hash_type
-      pepper = password.pepper
-      salt = password.salt
-      password = password.password
-    # set defaults
-    hash_type ?= 'sha512'
-    salt ?= 64
-    # convert types
-    password = new Buffer(password) if password? and not Buffer.isBuffer(password)
-    pepper = new Buffer(pepper) if pepper? and not Buffer.isBuffer(pepper)
-    if typeof salt is 'number'
-      salt = @random_bytes(salt,'buffer')
-    else unless Buffer.isBuffer(salt)
-      salt = new Buffer(salt)
-    # validate inputs
-    if not password?
-      throw new Error("password parameter is required")
-    else
-      # calculate hash
-      hash = crypto.createHash(hash_type)
-      hash.update salt
-      if pepper?
-        hash.update pepper
-      hash.update password
-      password = undefined # forget password when no longer needed
-      digest = hash.digest()
-      # return generated salt and calculated hash
-      return [salt,digest]
 
   # **compare** - *a basic comparator function*
   #
@@ -1018,7 +1044,9 @@ class Util
           return r
       return 0
 
-  # ## File Utilities
+################################################################################
+
+class FileUtil
 
   @read_stdin_sync:(end_byte="\x04",buffer_size=512)->
     read_buf = new Buffer(buffer_size)
@@ -1059,8 +1087,9 @@ class Util
   @load_json_stdin_sync:(end_byte="\x04",buffer_size=512)=>
     JSON.parse(@read_stdin_sync(end_byte,buffer_size))
 
-  # ## Various Other Utilities
+################################################################################
 
+class WebUtil
   # Identifies the "client IP" for the given request in various circumstances
   @remote_ip:(req)=>
     req?.get?('x-forwarded-for') ?
@@ -1068,6 +1097,10 @@ class Util
     req?.connection?.remoteAddress ?
     req?.socket?.remoteAddress ?
     req?.connection?.socket?.remoteAddress
+
+################################################################################
+
+class ErrorUtil
 
   # **handle_error** - *invoke a callback on error*
   #
@@ -1111,6 +1144,10 @@ class Util
     else
       return false
 
+################################################################################
+
+class IdUtil
+
   # **uuid** - *normalize or generate a UUID value*
   #
   # When a UUID value `v` is provided, a normalized value is returned (downcased and
@@ -1144,12 +1181,16 @@ class Util
     else
       return null
 
+################################################################################
+
+class Base64
+
   # **b64e** - *encodes a buffer as Base64*
   #
   # Base64-encodes the given Buffer or string, returning a string.
   # When a string value is provided, the optional `output_encoding` attribute
   # specifies the encoding to use when converting characters to bytes.
-  @b64e:(buf,output_encoding='utf8')=>
+  @encode:(buf,output_encoding='utf8')=>
     if not buf?
       return null
     else
@@ -1162,13 +1203,17 @@ class Util
   # Base64-decodes the given Buffer or string, returning a string.
   # The optional `output_encoding` attribute specifies the encoding to use
   # when converting bytes to characters.
-  @b64d:(buf,output_encoding='utf8')=>
+  @decode:(buf,output_encoding='utf8')=>
     if not buf?
       return null
     else
       unless buf instanceof Buffer
         buf = new Buffer(buf.toString(),'base64')
       return buf.toString(output_encoding)
+
+################################################################################
+
+class AsyncUtil
 
   # **for_async** - *executes an asynchronous `for` loop.*
   #
@@ -1191,7 +1236,7 @@ class Util
   #     actn = function(next) { console.log(i); next(); }
   #     incr = function() { i = i + 1; }
   #     done = function() { }
-    #     for_async(init,cond,actn,incr,done)
+  #     for_async(init,cond,actn,incr,done)
   #
   @for_async:(initialize,condition,action,increment,whendone)=>
     looper = ()->
@@ -1230,7 +1275,10 @@ class Util
     @for_async(init, cond, act, incr, whendone)
 
   # **procedure** - *generates a new `Sequencer` object, as described below.*
+
   @procedure:()=>(new Sequencer())
+
+################################################################################
 
 # **Sequencer** - *a simple asynchronous-method-chaining utility*
 #
@@ -1342,12 +1390,111 @@ class Sequencer
   #
 
 
-# ## Exports
+# **Util** - *collects assorted utility functions*
+class Util
 
-# The `Util` and `Sequencer` types are exported by this module.
+  @to_unit:               DateUtil.to_unit
+  @start_time:            DateUtil.start_time
+  @duration:              DateUtil.duration
+  @iso_8601_regexp:       DateUtil.iso_8601_regexp
 
-exports.Util = Util
+  @trim:                  StringUtil.trim
+  @isnt_blank:            StringUtil.isnt_blank
+  @is_blank:              StringUtil.is_blank
+  @blank_to_null:         StringUtil.blank_to_null
+  @truncate:              StringUtil.truncate
+  @escape_for_json:       StringUtil.escape_for_json
+  @escape_for_regexp:     StringUtil.escape_for_regexp
+  @truthy_string:         StringUtil.truthy_string
+  @falsey_string:         StringUtil.falsey_string
+  @lpad:                  StringUtil.lpad
+  @lpad_string:           StringUtil.lpad_string
+  @rpad:                  StringUtil.rpad
+  @rpad_string:           StringUtil.rpad_string
+
+  @lpad_array:            ArrayUtil.lpad_array
+  @rpad_array:            ArrayUtil.rpad_array
+  @smart_join:            ArrayUtil.smart_join
+  @trim_trailing_null:    ArrayUtil.trim_trailing_null
+  @right_shift_args:      ArrayUtil.right_shift_args
+  @paginate_list:         ArrayUtil.paginate_list
+  @subset_of:             ArrayUtil.subset_of
+  @is_subset_of:          ArrayUtil.is_subset_of
+  @strict_subset_of:      ArrayUtil.strict_subset_of
+  @is_strict_subset_of:   ArrayUtil.is_strict_subset_of
+  @sets_are_equal:        ArrayUtil.sets_are_equal
+  @arrays_are_equal:      ArrayUtil.arrays_are_equal
+  @uniquify:              ArrayUtil.uniquify
+
+  @round_decimal:         NumberUtil.round_decimal
+  @is_int:                NumberUtil.is_int
+  @to_int:                NumberUtil.to_int
+
+  @remove_null:           MapUtil.remove_null
+  @remove_falsey:         MapUtil.remove_falsey
+  @merge:                 MapUtil.merge
+  @shallow_clone:         MapUtil.shallow_clone
+  @object_array_to_map:   MapUtil.object_array_to_map
+
+  @hex_to_rgb_triplet:    ColorUtil.hex_to_rgb_triplet
+  @hex_to_rgb_string:     ColorUtil.hex_to_rgb_string
+  @rgb_string_to_triplet: ColorUtil.rgb_string_to_triplet
+  @rgb_to_hex:            ColorUtil.rgb_to_hex
+
+  @random_bytes:          RandomUtil.random_bytes
+  @random_hex:            RandomUtil.random_hex
+  @random_alphanumeric:   RandomUtil.random_alphanumeric
+
+  @validate_hashed_password:PasswordUtil.validate_hashed_password
+  @hash_password:PasswordUtil.hash_password
+
+  @slow_equals:ComparatorUtil.slow_equals
+  @compare:ComparatorUtil.compare
+  @case_insensitive_compare:ComparatorUtil.case_insensitive_compare
+  @field_comparator:ComparatorUtil.field_comparator
+  @path_comparator:ComparatorUtil.path_comparator
+  @desc_comparator:ComparatorUtil.desc_comparator
+  @descending_comparator:ComparatorUtil.descending_comparator
+  @composite_comparator:ComparatorUtil.composite_comparator
+
+  @read_stdin_sync:FileUtil.read_stdin_sync
+  @load_json_file_sync:FileUtil.load_json_file_sync
+  @load_json_stdin_sync:FileUtil.load_json_stdin_sync
+
+  @remote_ip:WebUtil.remote_ip
+
+  @handle_error:ErrorUtil.handle_error
+
+  @uuid:IdUtil.uuid
+  @pad_uuid:IdUtil.pad_uuid
+  @b64e:Base64.encode
+  @b64d:Base64.decode
+
+  @for_async:AsyncUtil.for_async
+  @for_each_async:AsyncUtil.for_each_async
+  @procedure:AsyncUtil.procedure
+
+################################################################################
+
+exports.ArrayUtil = ArrayUtil
+exports.AsyncUtil = AsyncUtil
+exports.Base65 = Base64
+exports.ColorUtil = ColorUtil
+exports.ComparatorUtil = ComparatorUtil
+exports.DateUtil = DateUtil
+exports.ErrorUtil = ErrorUtil
+exports.FileUtil = FileUtil
+exports.IdUtil = IdUtil
+exports.MapUtil = MapUtil
+exports.NumberUtil = NumberUtil
+exports.PasswordUtil = PasswordUtil
+exports.RandomUtil = RandomUtil
 exports.Sequencer = Sequencer
+exports.StringUtil = StringUtil
+exports.Util = Util
+exports.WebUtil = WebUtil
+
+################################################################################
 
 # (TESTS FOR STDIN METHODS)
 # if require.main is module
