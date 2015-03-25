@@ -25,15 +25,6 @@ and you can add it to your project as a dependency by adding a line like:
 
 to the `dependencies` or `devDependencies` part of your `package.json` file.
 
-## Using
-
-Please see [docs/api.md](./docs/api.md) or the commented source files
-in the [`lib` directory](./lib) for details.
-
-If you're viewing a packaged version of this module, you can find an
-HTML rendering of the annotated source code in the
-[`docs` directory](/docs/docco/index.html).
-
 ## Licensing
 
 The inote-util library and related documentation are made available
