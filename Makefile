@@ -163,18 +163,10 @@ clean-markdown:
 
 module: js test docs coverage
 	mkdir -p $(MODULE_DIR)
-	cp -r docs $(MODULE_DIR)
-	cp -r config $(MODULE_DIR)
-	rm -rf $(MODULE_DIR)/docs/docco
 	cp -r lib $(MODULE_DIR)
-	cp -r test $(MODULE_DIR)
 	cp $(PACKAGE_JSON) $(MODULE_DIR)
-	cp Makefile $(MODULE_DIR)
 	cp LICENSE.txt $(MODULE_DIR)
 	cp README.md $(MODULE_DIR)
-	find module -type f -name "*.md-toc" -exec rm -f {} \;
-	find module -type f -name "*.litcoffee-toc" -exec rm -f {} \;
-	find module -type f -name "*.x" -exec rm -f {} \;
 	mv module $(PACKAGE_DIR)
 	tar -czf $(PACKAGE_DIR).tgz $(PACKAGE_DIR)
 
@@ -205,7 +197,7 @@ $(COFFEE_JS_OBJ): $(NODE_MODULES) $(COFFEE_SRCS) $(COFFEE_TEST_SRCS)
 ################################################################################
 # TEST TARGETS
 
-test: $(MOCHA_TESTS) $(NODE_MODULES)
+test: js $(MOCHA_TESTS) $(NODE_MODULES)
 	$(MOCHA_EXE) $(MOCHA_TEST_ARGS) ${MOCHA_EXTRA_ARGS} $(MOCHA_TESTS)
 
 test-watch: $(MOCHA_TESTS) $(NODE_MODULES)
