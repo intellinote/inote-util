@@ -7,6 +7,59 @@ fs      = require 'fs'
 
 class DateUtil
 
+  @DAY_OF_WEEK = [
+    "Sunday"
+    "Monday"
+    "Tuesday"
+    "Wednesday"
+    "Thursday"
+    "Friday"
+    "Saturday"
+  ]
+
+  @MONTH = [
+    "January"
+    "February"
+    "March"
+    "April"
+    "May"
+    "June"
+    "July"
+    "August"
+    "September"
+    "November"
+    "December"
+  ]
+
+  @format_datetime_long:(dt = new Date())=>
+    if typeof dt is 'string'
+      try
+        dt = new Date(dt)
+      catch e
+        return null
+    return "#{@format_date_long(dt)} at #{@format_time_long(dt)}"
+
+  @format_time_long:(dt = new Date)=>
+    hours = dt.getUTCHours() % 12
+    if hours == 0
+      hours = 12
+    minutes = dt.getUTCMinutes()
+    if minutes < 10
+      minutes = "0#{minutes}"
+    if dt.getUTCHours() > 12
+      ampm = "PM"
+    else
+      ampm = "AM"
+    return "#{hours}:#{minutes} #{ampm} GMT"
+
+  @format_date_long:(dt = new Date())=>
+    if typeof dt is 'string'
+      try
+        dt = new Date(dt)
+      catch e
+        return null
+    return "#{@DAY_OF_WEEK[dt.getUTCDay()]} #{dt.getUTCDate()} #{@MONTH[dt.getUTCMonth()]} #{dt.getUTCFullYear()}"
+
   @to_unit:(value,singular,plural)=>
     unless plural?
       plural = "#{singular}s"
