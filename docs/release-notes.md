@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.5.2 - 25 March 2015
+
+### Enhancements
+
+ * Added `DateUtil.format_datetime_long`, `DateUtil.format_date_long` and `DateUtil.format_time_long`.
+
 ## Release 0.5.1 - 25 March 2015
 
 `Util` methods divided into distinct categories (`DateUtil`, `StringUtil`, etc.).
