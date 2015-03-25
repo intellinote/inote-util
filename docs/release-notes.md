@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.5.1 - 25 March 2015
+
+`Util` methods divided into distinct categories (`DateUtil`, `StringUtil`, etc.).
+
+(For now) the original `Util` methods still exist, as aliases the equivalent method in the new type.
+
 ## Release 0.4.7 - 21 January 2015
 
 This release is identical to Version 0.4.6.  I've updated the release number in an attempt to work around an issue with `npm publish`.
