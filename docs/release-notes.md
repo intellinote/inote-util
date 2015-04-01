@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.5.4 - 1 April 2015
+
+### Enhancements
+
+ * Check for `null` in `FileUtil.rm`, `FileUtil.rmdir` and `File.mkdir` and do nothing when found.
+
 ## Release 0.5.3 - 1 April 2015
 
 ### Enhancements

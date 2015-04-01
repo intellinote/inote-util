@@ -1146,29 +1146,32 @@ class FileUtil
   # Attempts to recursively create the specified directory, ignoring errors.
   # Set `NODE_DEBUG=inote-util` to view errors.
   @mkdir:(dir)=>
-    try
-      mkdirp.sync(dir)
-    catch e
-      if DEBUG
-        console.error "FileUtil.mkdir",e
+    if dir?
+      try
+        mkdirp.sync(dir)
+      catch e
+        if DEBUG
+          console.error "FileUtil.mkdir",e
 
   # Attempts to remove the specified file, ignoring errors.
   # Set `NODE_DEBUG=inote-util` to view errors.
   @rm:(f)=>
-    try
-      fs.unlinkSync(file)
-    catch e
-      if DEBUG
-        console.error "FileUtil.rm",e
+    if f?
+      try
+        fs.unlinkSync(file)
+      catch e
+        if DEBUG
+          console.error "FileUtil.rm",e
 
   # Attempts to (recursively) remove the specified directory or file, ignoring errors.
   # Set `NODE_DEBUG=inote-util` to view errors.
   @rmdir:(dir)=>
-    try
-      remove.removeSync(dir)
-    catch e
-      if DEBUG
-        console.error "FileUtil.rmdir",e
+    if dir?
+      try
+        remove.removeSync(dir)
+      catch e
+        if DEBUG
+          console.error "FileUtil.rmdir",e
 
   @read_stdin_sync:(end_byte="\x04",buffer_size=512)->
     read_buf = new Buffer(buffer_size)
