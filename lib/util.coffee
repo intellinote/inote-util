@@ -1,9 +1,16 @@
-# <i style="color:#666;font-size:80%">(Note: If you are viewing the [docco](http://jashkenas.github.io/docco/)-generated HTML version of this file, use the "Jump To..." menu in the upper right corner to navigate to the annotated versions of other source files.)</i>
-uuid    = require 'node-uuid'
-crypto  = require 'crypto'
-fs      = require 'fs'
-
+uuid   = require 'node-uuid'
+crypto = require 'crypto'
+fs     = require 'fs'
+path   = require 'path'
+mkdirp = require 'mkdirp'
+remove = require 'remove'
+DEBUG  = (/(^|,)inote-?util($|,)/i.test process?.env?.NODE_DEBUG) or (/(^|,)Util($|,)/.test process?.env?.NODE_DEBUG)
 ################################################################################
+
+class LogUtil
+  @_fdt:(d)=>"[#{(d ? new Date()).toISOString()}]"
+  @tlog:(args...)=>console.log @_fdt(),args...
+  @terr:(args...)=>console.error @_fdt(),args...
 
 class DateUtil
 
@@ -1101,6 +1108,68 @@ class ComparatorUtil
 
 class FileUtil
 
+  # Replaces invalid characters from and truncates very long filenames.
+  # This method will accept (and return) a full path but will only operate on the "basename".
+  @sanitize_filename:(str)=>
+    BAD_CHARS = /[^-A-Za-z0-9_]/g
+    SUBST_CHAR = '-'
+    MAX_EXTENSION = 260
+    MAX_BASENAME  = 260
+    parent = path.dirname(str) ? ''
+    ext = path.extname(str) ? ''
+    base = path.basename(str,ext) ? ''
+    if /^\..+/.test ext
+      ext = "."+ext.substring(1).replace(BAD_CHARS,SUBST_CHAR)
+    if ext?.length > MAX_EXTENSION
+      ext = ext.substring(0,MAX_EXTENSION)
+    base = base.replace(BAD_CHARS,SUBST_CHAR)
+    if base?.length > MAX_BASENAME
+      base = base.substring(0,MAX_BASENAME)
+    if parent?.length > 0
+      return path.join(parent,"#{base}#{ext}")
+    else
+      return "#{base}#{ext}"
+
+  @uniquify_filename:(dir,basename,ext='',minpadwidth=3,maxpadwidth=5)=>
+    max_attempts = Math.pow(10,maxpadwidth)
+    unless fs.existsSync(path.join(dir,"#{basename}#{ext}"))
+      return "#{basename}#{ext}"
+    else
+      i = 1
+      while fs.existsSync(path.join(dir,"#{basename}-#{Util.lpad(i,minpadwidth,'0')}#{ext}"))
+        if i > max_attempts
+          throw new Error("Unable to obtain a unique filename for \"#{basename}#{ext}\" in \"#{dir}\" after #{max_attempts} attempts.")
+        else
+          i += 1
+      return "#{basename}-#{Util.lpad(i,minpadwidth,'0')}#{ext}"
+
+  # Attempts to recursively create the specified directory, ignoring errors.
+  # Set `NODE_DEBUG=inote-util` to view errors.
+  @mkdir:(dir)=>
+    try
+      mkdirp.sync(dir)
+    catch e
+      if DEBUG
+        console.error "FileUtil.mkdir",e
+
+  # Attempts to remove the specified file, ignoring errors.
+  # Set `NODE_DEBUG=inote-util` to view errors.
+  @rm:(f)=>
+    try
+      fs.unlinkSync(file)
+    catch e
+      if DEBUG
+        console.error "FileUtil.rm",e
+
+  # Attempts to (recursively) remove the specified directory or file, ignoring errors.
+  # Set `NODE_DEBUG=inote-util` to view errors.
+  @rmdir:(dir)=>
+    try
+      remove.removeSync(dir)
+    catch e
+      if DEBUG
+        console.error "FileUtil.rmdir",e
+
   @read_stdin_sync:(end_byte="\x04",buffer_size=512)->
     read_buf = new Buffer(buffer_size)
     bytes_read = 0
@@ -1267,6 +1336,28 @@ class Base64
 ################################################################################
 
 class AsyncUtil
+
+  # Wait `delay` milliseconds then invoke `cb`.
+  # Much like `setTimeout`, but with a more sensible argument sequence for CoffeeScript
+  @wait:(delay,cb)=>process.nextTick(()=>setTimeout(cb,delay))
+  @set_timeout:(delay,cb)=>@wait(delay,cb)
+  @setTimeout:(delay,cb)=>@wait(delay,cb)
+
+  # Alias for `window.clearTimeout`
+  @cancel_wait:(id)=>clearTimeout(id)
+  @clearTimeout:(id)=>@cancel_wait(id)
+  @clear_timeout:(id)=>@cancel_wait(id)
+
+  # Like `setInterval`, but with a more sensible argument sequence for CoffeeScript
+  @interval:(delay,cb)=>setInterval(cb,delay)
+  @set_interval:(delay,cb)=>interval(cb,delay)
+  @setInterval:(delay,cb)=>@interval(delay,cb)
+
+  # Alias for `window.clearInterval`
+  @cancel_interval:(id)=>clearInterval(id)
+  @cancelInterval:(id)=>@cancel_interval(id)
+  @clear_interval:(id)=>@cancel_interval(id)
+  @clearInterval:(id)=>@cancel_interval(id)
 
   # **for_async** - *executes an asynchronous `for` loop.*
   #
@@ -1529,23 +1620,24 @@ class Util
 
 ################################################################################
 
-exports.ArrayUtil = ArrayUtil
-exports.AsyncUtil = AsyncUtil
-exports.Base65 = Base64
-exports.ColorUtil = ColorUtil
+exports.ArrayUtil      = ArrayUtil
+exports.AsyncUtil      = AsyncUtil
+exports.Base64         = Base64
+exports.ColorUtil      = ColorUtil
 exports.ComparatorUtil = ComparatorUtil
-exports.DateUtil = DateUtil
-exports.ErrorUtil = ErrorUtil
-exports.FileUtil = FileUtil
-exports.IdUtil = IdUtil
-exports.MapUtil = MapUtil
-exports.NumberUtil = NumberUtil
-exports.PasswordUtil = PasswordUtil
-exports.RandomUtil = RandomUtil
-exports.Sequencer = Sequencer
-exports.StringUtil = StringUtil
-exports.Util = Util
-exports.WebUtil = WebUtil
+exports.DateUtil       = DateUtil
+exports.ErrorUtil      = ErrorUtil
+exports.FileUtil       = FileUtil
+exports.IdUtil         = IdUtil
+exports.LogUtil        = LogUtil
+exports.MapUtil        = MapUtil
+exports.NumberUtil     = NumberUtil
+exports.PasswordUtil   = PasswordUtil
+exports.RandomUtil     = RandomUtil
+exports.Sequencer      = Sequencer
+exports.StringUtil     = StringUtil
+exports.Util           = Util
+exports.WebUtil        = WebUtil
 
 ################################################################################
 

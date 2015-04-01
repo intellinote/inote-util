@@ -4,6 +4,14 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.5.3 - 1 April 2015
+
+### Enhancements
+
+ * Added `FileUtil.rm`, `FileUtil.rmdir`, `File.mkdir`, `File.sanitize_filename` and `File.uniquify_filename`.
+ * Added `AsyncUtil.wait`, `AsyncUtil.cancel_wait`, `AsyncUtil.interval`, `AsyncUtil.cancel_interval` and related methods.
+ * Added `LogUtil.tlog`, `LogUtil.terr` and related methods.
+
 ## Release 0.5.2 - 25 March 2015
 
 ### Enhancements
