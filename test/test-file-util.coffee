@@ -35,12 +35,19 @@ describe 'FileUtil',->
     done()
 
   it "can make and remove directories",(done)->
-    FileUtil.mkdir(path.join(HOMEDIR,"foo","bar","gamma"))
-    fs.existsSync(path.join(HOMEDIR,"foo","bar","gamma")).should.be.ok
-    FileUtil.rmdir(path.join(HOMEDIR,"foo","bar"))
+    (FileUtil.mkdir(path.join(HOMEDIR,"foo","bar","gamma","another"))).should.be.ok
+    fs.existsSync(path.join(HOMEDIR,"foo","bar","gamma","another")).should.be.ok
+    fs.closeSync(fs.openSync(path.join(HOMEDIR,"foo","bar","gamma","another","some-file"), 'w'));
+    fs.existsSync(path.join(HOMEDIR,"foo","bar","gamma","another","some-file")).should.be.ok
+    (FileUtil.rmdir(path.join(HOMEDIR,"foo","bar","gamma","another"),path.join(HOMEDIR,"foo","bar","gamma"),path.join(HOMEDIR,"foo","bar","i-do-not-exist"))).should.not.be.ok
+    fs.existsSync(path.join(HOMEDIR,"foo","bar","gamma","another")).should.not.be.ok
     fs.existsSync(path.join(HOMEDIR,"foo","bar","gamma")).should.not.be.ok
-    fs.existsSync(path.join(HOMEDIR,"foo","bar")).should.not.be.ok
+    fs.existsSync(path.join(HOMEDIR,"foo","bar")).should.be.ok
+    fs.closeSync(fs.openSync(path.join(HOMEDIR,"foo","bar","some-file"), 'w'));
+    fs.existsSync(path.join(HOMEDIR,"foo","bar","some-file")).should.be.ok
+    (FileUtil.rm(path.join(HOMEDIR,"foo","bar","some-file"))).should.be.ok
+    fs.existsSync(path.join(HOMEDIR,"foo","bar","some-file")).should.not.be.ok
     fs.existsSync(path.join(HOMEDIR,"foo")).should.be.ok
-    FileUtil.rmdir(path.join(HOMEDIR,"foo"))
+    (FileUtil.rmdir(path.join(HOMEDIR,"foo"))).should.be.ok
     fs.existsSync(path.join(HOMEDIR,"foo")).should.not.be.ok
     done()

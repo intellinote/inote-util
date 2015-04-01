@@ -4,6 +4,14 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.5.5 - 1 April 2015
+
+### Enhancements
+
+ * Support multiple files in `FileUtil.rm` and `FileUtil.rmdir`.
+ * Add return value to `FileUtil.rm`, `FileUtil.rmdir` and `File.mkdir`.
+ * Add `ignore_errors` flag to `FileUtil.load_json_file_sync` and `FileUtil.load_json_stdin_sync`.
+
 ## Release 0.5.4 - 1 April 2015
 
 ### Enhancements

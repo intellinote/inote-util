@@ -433,8 +433,8 @@ class MapUtil
     map = {}
     if args.length is 1 and Array.isArray(args[0])
       args = args[0]
-    for m in args
-      for n,v of m
+    for m in args ? []
+      for n,v of m ? {}
         map[n] = v
     return map
 
@@ -1145,33 +1145,50 @@ class FileUtil
 
   # Attempts to recursively create the specified directory, ignoring errors.
   # Set `NODE_DEBUG=inote-util` to view errors.
+  # Returns `true` if no errors encountered, `false` otherwise
   @mkdir:(dir)=>
     if dir?
       try
         mkdirp.sync(dir)
+        return true
       catch e
         if DEBUG
           console.error "FileUtil.mkdir",e
+        return false
+    else
+      return false
 
   # Attempts to remove the specified file, ignoring errors.
   # Set `NODE_DEBUG=inote-util` to view errors.
-  @rm:(f)=>
-    if f?
-      try
-        fs.unlinkSync(file)
-      catch e
-        if DEBUG
-          console.error "FileUtil.rm",e
+  # Returns `true` if no errors encountered, `false` otherwise
+  @rm:(files...)=>
+    result = false
+    if files? and files.length > 0
+      result = true
+      for file in files
+        try
+          fs.unlinkSync(file)
+        catch e
+          result = false
+          if DEBUG
+            console.error "FileUtil.rm",e
+    return result
 
-  # Attempts to (recursively) remove the specified directory or file, ignoring errors.
+  # Attempts to (recursively) remove the specified directory(s) or file(s), ignoring errors.
   # Set `NODE_DEBUG=inote-util` to view errors.
-  @rmdir:(dir)=>
-    if dir?
-      try
-        remove.removeSync(dir)
-      catch e
-        if DEBUG
-          console.error "FileUtil.rmdir",e
+  # Returns `true` if no errors encountered, `false` otherwise
+  @rmdir:(dirs...)=>
+    result = false
+    if dirs? and dirs.length > 0
+      result = true
+      for dir in dirs
+        try
+          remove.removeSync(dir)
+        catch e
+          result = false
+          if DEBUG
+            console.error "FileUtil.rmdir",e
+    return result
 
   @read_stdin_sync:(end_byte="\x04",buffer_size=512)->
     read_buf = new Buffer(buffer_size)
@@ -1206,11 +1223,23 @@ class FileUtil
           break
       return all_buf
 
-  @load_json_file_sync:(file)->
-    JSON.parse(fs.readFileSync(file).toString())
+  @load_json_file_sync:(file,ignore_errors=false)->
+    try
+      return JSON.parse(fs.readFileSync(file).toString())
+    catch err
+      if ignore_errors
+        return null
+      else
+        throw err
 
-  @load_json_stdin_sync:(end_byte="\x04",buffer_size=512)=>
-    JSON.parse(@read_stdin_sync(end_byte,buffer_size))
+  @load_json_stdin_sync:(end_byte="\x04",buffer_size=512,ignore_errors=false)=>
+    try
+      return JSON.parse(@read_stdin_sync(end_byte,buffer_size))
+    catch err
+      if ignore_errors
+        return null
+      else
+        throw err
 
 ################################################################################
 
