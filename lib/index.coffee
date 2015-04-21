@@ -24,6 +24,7 @@ LIB_DIR   = if fs.existsSync(LIB_COV) then LIB_COV else LIB
 
 sources = [
   'util'
+  'io-util'
   'stopwatch'
   'config'
 ]

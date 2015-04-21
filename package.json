@@ -10,6 +10,7 @@
     "node-uuid"             : "latest",
     "nconf"                 : "latest",
     "remove"                 : "latest",
+    "request"                 : "latest",
     "mkdirp"                 : "latest"
   },
   "devDependencies": {

@@ -21,3 +21,7 @@ describe "index",->
   it "exports config", (done)->
     index.config.should.exist
     done()
+
+  it "exports IOUtil", (done)->
+    index.IOUtil.should.exist
+    done()

@@ -1,10 +1,11 @@
-uuid   = require 'node-uuid'
-crypto = require 'crypto'
-fs     = require 'fs'
-path   = require 'path'
-mkdirp = require 'mkdirp'
-remove = require 'remove'
-DEBUG  = (/(^|,)inote-?util($|,)/i.test process?.env?.NODE_DEBUG) or (/(^|,)Util($|,)/.test process?.env?.NODE_DEBUG)
+uuid    = require 'node-uuid'
+crypto  = require 'crypto'
+fs      = require 'fs'
+path    = require 'path'
+mkdirp  = require 'mkdirp'
+request = require 'request'
+remove  = require 'remove'
+DEBUG   = (/(^|,)inote-?util($|,)/i.test process?.env?.NODE_DEBUG) or (/(^|,)Util($|,)/.test process?.env?.NODE_DEBUG)
 ################################################################################
 
 class LogUtil
@@ -1251,6 +1252,57 @@ class WebUtil
     req?.connection?.remoteAddress ?
     req?.socket?.remoteAddress ?
     req?.connection?.socket?.remoteAddress
+
+class IOUtil
+
+  @pipe_to_buffer:(readable_stream,callback)=>
+    data = []
+    length = 0
+    readable_stream.on 'data', (chunk)=>
+      if chunk?
+        data.push chunk
+        length += chunk.length
+    readable_stream.on 'error', (err)=>
+      callback(err)
+    readable_stream.on 'end', ()=>
+      callback null, Buffer.concat(data)
+
+  @pipe_to_file:(readable_stream,dest,options,callback)=>
+    if options? and typeof options is 'function' and not callback?
+      callback = options
+      options = null
+    out = fs.createWriteStream(dest,options)
+    out.on 'close', callback
+    out.on 'error', callback
+    readable_stream.pipe(out)
+
+  @download_to_buffer:(url,callback)=>
+    params = {}
+    if typeof url is 'string'
+      params.url = url
+    else
+      params = url
+    request params, (err,response,body)=>
+      if err?
+        callback(err)
+      else unless /^2[0-9][0-9]$/.test request?.statusCode
+        callback(response,body)
+      else
+        callback(null,body)
+
+  @download_to_file:(url,dest,options,callback)=>
+    if options? and typeof options is 'function' and not callback?
+      callback = options
+      options = null
+    params = {}
+    if typeof url is 'string'
+      params.url = url
+    else
+      params = url
+    out = fs.createWriteStream(dest,options)
+    out.on 'close', callback
+    out.on 'error', callback
+    request(params).pipe(out)
 
 ################################################################################
 
