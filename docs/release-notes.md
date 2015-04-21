@@ -4,11 +4,11 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
-## Release 0.5.7 - 21 April 2015
+## Release 0.5.9 - 21 April 2015
 
 ### Bug Fixes
 
- * Ensure `IOUtil.download_to_buffer` always returns a `Buffer` (never a `String`).
+ * Ensure `IOUtil.download_to_buffer` always returns a raw-binary `Buffer` (never a `String`).
 
 ## Release 0.5.6 - 21 April 2015
 

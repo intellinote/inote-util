@@ -32,9 +32,10 @@ class IOUtil
       params.url = url
     else
       params = url
+    params.encoding = null
     request params, (err,response,body)=>
       if typeof body is 'string'
-        body = new Buffer(body)
+        body = new Buffer(body,'binary')
       if err?
         callback(err)
       else unless /^2[0-9][0-9]$/.test "#{response?.statusCode}"
