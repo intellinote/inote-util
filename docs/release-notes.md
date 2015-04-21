@@ -4,6 +4,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.5.6 - 21 April 2015
+
+### Enhancements
+
+ * Added `IOUtil` with `pipe_to_buffer`, `pipe_to_file`, `download_to_buffer` and `download_to_file` methods.
+
 ## Release 0.5.5 - 1 April 2015
 
 ### Enhancements
