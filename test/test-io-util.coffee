@@ -14,6 +14,7 @@ describe 'IOUtil',->
     IOUtil.download_to_buffer "https://www.intellinote.net/", (err,buffer)=>
       should.not.exist err
       should.exist buffer
+      Buffer.isBuffer(buffer).should.be.ok
       buffer.length.should.not.be.below 1
       str = buffer.toString()
       str.should.match /<html/i

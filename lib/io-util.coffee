@@ -33,6 +33,8 @@ class IOUtil
     else
       params = url
     request params, (err,response,body)=>
+      if typeof body is 'string'
+        body = new Buffer(body)
       if err?
         callback(err)
       else unless /^2[0-9][0-9]$/.test "#{response?.statusCode}"
