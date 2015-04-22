@@ -4,6 +4,17 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.6.0 - 21 April 2015
+
+### Enhancements
+
+ * Added `ObjectUtil.deep_clone`.
+ * `ObjectUtil.shallow_clone` has been extended to clone `Array`s and to handle `String`, `Number` and `Boolean` types.
+ 
+### Deprecated Methods
+
+ * All methods of `MapUtil` have been moved to `ObjectUtil`. The `MapUtil` versions have been marked as deprecated.
+
 ## Release 0.5.9 - 21 April 2015
 
 ### Bug Fixes
