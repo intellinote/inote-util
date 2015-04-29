@@ -59,7 +59,7 @@ class ObjectUtil
   # **shallow_clone** - *create a "shallow" copy of a mqp*
   #
   # Creates an independent map with the same keys as `map`.
-  # Any object-valued entry in `map` will *not* be cloned.
+  # The entries within the `map` will *not* be cloned.
   # The new map will contain a reference to the same underlying object
   # as the original map.
   #

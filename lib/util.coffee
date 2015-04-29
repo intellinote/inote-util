@@ -1137,6 +1137,15 @@ class FileUtil
       else
         throw err
 
+  # naive version of the Unix `touch` command
+  @touch:(file,callback)=>
+    fs.open file, "wx", (err, fd)=>
+      if fd?
+        fs.close fd, (err)=>
+          callback?()
+      else
+        callback?()
+
 ################################################################################
 
 class WebUtil
@@ -1147,6 +1156,10 @@ class WebUtil
     req?.connection?.remoteAddress ?
     req?.socket?.remoteAddress ?
     req?.connection?.socket?.remoteAddress
+
+  # replaces the now deprecated `req.param` found in Express.js
+  @param:(req,name,default_value)=>
+    return (req?.params?[name] ? (req?.body?[name] ? (req?.query?[name] ? default_value)))
 
 class IOUtil
 
