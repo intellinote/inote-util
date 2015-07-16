@@ -53,9 +53,9 @@ class DateUtil
         return null
     return "#{@format_date_long(dt)} at #{@format_time_long(dt)}"
 
-  @format_time_long:(dt = new Date)=>
+  @format_time_long:(dt = new Date())=>
     hours = dt.getUTCHours() % 12
-    if hours == 0
+    if hours is 0
       hours = 12
     minutes = dt.getUTCMinutes()
     if minutes < 10
@@ -708,7 +708,7 @@ class ColorUtil
   # The leading `#` character is optional, and both uppercase and lowercase letters
   # are supported.
   @hex_to_rgb_triplet:(hex)=>
-    result = /^\s*#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})\s*$/i.exec(hex);
+    result = /^\s*#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})\s*$/i.exec(hex)
     if result?
       return [
         parseInt(result[1],16)
@@ -1426,7 +1426,7 @@ class AsyncUtil
   #
   @for_each_async:(list,action,whendone)=>
     i = m = null
-    init = ()-> i = 0;
+    init = ()-> i = 0
     cond = ()-> (i < list.length)
     incr = ()-> i += 1
     act  = (next)-> action(list[i],i,list,next)
@@ -1498,6 +1498,7 @@ class AsyncUtil
 # Note that the sequence is not cleared when `run` is invoked, so one may
 # invoke `run` more than once to execute the sequence again.
 #
+#coffeelint:disable=no_this
 class Sequencer
   constructor:()->
     @list = []
@@ -1546,6 +1547,7 @@ class Sequencer
   #
   #     (new Sequencer()).first(a).then(b).finally(c)
   #
+#coffeelint:enable=no_this
 
 
 # **Util** - *collects assorted utility functions*

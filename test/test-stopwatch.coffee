@@ -9,7 +9,7 @@ Stopwatch = require(path.join(LIB_DIR,'stopwatch')).Stopwatch
 
 describe "Stopwatch",->
 
-  beforeEach (done)->
+  beforeEach (done)=>
     @method_started = false
     @method_finished = false
     @a_slow_method = ()=>
@@ -23,7 +23,7 @@ describe "Stopwatch",->
       @method_finished = true
     done()
 
-  it "can be used for timing \"inline\".", (done)->
+  it "can be used for timing \"inline\".", (done)=>
     # start the timer
     timer = Stopwatch.start()
     # validate the initial state
@@ -48,7 +48,7 @@ describe "Stopwatch",->
     # done
     done()
 
-  it "can be used to track \"lap\" times.", (done)->
+  it "can be used to track \"lap\" times.", (done)=>
     # start the timer
     timer = Stopwatch.start()
     # validate the initial state
@@ -121,7 +121,7 @@ describe "Stopwatch",->
     should.not.exist timer.lap
     done()
 
-  it "doesn't always give the same time.", (done)->
+  it "doesn't always give the same time.", (done)=>
     result = []
     result[2] = Stopwatch.start()
     result[1] = Stopwatch.start()
@@ -134,7 +134,7 @@ describe "Stopwatch",->
     result[1].elapsed_time.should.be.above result[0].elapsed_time
     done()
 
-  it "can wrap a method in order to time it.", (done)->
+  it "can wrap a method in order to time it.", (done)=>
     @method_started.should.not.be.ok
     @method_finished.should.not.be.ok
     result = Stopwatch.time @a_slow_method
@@ -148,7 +148,7 @@ describe "Stopwatch",->
     result.elapsed_time.should.be.above 0
     done()
 
-  it "returns any provided data (wrapped)", (done)->
+  it "returns any provided data (wrapped)", (done)=>
     @method_started.should.not.be.ok
     @method_finished.should.not.be.ok
     result = Stopwatch.time { alpha:1, beta:2 }, @a_slow_method
