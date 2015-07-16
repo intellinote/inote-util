@@ -1,16 +1,16 @@
-fs      = require 'fs'
-path    = require 'path'
-HOMEDIR = path.join(__dirname,'..')
-LIB_COV = path.join(HOMEDIR,'lib-cov')
-LIB_DIR = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
-MapUtil = require(path.join(LIB_DIR,'object-util')).MapUtil
-uuid    = require 'node-uuid'
-crypto  = require 'crypto'
-mkdirp  = require 'mkdirp'
-request = require 'request'
-remove  = require 'remove'
-
-DEBUG   = (/(^|,)inote-?util($|,)/i.test process?.env?.NODE_DEBUG) or (/(^|,)Util($|,)/.test process?.env?.NODE_DEBUG)
+fs         = require 'fs'
+path       = require 'path'
+HOMEDIR    = path.join(__dirname,'..')
+LIB_COV    = path.join(HOMEDIR,'lib-cov')
+LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
+MapUtil    = require(path.join(LIB_DIR,'object-util')).MapUtil
+uuid       = require 'node-uuid'
+crypto     = require 'crypto'
+mkdirp     = require 'mkdirp'
+request    = require 'request'
+remove     = require 'remove'
+seedrandom = require 'seedrandom'
+DEBUG      = (/(^|,)inote-?util($|,)/i.test process?.env?.NODE_DEBUG) or (/(^|,)Util($|,)/.test process?.env?.NODE_DEBUG)
 
 ################################################################################
 
@@ -781,23 +781,45 @@ class RandomUtil
     else
       return bytes.toString(enc)
 
+  @seed_rng:(seed)->new Math.seedrandom(seed)
+  @set_rng:(rng = Math.random)=>@rng = rng
+  @rng:Math.random
+    
   # **random_hex** - *generate a string of random hexadecimal characters*
   #
   # Generates a string of `count` pseudo-random hexadecimal digits.
-  @random_hex:(count=32)=>@_random_digits(count,16)
+  @random_hex:(count=32,rng)=>@_random_digits(count,16,rng)
 
   # **random_alphanumeric** - *generate a string of random numbers and letters*
   #
   # Generates a string of `count` pseudo-random characters from the set `[a-z0-9]`.
-  @random_alphanumeric:(count=32)=>@_random_digits(count,36)
+  @random_alphanumeric:(count=32,rng)=>@_random_digits(count,36,rng)
 
   # **_random_digits** - *generate a string of random bytes in the specfied base number system*
   #
-  # (An internal method that generates `count` characters in the specfified base.)
-  @_random_digits:(count=32,base)=>
+  # (An internal method that generates `count` characters in the specified base.)
+  @_random_digits:(args...)=> #count=32,base,rng
+    ints = []
+    rng = null
+    while args.length > 0
+      a = args.shift()
+      if typeof a is 'function'
+        if rng?
+          throw new Error("Unexpected arguments: #{args}")
+        else
+          rng = a
+      else
+        if ints.length is 2 and a?
+          throw new Error("Unexpected arguments: #{args}")
+        else
+          ints.push a
+    [count,base] = ints
+    count ?= 32
+    base ?= 10
+    rng ?= @rng
     str = ""
     while str.length < count
-      str += Math.random().toString(base).substring(2)
+      str += rng().toString(base).substring(2)
     if str.length > count
       str = str.substring(0,count)
     return str
@@ -1580,6 +1602,9 @@ class Util
   @random_bytes:          RandomUtil.random_bytes
   @random_hex:            RandomUtil.random_hex
   @random_alphanumeric:   RandomUtil.random_alphanumeric
+  @seed_rng:              RandomUtil.seed_rng
+  @set_rng:               RandomUtil.set_rng
+  @random_digits:         RandomUtil.random_digits
 
   @validate_hashed_password:PasswordUtil.validate_hashed_password
   @hash_password:PasswordUtil.hash_password

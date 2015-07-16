@@ -5,7 +5,8 @@ HOMEDIR = path.join(__dirname,'..')
 LIB_COV = path.join(HOMEDIR,'lib-cov')
 LIB_DIR = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 Util    = require(path.join(LIB_DIR,'util')).Util
-
+Stream  = require 'stream'
+zipstream = require 'zipstream'
 
 describe 'Util',->
 
@@ -252,46 +253,46 @@ describe 'Util',->
     done()
 
   it "can truncate in a smartish way",(done)->
-   tests = [
-     [ '123456789', 11, null, '123456789' ]
-     [ '123456789', 10, null, '123456789' ]
-     [ '123456789', 9, null, '123456789' ]
-     [ '123456789', 8, null, '1234567…' ]
-     [ '123456789', 7, null, '123456…' ]
-     [ '123456789', 11, '...','123456789' ]
-     [ '123456789', 10, '...','123456789' ]
-     [ '123456789', 9, '...', '123456789' ]
-     [ '123456789', 8, '...', '12345...' ]
-     [ '123456789', 7, '...',  '1234...' ]
-     [ '123456789', 11, '','123456789' ]
-     [ '123456789', 10, '','123456789' ]
-     [ '123456789', 9, '', '123456789' ]
-     [ '123456789', 8, '', '12345678' ]
-     [ '123456789', 7, '', '1234567' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 50, null, 'The quick brown fox jumped over the lazy dogs.' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 47, null, 'The quick brown fox jumped over the lazy dogs.' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 46, null, 'The quick brown fox jumped over the lazy dogs.' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 45, null, 'The quick brown fox jumped over the lazy…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 44, null, 'The quick brown fox jumped over the lazy…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 43, null, 'The quick brown fox jumped over the lazy…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 40, null, 'The quick brown fox jumped over the…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 39, null, 'The quick brown fox jumped over the…' ]
-     [ 'The quick brown foxjumpedoverthelazydogs.', 39, null, 'The quick brown foxjumpedoverthelazydo…' ]
-     [ 'The quick brown foxjumpedoverthelazydogs.', 38, null, 'The quick brown foxjumpedoverthelazyd…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 25, null, 'The quick brown fox…' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 45, '...', 'The quick brown fox jumped over the lazy...' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 44, '...', 'The quick brown fox jumped over the lazy...' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 43, '...', 'The quick brown fox jumped over the lazy...' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 40, '...', 'The quick brown fox jumped over the...' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 39, '...', 'The quick brown fox jumped over the...' ]
-     [ 'The quick brown foxjumpedoverthelazydogs.', 39, '...', 'The quick brown foxjumpedoverthelazy...' ]
-     [ 'The quick brown foxjumpedoverthelazydogs.', 38, '...', 'The quick brown foxjumpedoverthelaz...' ]
-     [ 'The quick brown fox jumped over the lazy dogs.', 25, '...', 'The quick brown fox...' ]
-   ]
-   for [text,width,marker,expected] in tests
-     Util.truncate(text,width,marker).should.equal expected
-     Util.truncate(text,width,marker).length.should.not.be.above width
-   done()
+    tests = [
+      [ '123456789', 11, null, '123456789' ]
+      [ '123456789', 10, null, '123456789' ]
+      [ '123456789', 9, null, '123456789' ]
+      [ '123456789', 8, null, '1234567…' ]
+      [ '123456789', 7, null, '123456…' ]
+      [ '123456789', 11, '...','123456789' ]
+      [ '123456789', 10, '...','123456789' ]
+      [ '123456789', 9, '...', '123456789' ]
+      [ '123456789', 8, '...', '12345...' ]
+      [ '123456789', 7, '...',  '1234...' ]
+      [ '123456789', 11, '','123456789' ]
+      [ '123456789', 10, '','123456789' ]
+      [ '123456789', 9, '', '123456789' ]
+      [ '123456789', 8, '', '12345678' ]
+      [ '123456789', 7, '', '1234567' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 50, null, 'The quick brown fox jumped over the lazy dogs.' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 47, null, 'The quick brown fox jumped over the lazy dogs.' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 46, null, 'The quick brown fox jumped over the lazy dogs.' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 45, null, 'The quick brown fox jumped over the lazy…' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 44, null, 'The quick brown fox jumped over the lazy…' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 43, null, 'The quick brown fox jumped over the lazy…' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 40, null, 'The quick brown fox jumped over the…' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 39, null, 'The quick brown fox jumped over the…' ]
+      [ 'The quick brown foxjumpedoverthelazydogs.', 39, null, 'The quick brown foxjumpedoverthelazydo…' ]
+      [ 'The quick brown foxjumpedoverthelazydogs.', 38, null, 'The quick brown foxjumpedoverthelazyd…' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 25, null, 'The quick brown fox…' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 45, '...', 'The quick brown fox jumped over the lazy...' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 44, '...', 'The quick brown fox jumped over the lazy...' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 43, '...', 'The quick brown fox jumped over the lazy...' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 40, '...', 'The quick brown fox jumped over the...' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 39, '...', 'The quick brown fox jumped over the...' ]
+      [ 'The quick brown foxjumpedoverthelazydogs.', 39, '...', 'The quick brown foxjumpedoverthelazy...' ]
+      [ 'The quick brown foxjumpedoverthelazydogs.', 38, '...', 'The quick brown foxjumpedoverthelaz...' ]
+      [ 'The quick brown fox jumped over the lazy dogs.', 25, '...', 'The quick brown fox...' ]
+    ]
+    for [text,width,marker,expected] in tests
+      Util.truncate(text,width,marker).should.equal expected
+      Util.truncate(text,width,marker).length.should.not.be.above width
+    done()
 
 
   it "random_bytes returns random bytes in the specified encoding",(done)->
@@ -329,6 +330,106 @@ describe 'Util',->
       str = Util.random_alphanumeric(c)
       (/^[0-9a-z]*$/.test str).should.be.ok
       str.length.should.equal c
+    done()
+
+  it "random_alphanumeric returns base-36 values (seed_rng case)",(done)->
+    Util.set_rng(Util.seed_rng("hello."))
+    for c in [0,1,3,117]
+      str = Util.random_alphanumeric(c)
+      (/^[0-9a-z]*$/.test str).should.be.ok
+      str.length.should.equal c
+    Util.set_rng()
+    done()
+
+  it "random_alphanumeric passes a rough test of randomness",(done)->
+    old_nextTick = process.nextTick
+    process.nextTick = setImmediate
+    stream = new Stream.Readable()
+    loops = 512
+    size = 64
+    for i in [0..loops]
+      stream.push(Util.random_alphanumeric(size))
+    stream.push null
+    zip = zipstream.createZip({ level: 1 })
+    zip.addFile (stream),{name:"random.txt"}, ()->
+      zip.finalize (count)->
+        process.nextTick = old_nextTick
+        console.log (count/(loops*size))
+        (count/(loops*size)).should.not.be.below 0.6
+        done()
+
+  it "random_alphanumeric passes a rough test of randomness (seed_rng case)",(done)->
+    Util.set_rng(Util.seed_rng("hello."))
+    old_nextTick = process.nextTick
+    process.nextTick = setImmediate
+    stream = new Stream.Readable()
+    loops = 512
+    size = 64
+    for i in [0..loops]
+      stream.push(Util.random_alphanumeric(size))
+    stream.push null
+    zip = zipstream.createZip({ level: 1 })
+    zip.addFile (stream),{name:"random.txt"}, ()->
+      zip.finalize (count)->
+        process.nextTick = old_nextTick
+        console.log (count/(loops*size))
+        (count/(loops*size)).should.not.be.below 0.65
+        done()
+
+  it "random_alphanumeric passes a rough test of randomness (seed_rng case)",(done)->
+    Util.set_rng(Util.seed_rng("hello."))
+    old_nextTick = process.nextTick
+    process.nextTick = setImmediate
+    stream = new Stream.Readable()
+    loops = 512
+    size = 64
+    for i in [0..loops]
+      stream.push(Util.random_alphanumeric(size))
+    stream.push null
+    zip = zipstream.createZip({ level: 1 })
+    zip.addFile (stream),{name:"random.txt"}, ()->
+      zip.finalize (count)->
+        process.nextTick = old_nextTick
+        console.log (count/(loops*size))
+        (count/(loops*size)).should.not.be.below 0.65
+        done()
+
+  it "random_alphanumeric passes a rough test of randomness (seed_rng case 2)",(done)->
+    Util.set_rng(Util.seed_rng("goodbye."))
+    old_nextTick = process.nextTick
+    process.nextTick = setImmediate
+    stream = new Stream.Readable()
+    loops = 512
+    size = 64
+    for i in [0..loops]
+      stream.push(Util.random_alphanumeric(size))
+    stream.push null
+    zip = zipstream.createZip({ level: 1 })
+    zip.addFile (stream),{name:"random.txt"}, ()->
+      zip.finalize (count)->
+        process.nextTick = old_nextTick
+        console.log (count/(loops*size))
+        (count/(loops*size)).should.not.be.below 0.65
+        done()
+
+  it "seed_random ensures we get the same values for the same seed",(done)->
+    rng1 = Util.seed_rng(1234567)
+    rng2 = Util.seed_rng(1234567)
+    rng3 = Util.seed_rng(168)
+    rng4 = Util.seed_rng(168)
+    old1 = old3 = ""
+    for i in [0..1000]
+      str1 = Util.random_alphanumeric(64,rng1)
+      str2 = Util.random_alphanumeric(64,rng2)
+      str3 = Util.random_alphanumeric(64,rng3)
+      str4 = Util.random_alphanumeric(64,rng4)
+      str1.should.equal str2
+      str2.should.not.equal str3
+      str3.should.equal str4
+      str1.should.not.equal old1
+      str3.should.not.equal old3
+      old1 = str1
+      old3 = str3
     done()
 
   it "slow_equals compares two buffers for equality",(done)->
