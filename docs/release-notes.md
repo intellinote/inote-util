@@ -4,6 +4,20 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.7.0 - 16 July 2015
+
+### Enhancements
+
+ * Added `RandomUtil.seed_rng` and `RandomUtil.set_rng`.
+ * Added (optional) `rng` parameter to `RandomUtil.random_hex` and `RandomUtil.random_alphanumeric`.
+ * Exposed (exported) `RandomUtil.random_digits`.
+ 
+### Other
+
+ * Added coffeelint configuration defaults; addressed several coffeelint-reported issues.
+ * Changed package.json to refer to explicit versions of dependencies, rather than just `latest`.
+
+
 ## Release 0.6.1 - 20 April 2015
 
 ### Enhancements

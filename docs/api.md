@@ -1,6 +1,6 @@
 # Overview of inote-util methods
 
-**NOTE:** This document is signficantly out of date.  The information included below is very likely to be accurate, but it is also very incomplete.  That is, many methods have been added that are not documented below.
+**NOTE:** This document is significantly out of date.  The information included below is very likely to be accurate, but it is also very incomplete.  That is, many methods have been added that are not documented below.
 
 ## Util
 
