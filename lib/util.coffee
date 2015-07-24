@@ -1438,7 +1438,7 @@ class AsyncUtil
   # - `methods` - an array of methods
   # - `args_for_methods` - an array of arrays; the contents of each array (plus a callback method) with be passed to the corresponding `method` when invoked
   # - `callback` - the method called when all methods have completed; the single argument passed to `callback` will be an array containing the arguments passed to each method's callback (as an array)
-  fork:(methods, args_for_methods, callback)->
+  @fork:(methods, args_for_methods, callback)->
     if (not callback?) and (typeof args_for_methods is 'function')
       callback = args_for_methods
       args_for_methods = null
@@ -1454,7 +1454,7 @@ class AsyncUtil
             callback(results)
 
   # Just like `fork` save that at most `max_parallel` methods will run at any one time
-  throttled_fork: (max_parallel, methods, args_for_methods, callback)->
+  @throttled_fork: (max_parallel, methods, args_for_methods, callback)->
     if (not callback?) and typeof args_for_methods is 'function'
       callback = args_for_methods
       args_for_methods = null
