@@ -1433,7 +1433,6 @@ class AsyncUtil
     @for_async(init, cond, act, incr, whendone)
 
   # **procedure** - *generates a new `Sequencer` object, as described below.*
-
   @procedure:()=>(new Sequencer())
 
 ################################################################################
