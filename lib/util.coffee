@@ -1432,6 +1432,55 @@ class AsyncUtil
     act  = (next)-> action(list[i],i,list,next)
     @for_async(init, cond, act, incr, whendone)
 
+
+
+  # Run the given array of methods asynchronously, invoking `callback` when done
+  # - `methods` - an array of methods
+  # - `args_for_methods` - an array of arrays; the contents of each array (plus a callback method) with be passed to the corresponding `method` when invoked
+  # - `callback` - the method called when all methods have completed; the single argument passed to `callback` will be an array containing the arguments passed to each method's callback (as an array)
+  fork:(methods, args_for_methods, callback)->
+    if (not callback?) and (typeof args_for_methods is 'function')
+      callback = args_for_methods
+      args_for_methods = null
+    results = []
+    remaining_callbacks = methods.length
+    for method, index in methods
+      do (method,index)->
+        method_args = args_for_methods?[index] ? []
+        method method_args..., (callback_args...)->
+          results[index] = callback_args
+          remaining_callbacks--
+          if remaining_callbacks is 0
+            callback(results)
+
+  # Just like `fork` save that at most `max_parallel` methods will run at any one time
+  throttled_fork: (max_parallel, methods, args_for_methods, callback)->
+    if (not callback?) and typeof args_for_methods is 'function'
+      callback = args_for_methods
+      args_for_methods = null
+    results = []
+    currently_running = 0
+    next_to_run = 0
+    remaining_callbacks = methods.length
+    run_more = ()->
+      while (currently_running < max_parallel) and (next_to_run < methods.length)
+        index = next_to_run
+        currently_running++
+        next_to_run++
+        do (index)->
+          method_args = args_for_methods?[index] ? []
+          method = methods[index]
+          method method_args..., (callback_args...)->
+            results[index] = callback_args
+            currently_running--
+            remaining_callbacks--
+            if remaining_callbacks is 0
+              callback(results)
+            else
+              run_more()
+    run_more()
+    
+    
   # **procedure** - *generates a new `Sequencer` object, as described below.*
   @procedure:()=>(new Sequencer())
 
@@ -1634,6 +1683,8 @@ class Util
 
   @for_async:AsyncUtil.for_async
   @for_each_async:AsyncUtil.for_each_async
+  @fork:AsyncUtil.fork
+  @throttled_fork:AsyncUtil.throttled_fork
   @procedure:AsyncUtil.procedure
 
 ################################################################################

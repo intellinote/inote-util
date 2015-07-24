@@ -4,6 +4,13 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.8.0 - 24 July 2015
+
+### Enhancements
+
+ * Added `AsyncUtil.fork` and `AsyncUtil.throttled_fork`.
+ 
+
 ## Release 0.7.0 - 16 July 2015
 
 ### Enhancements
