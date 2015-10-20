@@ -96,7 +96,8 @@ class Stopwatch
     # `lap_time` and `lap_elapsed_time` (where `lap_time` is the duration of the
     # lap itself and `lap_elapsed_time` is the duration from the start of the
     # overall timer to the end of the lap).
-    timer.lap = ()->
+    # an optional `label` can be associated with the lap
+    timer.lap = (label)->
       lap_finish = new Date()
       if timer.laps?
         lap_start = timer.laps[timer.laps.length-1].lap_finish_time
@@ -108,6 +109,7 @@ class Stopwatch
         lap_finish_time: lap_finish
         lap_time: lap_finish - lap_start
         lap_elapsed_time: lap_finish - timer.start_time
+        label: label
       }
       return timer
     return timer
@@ -126,7 +128,7 @@ class Stopwatch
     timer = @start(base)
     fn()
     return timer.stop()
-
+    
 # ## Exports
 
 # `Stopwatch` is exported as a singleton object.
