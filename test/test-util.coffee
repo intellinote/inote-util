@@ -342,6 +342,69 @@ describe 'Util',->
     Util.set_rng()
     done()
 
+  it "random_numeric returns random decimal digits",(done)->
+    digits = Util.random_numeric(63)
+    digits.length.should.equal 63
+    (/^[0-9]+$/.test digits).should.be.ok
+    done()
+
+  it "random_ALPHA returns random UPPERCASE letters",(done)->
+    letters = Util.random_ALPHA(63)
+    letters.length.should.equal 63
+    (/^[A-Z]+$/.test letters).should.be.ok
+    done()
+
+  it "random_alpha returns random lowercase letters",(done)->
+    letters = Util.random_alpha(63)
+    letters.length.should.equal 63
+    (/^[a-z]+$/.test letters).should.be.ok
+    done()
+
+  it "random_Alpha returns random Mixed-Case letters",(done)->
+    letters = Util.random_Alpha(630)
+    letters.length.should.equal 630
+    (/^[a-zA-Z]+$/.test letters).should.be.ok
+    (/[a-z]/.test letters).should.be.ok # it is unlikely that there are no lowercase letters
+    (/[A-Z]/.test letters).should.be.ok # it is unlikely that there are no uppercase letters
+    done()
+
+  it "random_element returns a random element of an array",(done)->
+    a = [0...10]
+    for i in [0...20]
+      e = Util.random_element(a)
+      (e in a).should.be.ok
+    done()
+
+  it "random_element returns a random pair from a map",(done)->
+    m = {
+      a:"A"
+      b:"B"
+      c:"C"
+      d:"D"
+      e:"E"
+      f:"F"
+      g:"G"
+    }
+    for i in [0...20]
+      [k,v] = Util.random_element(m)
+      (k in Object.keys(m)).should.be.ok
+      v.should.equal(k.toUpperCase())
+    done()
+    
+
+  it "random_element handles nulls and empty collections sensibly",(done)->
+    tests = [
+      [null,undefined]
+      [undefined,undefined]
+      [[],undefined]
+      [{},undefined]
+      ["foobar",undefined]
+    ]
+    for t in tests
+      found = Util.random_element(t[0])
+      (found is t[1]).should.be.ok
+    done()
+
   it "random_alphanumeric passes a rough test of randomness",(done)->
     old_nextTick = process.nextTick
     process.nextTick = setImmediate

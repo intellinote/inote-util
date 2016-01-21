@@ -4,12 +4,23 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+## Release 0.9.0 - 20 January 2016
+
+### Enhancements
+
+ * Added `RandomUtil.random_element`, `RandomUtil.random_alpha`, `RandomUtil.random_ALPHA`, `RandomUtil.random_Alpha` and , `RandomUtil.random_numeric`.
+
+### Bug Fixes
+
+ * Adding missing `October` from date formatting methods.
+
+
 ## Release 0.8.0 - 24 July 2015
 
 ### Enhancements
 
  * Added `AsyncUtil.fork` and `AsyncUtil.throttled_fork`.
- 
+
 
 ## Release 0.7.0 - 16 July 2015
 

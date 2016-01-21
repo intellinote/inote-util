@@ -41,6 +41,7 @@ class DateUtil
     "July"
     "August"
     "September"
+    "October"
     "November"
     "December"
   ]
@@ -785,18 +786,62 @@ class RandomUtil
   @set_rng:(rng = Math.random)=>@rng = rng
   @rng:Math.random
     
-  # **random_hex** - *generate a string of random hexadecimal characters*
-  #
-  # Generates a string of `count` pseudo-random hexadecimal digits.
+  # **random_hex** - *generate a string of `count` pseudo-random characters from the set ``[0-9a-f]``.
   @random_hex:(count=32,rng)=>@_random_digits(count,16,rng)
 
-  # **random_alphanumeric** - *generate a string of random numbers and letters*
-  #
-  # Generates a string of `count` pseudo-random characters from the set `[a-z0-9]`.
+  # **random_alphanumeric** - *generate a string of `count` pseudo-random characters from the set `[a-z0-9]`.
   @random_alphanumeric:(count=32,rng)=>@_random_digits(count,36,rng)
 
+  # **random_numeric** - *generate a string of `count` pseudo-random characters from the set `[0-9]`.*
+  @random_numeric:(count=32,rng)=>@_random_digits(count,10,rng)
+
+  # **random_Alpha** - *generate a string of `count` pseudo-random characters from the set `[a-zA-Z]` (mixed case).
+  @random_Alpha:(count=32,rng)=>@_random_alpha(count,'M',rng)
+
+  # **random_ALPHA** - *generate a string of `count` pseudo-random characters from the set `[A-Z]` (upper case).
+  @random_ALPHA:(count=32,rng)=>@_random_alpha(count,'U',rng)
+
+  # **random_alpha** - *generate a string of `count` pseudo-random characters from the set `[a-z]` (lower case).
+  @random_alpha:(count=32,rng)=>@_random_alpha(count,'L',rng)
+
+  # lettercase = 'upper', 'lower', 'both' (or 'mixed')
+  @_random_alpha:(count=32,lettercase='lower',rng)=>
+    rng ?= @rng
+    str = ""
+    include_upper = /^(u|b|m)/i.test lettercase
+    include_lower = not /^u/i.test lettercase # everything but `UPPER` includes `LOWER`, to avoid both checks being false
+    while str.length < count
+      char = Math.floor(rng()*26)
+      if include_upper and include_lower
+        if rng() > 0.5
+          char += 97 # a
+        else
+          char += 65 # A
+      else if include_upper
+        char += 65 # A
+      else
+        char += 97 # a
+      str += String.fromCharCode(char)
+    return str
+
+  # **random_element** - *selects a random element from the given array (or map)*
+  # In the case of a map, a random key/value pair will be returned as a two-element array.
+  @random_element:(collection,rng)=>
+    unless collection?
+      return undefined
+    else
+      if Array.isArray(collection)
+        unless collection.length > 0
+          return undefined
+        else
+          rng ?= @rng
+          index = Math.floor(rng()*collection.length)
+          return collection[index]
+      else if collection? and typeof collection is 'object'
+        key = @random_element(Object.keys(collection),rng)
+        return [key,collection[key]]
+
   # **_random_digits** - *generate a string of random bytes in the specfied base number system*
-  #
   # (An internal method that generates `count` characters in the specified base.)
   @_random_digits:(args...)=> #count=32,base,rng
     ints = []
@@ -1652,9 +1697,14 @@ class Util
   @random_bytes:          RandomUtil.random_bytes
   @random_hex:            RandomUtil.random_hex
   @random_alphanumeric:   RandomUtil.random_alphanumeric
+  @random_numeric:        RandomUtil.random_numeric
+  @random_alpha:          RandomUtil.random_alpha
+  @random_ALPHA:          RandomUtil.random_ALPHA
+  @random_Alpha:          RandomUtil.random_Alpha
+  @random_element:        RandomUtil.random_element
   @seed_rng:              RandomUtil.seed_rng
   @set_rng:               RandomUtil.set_rng
-  @random_digits:         RandomUtil.random_digits
+  @random_digits:         RandomUtil._random_digits
 
   @validate_hashed_password:PasswordUtil.validate_hashed_password
   @hash_password:PasswordUtil.hash_password
