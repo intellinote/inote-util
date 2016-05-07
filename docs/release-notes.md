@@ -72,7 +72,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 ### Enhancements
 
- * Now fully compatible with Node versions 0.10 thru 6.1.
+ * Now fully compatible with Node versions 0.10 thru 6.1.  (See the [Travis build status here](https://travis-ci.org/intellinote/inote-util).)
  * Clarified second argument of `Util.field_comparator` and `Util.path_comparator` as "use locale compare".  (When `true` string-valued arguments are compared using `localeCompare`.)
 
 ### Changes
