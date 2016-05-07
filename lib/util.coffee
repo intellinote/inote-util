@@ -271,7 +271,7 @@ class StringUtil
     return data
 
 
-  # **truncate** - *a minimally "smart" truncation that attempts to truncate a string at a word boundarie*
+  # **truncate** - *a minimally "smart" truncation that attempts to truncate a string at a word boundaries
   #
   # truncates `text` to at most `width` characters, appending the specified
   # `marker` when an actual truncation occurred.  (pass an empty string--`''`--to
@@ -992,8 +992,12 @@ class ComparatorUtil
   # E.g., `field_comparator('foo')` will compare two objects `A` and `B`
   # based on the value of `A.foo` and `B.foo`.
   #
-  # When `ignore_case` is `true`, string-valued fields will be compared in a
-  # case-insensitive way.
+  # When `locale_compare` is `true`, string-valued fields will be compared using
+  # the `localeCompare` function.  Otherwise the (ASCII-betical) `<` and `>`
+  # operators are used.
+  #
+  # Also see `compare`.
+  #
   @field_comparator:(field,locale_compare=false)=>@path_comparator([field],locale_compare)
 
   # **path_operator** - *compares objects based on (optionally nested) attributes*
@@ -1014,8 +1018,11 @@ class ComparatorUtil
   # `path_comparator(path)(a,b)` will compare `null` and `{ bar: null }`, since
   # the value of `a.foo` is `null`.)
   #
-  # When `ignore_case` is `true`, string-valued fields will be compared in a
-  # case-insensitive way.
+  # When `locale_compare` is `true`, string-valued fields will be compared using
+  # the `localeCompare` function.  Otherwise the (ASCII-betical) `<` and `>`
+  # operators are used.
+  #
+  # Also see `compare`.
   #
   @path_comparator:(path,locale_compare=false)=>
     (a,b)=>
