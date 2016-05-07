@@ -785,7 +785,7 @@ class RandomUtil
   @seed_rng:(seed)->new Math.seedrandom(seed)
   @set_rng:(rng = Math.random)=>@rng = rng
   @rng:Math.random
-    
+
   # **random_hex** - *generate a string of `count` pseudo-random characters from the set ``[0-9a-f]``.
   @random_hex:(count=32,rng)=>@_random_digits(count,16,rng)
 
@@ -952,11 +952,12 @@ class ComparatorUtil
   # A basic comparator.
   #
   # When `a` and `b` are strings, they are compared in a case-folded
-  # sort (`a` before `B`) using `String.prototype.localeCompare`.
+  # sort (both 'A' and `a` before both `B` and 'b') using
+  # `String.prototype.localeCompare`.
   #
   # Otherwise JavaScript's default `<` and `>` operators are used.
   #
-  # This method `null` values, which are sorted before any non-null values.
+  # This method allows `null` values, which are sorted before any non-null values.
   #
   # Returns:
   #  - a positive integer when `a > b`, or when `a` is not `null` and `b` is `null`
@@ -981,25 +982,9 @@ class ComparatorUtil
     else
       return 0
 
-  # **case_insensitive_compare** - *a case-insensitive comparator function*
-  #
-  # Compares to elements (exactly like `compare`), with two exceptions:
-  #   1. Any string-valued argument is converted to upper case before the comparison.
-  #   2. If the case-insensitive comparison yields `0` (i.e., the two case-insensitive
-  #      values are equal), a case-sensitive comparison is used as a tie-breaker).
-  @case_insensitive_compare:(a,b)=>
-    if a?.toUpperCase?
-      A = a.toUpperCase()
-    else
-      A = a
-    if b?.toUpperCase?
-      B = b.toUpperCase()
-    else
-      B = b
-    result = @compare(A,B)
-    if result is 0
-      result = @compare(a,b)
-    return result
+  # DEPRECATED - just use @compare
+  @case_insensitive_compare:(a,b)=>@compare(a,b)
+
 
   # **field_comparator** - *compares objects based on an attribute*
   #
@@ -1009,7 +994,7 @@ class ComparatorUtil
   #
   # When `ignore_case` is `true`, string-valued fields will be compared in a
   # case-insensitive way.
-  @field_comparator:(field,ignore_case=false)=>@path_comparator([field],ignore_case)
+  @field_comparator:(field,locale_compare=false)=>@path_comparator([field],locale_compare)
 
   # **path_operator** - *compares objects based on (optionally nested) attributes*
   #
@@ -1032,17 +1017,29 @@ class ComparatorUtil
   # When `ignore_case` is `true`, string-valued fields will be compared in a
   # case-insensitive way.
   #
-  @path_comparator:(path,ignore_case=false)=>
+  @path_comparator:(path,locale_compare=false)=>
     (a,b)=>
-      fn = if ignore_case then 'case_insensitive_compare' else 'compare'
+      fn = null
+      if locale_compare
+        fn = Util.compare
+      else
+        fn = (a,b)=>
+          if a? and b?
+            return (if a > b then 1 else (if a < b then -1 else 0))
+          else if a? and not b?
+            return 1
+          else if b? and not a?
+            return -1
+          else
+            return 0
       A = a
       B = b
       for f in path
         A = A?[f]
         B = B?[f]
         unless A? and B? # should we continue walking the graph if one of the values is not-null?
-          return Util[fn](A,B)
-      return Util[fn](A,B)
+          return fn(A,B)
+      return fn(A,B)
 
   # **desc_comparator** - *reverses another comparison function.*
   #
@@ -1524,8 +1521,8 @@ class AsyncUtil
             else
               run_more()
     run_more()
-    
-    
+
+
   # **procedure** - *generates a new `Sequencer` object, as described below.*
   @procedure:()=>(new Sequencer())
 

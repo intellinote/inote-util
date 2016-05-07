@@ -29,5 +29,5 @@
   "scripts": {
     "test":"./node_modules/.bin/mocha -t 6000  -R list --compilers coffee:coffee-script/register ./test/test-*.coffee"
   },
-  "engines": { "node": ">=0.10"  }
+  "engines": { "node": ">=0.10.45"  }
 }

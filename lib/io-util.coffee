@@ -21,6 +21,7 @@ class IOUtil
     if options? and typeof options is 'function' and not callback?
       callback = options
       options = null
+    options ?= {}
     out = fs.createWriteStream(dest,options)
     out.on 'close', callback
     out.on 'error', callback
@@ -48,6 +49,7 @@ class IOUtil
       callback = options
       options = null
     params = {}
+    options ?= {}
     if typeof url is 'string'
       params.url = url
     else

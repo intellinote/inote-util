@@ -390,7 +390,7 @@ describe 'Util',->
       (k in Object.keys(m)).should.be.ok
       v.should.equal(k.toUpperCase())
     done()
-    
+
 
   it "random_element handles nulls and empty collections sensibly",(done)->
     tests = [
@@ -1055,14 +1055,25 @@ describe 'Util',->
       "gamma"
     ]
     list = list.sort(Util.compare)
-    list[0].should.equal "Alpha"
-    list[1].should.equal "alpha"
-    list[2].should.equal "Beta"
-    list[3].should.equal "beta"
-    list[4].should.equal "Gamma"
-    list[5].should.equal "gamma"
-    list[6].should.equal "Omega"
-    list[7].should.equal "omega"
+    # javascript's String.localeCompare changed "A before a" to "a before A" around version 0.12
+    if /v0\.10/.test process.version
+      list[0].should.equal "Alpha"
+      list[1].should.equal "alpha"
+      list[2].should.equal "Beta"
+      list[3].should.equal "beta"
+      list[4].should.equal "Gamma"
+      list[5].should.equal "gamma"
+      list[6].should.equal "Omega"
+      list[7].should.equal "omega"
+    else
+      list[0].should.equal "alpha"
+      list[1].should.equal "Alpha"
+      list[2].should.equal "beta"
+      list[3].should.equal "Beta"
+      list[4].should.equal "gamma"
+      list[5].should.equal "Gamma"
+      list[6].should.equal "omega"
+      list[7].should.equal "Omega"
     done()
 
   it "compare compares elements", (done)->
@@ -1077,8 +1088,12 @@ describe 'Util',->
     Util.compare("ABCD","ABCE").should.be.below 0
     Util.compare("z","A").should.be.above 0
     Util.compare("Z","a").should.be.above 0
-    Util.compare("a","A").should.be.above 0
-    Util.compare("A","a").should.be.below 0
+    if /^v0\.10/.test process.version
+      Util.compare("a","A").should.be.above 0
+      Util.compare("A","a").should.be.below 0
+    else
+      Util.compare("a","A").should.be.below 0
+      Util.compare("A","a").should.be.above 0
     done()
 
   it "case_insensitive_compare compares elements in a case insenstive way", (done)->
@@ -1094,10 +1109,14 @@ describe 'Util',->
     Util.case_insensitive_compare("z","A").should.be.above 0
     Util.case_insensitive_compare("Z","A").should.be.above 0
     Util.case_insensitive_compare("z","a").should.be.above 0
-    Util.case_insensitive_compare("A","a").should.be.below 0
-    Util.case_insensitive_compare("a","A").should.be.above 0
     Util.case_insensitive_compare("a","a").should.equal 0
     Util.case_insensitive_compare("A","A").should.equal 0
+    if /v0\.10/.test process.version
+      Util.case_insensitive_compare("A","a").should.be.below 0
+      Util.case_insensitive_compare("a","A").should.be.above 0
+    else
+      Util.case_insensitive_compare("A","a").should.be.above 0
+      Util.case_insensitive_compare("a","A").should.be.below 0
     done()
 
   it "field_comparator generates simple field comparators", (done)->
