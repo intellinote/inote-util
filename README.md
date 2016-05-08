@@ -3,91 +3,293 @@
 
 A collection of utility functions and classes for Node.js.
 
-## Features (incomplete)
+## Features
 
-* **LogUtil.tlog(...)** - writes to stdout (`console.log`), pre-pending a timestamp.
-* **LogUtil.terr(...)** - writes to stderr (`console.error`), pre-pending a timestamp.
-* **DateUtil.start_time** - timestamp at which `inote-util` was loaded (hence approximately the time the application was started in most circumstances).
-* **DateUtil.duration([now = Date.now(),]since)** - returns an object that breaks-down the time between `now` and `since` in several ways (see code for details).
-* **DateUtil.iso_8601_regexp()** - returns a regular expression that can be used to validate an ISO 8601 formatted date.
-* **StringUtil.trim(str)** - equivalent to `String.trim()` save that `str` can be `null`.
-* **StringUtil.is_blank(str)** - `true` whenever `str` is empty, composed entirely of whitespace, `null` or `undefined`.
-* **StringUtil.isnt_blank(str)** - opposite of `is_blank()`
-* **StringUtil.blank_to_null(str)** - given a "blank" string, returns `null`. Given an object (map), removes any *top-level* "blank" attributes.
-* **StringUtil.truncate(str,width[,marker='…']** - a minimally "smart" truncation that attempts to truncate a string at a word boundaries. The specified `marker` will be added if and only if the string was actually truncated.
-* **StringUtil.escape_for_json(str)** - escapes a (possibly `null`) string for use as literal characters in a JSON string.
-* **StringUtil.escape_for_regexp(str)** - escapes a (possibly `null`) string for use as literal characters in a regular expression.
-* **StringUtil.truthy_string(str)** - `true` if the given string is `t`, `true`, `y`, `yes`, `on`, `1`, etc.
-* **StringUtil.falsey_string(str)** - `true` if the given string is `f`, `false`, `no`, `off`, `0`, etc.
-* **StringUtil.lpad(value,width,pad)** - adds `pad` characters to the beginning of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.lpad`, which is an identical method.)
-* **StringUtil.rpad(value,width,pad)** - adds `pad` characters to the end of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.rpad`, which is an identical method.)
-* **ArrayUtil.lpad(value,width,pad)** - adds `pad` elements to the beginning of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.lpad`, which is identical.)
-* **ArrayUtil.rpad(value,width,pad)** - adds `pad` elements to the end of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.rpad`, which is identical.)
-* **ArrayUtil.smart_join(array,delim,last_delim)** - identical to `Array.join`, except the specified `last_delim` is used between the last two elements (if any). E.g., `smart_join(["Tom","Dick","Harry"],", "," and ")` yields `Tom, Dick and Harry`.
-* **ArrayUtil.trim_trailing_null(array)** - returns a copy of `array` with trailing `null` elements removed
-* **ArrayUtil.right_shift_args(...)** - returns an array the same length as the given arguments, but any trailing `null` values are converted to leading `null` values. (Most useful in the CoffeeScript idiom `[a,b,c,d] = right_shift_args(a,b,c,d)`.)
-* **ArrayUtil.paginate_list(list[,offset=0[,limit=20]])** - returns the specified section of the given array.
-* **ArrayUtil.subset_of(a,b) / ArrayUtil.is_subset_of(a,b)** - returns `true` if every element of array a is also an element of b.
-* **ArrayUtil.strict_subset_of(a,b) / ArrayUtil.is_strict_subset_of(a,b)** - returns `true` if every element of array a appears exacty the same number of times in array b as it does in array a. (E.g., `['a','a','b']` is subset of but not a *strict* subset of `['a','b','c']`, according to this definition).
-* **ArrayUtil.sets_are_equal(a,b)** - compares arrays as if they were sets.
-* **ArrayUtil.arrays_are_equal(a,b)** - `true` if and only if array a and array b contain the exact same elements in the exact same order.
-* **ArrayUtil.uniquify(array[,key])** - returns a clone of `array` with duplicate values removed. When the array contains objects (maps) and a `key` is provided, two elements will be considered duplicates if they have the same value for the attribute `key`.
-* **NumberUtil.round_decimal(value[,digits=0])** - round a number to the specified number of digits to the right of the decimal point.
-* **NumberUtil.is_int(val)** - returns `true` if and only if `val` is a simple integer (matching `/^-?[0-9]+$/).
-* **NumberUtil.to_int(val)** - returns `parseInt(val)` when `val` is a simple integer (matching `/^-?[0-9]+$/), `null` otherwise. (Compare with the default behavior of `parseInt`, which returns `17` for `parseInt("17.93 meters")`).
-* **ColorUtil.hex_to_rgb_triplet(hex)** - converts a hex-based `#rrggbb` string to decimal `[r,g,b]` values.
-* **ColorUtil.hex_to_rgb_string(hex)** - converts a hex-based `#rrggbb` string to a string of the form `rgb(r,g,b)`.
-* **ColorUtil.rgb_string_to_triplet(rgb)** - converts a string of the form `rgb(r,g,b)` to decimal `[r,g,b]` values.
-* **ColorUtil.rgb_triplet_to_string(r,g,b)** - convert an array or sequence of r, g, b values to a string of the form `rgb(r,g,b)`.
-* **RandomUtil.random_bytes([count=32[,encoding='hex']])** - returns `count` random bytes in the specified `encoding`.
-* **RandomUtil.seed_rng(seed)** - returns a new `random()` function with the specified `seed` value.
-* **RandomUtil.set_rn([rng = Math.random])** - sets the `random()` function used by the `RandomUtil` methods.
-* **RandomUtil.random_hex([count=32[,rng]])** - returns `count` random hexadecimal digits (`[a-f0-9]`) (using the given random number generator if provided).
-* **RandomUtil.random_alphanumeric([count=32[,rng]])** - returns `count` random digits from the set `[a-z0-9]` (using the given random number generator if provided).
-* **RandomUtil.random_alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-z]` (using the given random number generator if provided).
-* **RandomUtil.random_numeric([count=32[,rng]])** - returns `count` random digits from the set `[0-9]` (using the given random number generator if provided).
-* **RandomUtil.random_Alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-zA-Z]` (using the given random number generator if provided).
-* **RandomUtil.random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
-* **RandomUtil.random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).
-* **Util.slow_equals(a,b)** - constant-time comparison of two buffers for equality.
-* **Util.compare(a,b)** - a minimally-smart comparision function (allows `null`, uses `localeCompare` when available, folds case so that both `A` and `a` appear before `B`, etc.).
-* **Util.field_comparator(field\[,use_locale_compare=false])** - returns a comparator (`function(a,b)`) that compares two maps on the `field` attribute.
-* **Util.path_comparator(path\[,use_locale_compare=false])** - like `field_comparator`, but `path` may be an array of fields that will be interpreted as nested-attributes. (E.g., `["foo","bar"]` compares `a.foo.bar` with `b.foo.bar`.)
-* **Util.descending_comparator(comparator) / desc_comparator(comparator)** - reverses the order of the given `comparator`.
-* **Util.composite_comparator(list)** - generates a comparator that first compares elements by `list[0]` then (if equal) `list[1]` and so on, until a non-equal comparison is found or we run out of comparators.
-* **FileUtil.sanitize_filename(filename)** - removes invalid characters from and truncates extremely long filenames; only operates on the (last segement of) the given filename.
-* **FileUtil.uniquify_filename(dir,basename[,ext=''[,minpadwidth=3\[,maxpadwidth=5]])** - attempts to generate a unique filename in `dir` based on `basename`.
-* **FileUtil.mkdir(dir)** - `mkdir -p dir`
-* **FileUtil.touch(file)** - `touch file`
-* **FileUtil.rm(files...)** - remove one or more files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
-* **FileUtil.rmdir(dirs...)** - recursively remove one or more diretctories or files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
-* **FileUtil.read_stdin_sync([end_byte="\x04"\[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
-* **FileUtil.load_json_file_sync(file\[,ignore_errors=false])** - synchronously read and parse a JSON file. When `ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.
-* **FileUtil.load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
-* **WebUtil.remote_ip(req,name,default_value)** - attempts to discover the proper "client IP" for the given request using various approaches.
-* **WebUtil.param(req)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js
-* **Util.handle_error(err[,callback\[,throw_when_no_callback=true]])** - if `err` is not `null`, invokes `callback(err)` or `throw err` as appropriate. Returns `true` if an error was encountered, `false` otherwise. (`function my_callback(err,other,stuff) { if(!handle_error(err,callback)) { /* keep going */ } }`)
-* **Util.uuid(val\[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
-* **Util.pad_uuid(val\[,generate=false])** - normalize `val` to all a lower-case, with-dashes version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
-* **Util.b64e(buf\[,encoding='utf8']) / Base64.encode(buf\[,encoding='utf8'])** - Base64 encode the given buffer.
-* **Util.b64d(buf\[,encoding='utf8']) / Base64.decode(buf\[,encoding='utf8'])** - Base64 *decode* the given buffer.
-* **AsyncUtil.wait(delay,callback) / AsyncUtil.set_timeout(delay,callback) / AsyncUtil.setTimeout(delay,callback)** - just like `setTimeout(callback,delay)` but with a more CoffeeScript-friendly parameter order.
-* **AsyncUtil.cancel_wait(id) / AsyncUtil.clear_timeout(id) / AsyncUtil.clearTimeout(id)** - alias for `window.clearTimeout(id)`.
-* **AsyncUtil.interval(delay,callback) / AsyncUtil.set_intreval(delay,callback) / AsyncUtil.setInterval(delay,callback)** - just like `setInterval(callback,delay)` but with a more CoffeeScript-friendly parameter order.
-* **AsyncUtil.cancel_interval(id) / AsyncUtil.cancelInterval(id) / AsyncUtil.clear_interval(id) / AsyncUtil.clearlInterval(id)** - alias for `window.clearInterval(id)`.
-* **AsyncUtil.for_async(initialize,condition,action,increment,whendone)** - executes an asynchronous `for` loop. Accepts 5 function-valued parameters:
+### ArrayUtil
+* **lpad(value,width,pad)** - adds `pad` elements to the beginning of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.lpad`, which is identical.)
+* **rpad(value,width,pad)** - adds `pad` elements to the end of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.rpad`, which is identical.)
+* **smart_join(array,delim,last_delim)** - identical to `Array.join`, except the specified `last_delim` is used between the last two elements (if any). E.g., `smart_join(["Tom","Dick","Harry"],", "," and ")` yields `Tom, Dick and Harry`.
+* **trim_trailing_null(array)** - returns a copy of `array` with trailing `null` elements removed
+* **right_shift_args(...)** - returns an array the same length as the given arguments, but any trailing `null` values are converted to leading `null` values. (Most useful in the CoffeeScript idiom `[a,b,c,d] = right_shift_args(a,b,c,d)`.)
+* **paginate_list(list[,offset=0[,limit=20]])** - returns the specified section of the given array.
+* **subset_of(a,b) / ArrayUtil.is_subset_of(a,b)** - returns `true` if every element of array a is also an element of b.
+* **strict_subset_of(a,b) / ArrayUtil.is_strict_subset_of(a,b)** - returns `true` if every element of array a appears exacty the same number of times in array b as it does in array a. (E.g., `['a','a','b']` is subset of but not a *strict* subset of `['a','b','c']`, according to this definition).
+* **sets_are_equal(a,b)** - compares arrays as if they were sets.
+* **arrays_are_equal(a,b)** - `true` if and only if array a and array b contain the exact same elements in the exact same order.
+* **uniquify(array[,key])** - returns a clone of `array` with duplicate values removed. When the array contains objects (maps) and a `key` is provided, two elements will be considered duplicates if they have the same value for the attribute `key`.
+
+### AsyncUtil
+* **wait(delay,callback) / AsyncUtil.set_timeout(delay,callback) / AsyncUtil.setTimeout(delay,callback)** - just like `setTimeout(callback,delay)` but with a more CoffeeScript-friendly parameter order.
+* **cancel_wait(id) / AsyncUtil.clear_timeout(id) / AsyncUtil.clearTimeout(id)** - alias for `window.clearTimeout(id)`.
+* **interval(delay,callback) / AsyncUtil.set_intreval(delay,callback) / AsyncUtil.setInterval(delay,callback)** - just like `setInterval(callback,delay)` but with a more CoffeeScript-friendly parameter order.
+* **cancel_interval(id) / AsyncUtil.cancelInterval(id) / AsyncUtil.clear_interval(id) / AsyncUtil.clearlInterval(id)** - alias for `window.clearInterval(id)`.
+* **for_async(initialize,condition,action,increment,whendone)** - executes an asynchronous `for` loop. Accepts 5 function-valued parameters:
   * `initialize` - an initialization function (no arguments passed, no return value is expected);
   * `condition` - a predicate that indicates whether we should continue looping (no arguments passed, a boolean value is expected to be returned);
   * `action` - the action to take (a single callback function is passed and should be invoked at the end of the action, no return value is expected);
   * `increment` - called at the end of every `action`, prior to `condition` (no arguments passed, no return value is expected);
   * `whendone` - called at the end of the loop (when `condition` returns `false`), (no arguments passed, no return value is expected).
-* **AsyncUtil.for_each_async(list,action,whendone)** - executes an asynchronous `forEach` loop. Accepts 3 parameters:
+* **for_each_async(list,action,whendone)** - executes an asynchronous `forEach` loop. Accepts 3 parameters:
   * `list` - the array to iterate over;
   * `action` - a function with the signature `(value,index,list,next)` indicating the action to take for each element (*must* call `next` for processing to continue);
   * `whendone` - called at the end of the loop.
-* **AsyncUtil.fork(methods, args_for_methods, callback)** - runs the given array of methods "simaltaneously" (asynchronously), invoking `callback` when they are *all* complete.
-* **AsyncUtil.throttled_fork(max_parallel, methods, args_for_methods, callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
-* **AsyncUtil.procedure()** - generates a `Sequencer` object, as described below
+* **fork(methods, args_for_methods, callback)** - runs the given array of methods "simaltaneously" (asynchronously), invoking `callback` when they are *all* complete.
+* **throttled_fork(max_parallel, methods, args_for_methods, callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
+* **procedure()** - generates a `Sequencer` object, as described below
+
+#### The Sequencer
+
+The methods `Util.procedure()`, `AsyncUtil.procedure()`, and `new Sequencer()` will create a new "sequencer" object that provides a simple way to "flatten" long chains of nested asynchronous methods.
+
+For example, rather than writing:
+
+```javascript
+method_one( function(e,a,b) {
+  method_two(a, b, function() {
+    method_three( function(e,c,d) {
+      and_so_on();
+    });
+  });
+});
+```
+
+We can flatten the calls out like this:
+
+```javascript
+var procedure = Util.procedure();
+procedure.first( method_one );
+procedure.then( method_two );
+procedure.then( method_three );
+procedure.then( and_so_on );
+procedure.run();
+```
+
+Each call to `then` appends the given callback method to the chain.
+
+Each callback method is passed a `next_step` function that *must* be called to trigger the next step in the processing.
+
+Note that any arguments passed to `next_step()` will be passed to the next method in the sequence (with the `next` function appended). For example, given a method in the sequence such as:
+
+```javascript
+procedure.next(function(next_step) {
+  next_step(1,"A",[]);
+});
+```
+The following method in the procedure will be invoked with the following signature:
+
+```javascript
+the_next_method_in_the_sequence(1,"A",[],next_step);
+```
+
+Hence the typical use of the class looks something like this:
+
+```javascript
+var s = new Sequencer()
+s.first( function(done) {
+  // do something, then invoke the callback
+  done();
+});
+
+s.next( function(done) {
+  // do something, then invoke the callback
+  done();
+});
+s.next( function(done) {
+  // do something, then invoke the callback
+  done();
+});
+
+s.run();
+```
+
+When `run` is invoked, each asynchronous  method is executed in sequence.
+
+The `first` method is optional (you can just use `next` instead), but when invoked `first` will remove any methods previously added to the chain.
+
+You `last` methods is an optional short-hand for adding one final method to the chain and then running it.  E.g., the last two lines of our example:
+
+```javascript
+procedure.then( and_so_on )
+procedure.run()
+```
+
+Could be re-written:
+
+```javascript
+procedure.last( and_so_on )
+```
+
+Note that the sequence is not cleared when `run` is invoked, so one may invoke `run` more than once to execute the sequence again.
+
+### ColorUtil
+* **hex_to_rgb_triplet(hex)** - converts a hex-based `#rrggbb` string to decimal `[r,g,b]` values.
+* **hex_to_rgb_string(hex)** - converts a hex-based `#rrggbb` string to a string of the form `rgb(r,g,b)`.
+* **rgb_string_to_triplet(rgb)** - converts a string of the form `rgb(r,g,b)` to decimal `[r,g,b]` values.
+* **rgb_triplet_to_string(r,g,b)** - convert an array or sequence of r, g, b values to a string of the form `rgb(r,g,b)`.
+
+### Config
+A thin wrapper around [`nconf`](https://github.com/flatiron/nconf) providing a consistent way to load configuration data from files or the environment.
+
+EXAMPLE OF USE
+
+```javascript
+var config = require('inote-util').config.init();
+var prop = config.get('my:property');
+```
+
+`Config` will load the configuration from several sources.
+
+In order of precedence:
+
+1. "Override" values passed to the `init` function.
+
+2. Command line parameters (`--name value`).
+
+3. A JSON-format configuration file (from a location deterimined by
+  `NODE_ENV`, `config_dir` or `config_file`).
+
+4. Environment variables.
+
+5. A "default" JSON-format configuration file at `${config_dir}/config.json`.
+
+6. "Default" values passed to the `init` function.
+
+To discover a configuration file (as used in step 3 above), `Config` will:
+
+  1. Look for `NODE_ENV`, `config_dir` or `config_file` environment variables.
+
+  2. If `config_dir` is set, the value will be used as the "parent" directory
+  of the configuration files.  (If `config_dir` is not set, it defaults to
+  the directory `config` within the working directory from which the current
+  Node.js process was launched.)
+
+  3. If `NODE_ENV` is set and a file named `${NODE_ENV}.json` exists within
+  the `config_dir`, that file will be used.
+
+  4. If `config_file` is set, that file will be used.
+
+### DateUtil
+* **start_time** - timestamp at which `inote-util` was loaded (hence approximately the time the application was started in most circumstances).
+* **duration([now = Date.now(),]since)** - returns an object that breaks-down the time between `now` and `since` in several ways (see code for details).
+* **iso_8601_regexp()** - returns a regular expression that can be used to validate an ISO 8601 formatted date.
+
+### FileUtil
+* **sanitize_filename(filename)** - removes invalid characters from and truncates extremely long filenames; only operates on the (last segement of) the given filename.
+* **uniquify_filename(dir,basename[,ext=''[,minpadwidth=3\[,maxpadwidth=5]])** - attempts to generate a unique filename in `dir` based on `basename`.
+* **mkdir(dir)** - `mkdir -p dir`
+* **touch(file)** - `touch file`
+* **rm(files...)** - remove one or more files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
+* **rmdir(dirs...)** - recursively remove one or more diretctories or files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
+* **read_stdin_sync([end_byte="\x04"\[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
+* **load_json_file_sync(file\[,ignore_errors=false])** - synchronously read and parse a JSON file. When `ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.
+* **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
+
+### IOUtil
+* **pipe_to_file(readable_stream,dest,options,callback)** - write a stream to a file.
+* **pipe_to_buffer(readable_stream,callback)** - write a stream to a buffer.
+* **download_to_file(url,dest,options,callback)** - write the contents of a URL to a file.
+* **download_to_buffer(url,callback)** - write the contents of a URL to a buffer.
+
+### LogUtil
+* **tlog(...)** - writes to stdout (`console.log`), pre-pending a timestamp.
+* **terr(...)** - writes to stderr (`console.error`), pre-pending a timestamp.
+
+### NumberUtil
+* **round_decimal(value[,digits=0])** - round a number to the specified number of digits to the right of the decimal point.
+* **is_int(val)** - returns `true` if and only if `val` is a simple integer (matching `/^-?[0-9]+$/).
+* **to_int(val)** - returns `parseInt(val)` when `val` is a simple integer (matching `/^-?[0-9]+$/), `null` otherwise. (Compare with the default behavior of `parseInt`, which returns `17` for `parseInt("17.93 meters")`).
+
+### ObjectUtil
+* **remove_null(map)** - generates a (shallow) *clone* of the map, with `null` entries removed.
+* **remove_falsey(map)** - generates a (shallow) *clone* of the map, with "falsey" entries removed (see `falsey_string`).
+* **merge(maps...)** - given two or more maps `a` and `b`, creates new new map containing the union of elements from each. If `a` and `b` share a key, the value in `b` will overwrite the value in `a`.
+* **shallow_clone(obj)** - create a shallow clone of the given map or array.
+* **deep_clone(obj)** - recursively copy the elements `obj` into a new map (or array)
+* **object_array_to_map(array,key_field[,options={})])** - Given a list of objects, creates a map from `elt[key_field]` to `elt` for each `elt` in the array.
+  * `options.transform` - an optional function used to transform the value of `elt[key_field]` before using it as the map key.
+  * `options.duplicates` - a string indicating how to handle duplicate keys:
+    * `"overwrite"` - replace the old value with the new value (the default)
+    * `"stack"` - create an array containing both values (in sequence)
+    * `"merge"` - merge the objects using `Util.merge(old,new)`
+    * `"skip"` - keep the old value and ignore the new one
+
+### RandomUtil
+* **random_bytes([count=32[,encoding='hex']])** - returns `count` random bytes in the specified `encoding`.
+* **seed_rng(seed)** - returns a new `random()` function with the specified `seed` value.
+* **set_rn([rng = Math.random])** - sets the `random()` function used by the `RandomUtil` methods.
+* **random_hex([count=32[,rng]])** - returns `count` random hexadecimal digits (`[a-f0-9]`) (using the given random number generator if provided).
+* **random_alphanumeric([count=32[,rng]])** - returns `count` random digits from the set `[a-z0-9]` (using the given random number generator if provided).
+* **random_alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-z]` (using the given random number generator if provided).
+* **random_numeric([count=32[,rng]])** - returns `count` random digits from the set `[0-9]` (using the given random number generator if provided).
+* **random_Alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-zA-Z]` (using the given random number generator if provided).
+* **random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
+* **random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).
+
+### Stopwatch
+A simple utility that can be used to track and report the time it takes to do some thing in your JavaScript code.
+
+#### Basic Use
+
+```javascript
+var SW = require('inote-util').Stopwatch;
+var timer = SW.start();
+// ...do something...
+timer.stop();
+console.log("Start Time:  ",timer.start_time);
+console.log("Finish Time: ",timer.finish_time);
+console.log("Elapsed Time:",timer.elapsed_time);
+```
+
+#### Wrapped (Synchronous)
+
+```javascript
+timer = SW.time( some_method );
+console.log("some_method took",timer.elapsed_time,"millis to complete.");
+```
+
+#### "Cookies"
+
+The `start` and `time` methods accept an optional map of attributes that will be bundled with the returned timer.  For example:
+
+```javascript
+timer = SW.start({label:"foo"});
+// ...do something...
+timer.stop();
+console.log(timer.label," Start Time:  ",timer.start_time);
+console.log(timer.label,"Finish Time: ",timer.finish_time);
+console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
+```
+
+### StringUtil
+* **trim(str)** - equivalent to `String.trim()` save that `str` can be `null`.
+* **is_blank(str)** - `true` whenever `str` is empty, composed entirely of whitespace, `null` or `undefined`.
+* **isnt_blank(str)** - opposite of `is_blank()`
+* **blank_to_null(str)** - given a "blank" string, returns `null`. Given an object (map), removes any *top-level* "blank" attributes.
+* **truncate(str,width[,marker='…'])** - a minimally "smart" truncation that attempts to truncate a string at a word boundaries. The specified `marker` will be added if and only if the string was actually truncated.
+* **escape_for_json(str)** - escapes a (possibly `null`) string for use as literal characters in a JSON string.
+* **escape_for_regexp(str)** - escapes a (possibly `null`) string for use as literal characters in a regular expression.
+* **truthy_string(str)** - `true` if the given string is `t`, `true`, `y`, `yes`, `on`, `1`, etc.
+* **falsey_string(str)** - `true` if the given string is `f`, `false`, `no`, `off`, `0`, etc.
+* **lpad(value,width,pad)** - adds `pad` characters to the beginning of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.lpad`, which is an identical method.)
+* **rpad(value,width,pad)** - adds `pad` characters to the end of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.rpad`, which is an identical method.)
+
+### Util
+* **slow_equals(a,b)** - constant-time comparison of two buffers for equality.
+* **compare(a,b)** - a minimally-smart comparision function (allows `null`, uses `localeCompare` when available, folds case so that both `A` and `a` appear before `B`, etc.).
+* **field_comparator(field\[,use_locale_compare=false])** - returns a comparator (`function(a,b)`) that compares two maps on the `field` attribute.
+* **path_comparator(path\[,use_locale_compare=false])** - like `field_comparator`, but `path` may be an array of fields that will be interpreted as nested-attributes. (E.g., `["foo","bar"]` compares `a.foo.bar` with `b.foo.bar`.)
+* **descending_comparator(comparator) / desc_comparator(comparator)** - reverses the order of the given `comparator`.
+* **composite_comparator(list)** - generates a comparator that first compares elements by `list[0]` then (if equal) `list[1]` and so on, until a non-equal comparison is found or we run out of comparators.
+* **handle_error(err[,callback\[,throw_when_no_callback=true]])** - if `err` is not `null`, invokes `callback(err)` or `throw err` as appropriate. Returns `true` if an error was encountered, `false` otherwise. (`function my_callback(err,other,stuff) { if(!handle_error(err,callback)) { /* keep going */ } }`)
+* **uuid(val\[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
+* **pad_uuid(val\[,generate=false])** - normalize `val` to all a lower-case, with-dashes version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
+* **b64e(buf\[,encoding='utf8']) / Base64.encode(buf\[,encoding='utf8'])** - Base64 encode the given buffer.
+* **b64d(buf\[,encoding='utf8']) / Base64.decode(buf\[,encoding='utf8'])** - Base64 *decode* the given buffer.
+
+
+### WebUtil
+* **remote_ip(req,name,default_value)** - attempts to discover the proper "client IP" for the given request using various approaches.
+* **param(req)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js
 
 ## Installing
 
