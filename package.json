@@ -8,21 +8,21 @@
   "author"      : "Intellinote <https://www.intellinote.net/>",
   "dependencies": {
     "mkdirp"                : "^0.5",
-    "nconf"                 : "^0.7",
+    "nconf"                 : "^0.8",
     "node-uuid"             : "^1.4",
     "remove"                : "^0.1",
     "request"               : "^2.58",
     "seedrandom"            : "^2.4"
   },
   "devDependencies": {
-    "coffee-coverage"       : "^0.6",
+    "coffee-coverage"       : "^1.0",
     "coffee-script"         : "^1.9",
     "docco"                 : "^0.7",
-    "highlight.js"          : "^8.6",
+    "highlight.js"          : "^9.3",
     "marked-toc"            : "^0.3",
     "marked"                : "^0.3",
     "mocha"                 : "^2.2",
-    "should"                : "^7.0",
+    "should"                : "^8.3",
     "zipstream"             : "^0.2"
   },
   "main": "lib/index.js",
