@@ -5,70 +5,78 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 - [inote-util Release Notes](#inote-util-release-notes)
-	- [Release 1.0.0 - 7 May 2016](#release-100-7-may-2016)
+	- [Release 1.0.1 (8 May 2016)](#release-101-8-may-2016)
+		- [Changes](#changes)
+	- [Release 1.0.0 (7 May 2016)](#release-100-7-may-2016)
 		- [Enhancements](#enhancements)
 		- [Changes](#changes)
-	- [Release 0.9.0 - 20 January 2016](#release-090-20-january-2016)
+	- [Release 0.9.0 (20 January 2016)](#release-090-20-january-2016)
 		- [Enhancements](#enhancements-1)
 		- [Bug Fixes](#bug-fixes)
-	- [Release 0.8.0 - 24 July 2015](#release-080-24-july-2015)
+	- [Release 0.8.0 (24 July 2015)](#release-080-24-july-2015)
 		- [Enhancements](#enhancements-2)
-	- [Release 0.7.0 - 16 July 2015](#release-070-16-july-2015)
+	- [Release 0.7.0 (16 July 2015)](#release-070-16-july-2015)
 		- [Enhancements](#enhancements-3)
 		- [Other](#other)
-	- [Release 0.6.1 - 20 April 2015](#release-061-20-april-2015)
+	- [Release 0.6.1 (20 April 2015)](#release-061-20-april-2015)
 		- [Enhancements](#enhancements-4)
 	- [Release 0.6.0 - 21 April 2015](#release-060-21-april-2015)
 		- [Enhancements](#enhancements-5)
 		- [Deprecated Methods](#deprecated-methods)
-	- [Release 0.5.9 - 21 April 2015](#release-059-21-april-2015)
+	- [Release 0.5.9 (21 April 2015)](#release-059-21-april-2015)
 		- [Bug Fixes](#bug-fixes-1)
-	- [Release 0.5.6 - 21 April 2015](#release-056-21-april-2015)
+	- [Release 0.5.6 (21 April 2015)](#release-056-21-april-2015)
 		- [Enhancements](#enhancements-6)
-	- [Release 0.5.5 - 1 April 2015](#release-055-1-april-2015)
+	- [Release 0.5.5 (1 April 2015)](#release-055-1-april-2015)
 		- [Enhancements](#enhancements-7)
-	- [Release 0.5.4 - 1 April 2015](#release-054-1-april-2015)
+	- [Release 0.5.4 (1 April 2015)](#release-054-1-april-2015)
 		- [Enhancements](#enhancements-8)
-	- [Release 0.5.3 - 1 April 2015](#release-053-1-april-2015)
+	- [Release 0.5.3 (1 April 2015)](#release-053-1-april-2015)
 		- [Enhancements](#enhancements-9)
-	- [Release 0.5.2 - 25 March 2015](#release-052-25-march-2015)
+	- [Release 0.5.2 (25 March 2015)](#release-052-25-march-2015)
 		- [Enhancements](#enhancements-10)
-	- [Release 0.5.1 - 25 March 2015](#release-051-25-march-2015)
-	- [Release 0.4.7 - 21 January 2015](#release-047-21-january-2015)
-	- [Release 0.4.6 - 21 January 2015](#release-046-21-january-2015)
+	- [Release 0.5.1 (25 March 2015)](#release-051-25-march-2015)
+	- [Release 0.4.7 (21 January 2015)](#release-047-21-january-2015)
+	- [Release 0.4.6 (21 January 2015)](#release-046-21-january-2015)
 		- [Enhancements](#enhancements-11)
-	- [Release 0.4.5 - 18 December 2014](#release-045-18-december-2014)
+	- [Release 0.4.5 (18 December 2014)](#release-045-18-december-2014)
 		- [Enhancements](#enhancements-12)
-	- [Release 0.4.4 - 17 December 2014](#release-044-17-december-2014)
+	- [Release 0.4.4 (17 December 2014)](#release-044-17-december-2014)
 		- [Enhancements](#enhancements-13)
-	- [Release 0.4.3 - 17 December 2014](#release-043-17-december-2014)
+	- [Release 0.4.3 (17 December 2014)](#release-043-17-december-2014)
 		- [Enhancements](#enhancements-14)
-	- [Release 0.4.2 - 12 December 2014](#release-042-12-december-2014)
+	- [Release 0.4.2 (12 December 2014)](#release-042-12-december-2014)
 		- [Enhancements](#enhancements-15)
 		- [Bug Fixes](#bug-fixes-2)
-	- [Release 0.4.1 - 11 December 2014](#release-041-11-december-2014)
+	- [Release 0.4.1 (11 December 2014)](#release-041-11-december-2014)
 		- [Enhancements](#enhancements-16)
-	- [Release 0.4.0 - 14 Novemver 2014](#release-040-14-novemver-2014)
+	- [Release 0.4.0 (14 Novemver 2014)](#release-040-14-novemver-2014)
 		- [Enhancements](#enhancements-17)
-	- [Release 0.3.5 - 2 Novemver 2014](#release-035-2-novemver-2014)
+	- [Release 0.3.5 (2 Novemver 2014)](#release-035-2-novemver-2014)
 		- [Enhancements](#enhancements-18)
-	- [Release 0.3.3 - 20 October 2014](#release-033-20-october-2014)
+	- [Release 0.3.3 (20 October 2014)](#release-033-20-october-2014)
 		- [Enhancements](#enhancements-19)
-	- [Release 0.3.2 - 20 October 2014](#release-032-20-october-2014)
+	- [Release 0.3.2 (20 October 2014)](#release-032-20-october-2014)
 		- [Enhancements](#enhancements-20)
-	- [Release 0.3.1 - 18 October 2014](#release-031-18-october-2014)
+	- [Release 0.3.1 (18 October 2014)](#release-031-18-october-2014)
 		- [Bug Fixes](#bug-fixes-3)
 		- [Enhancements](#enhancements-21)
-	- [Release 0.2.1 - 15 October 2014](#release-021-15-october-2014)
+	- [Release 0.2.1 (15 October 2014)](#release-021-15-october-2014)
 		- [Enhancements](#enhancements-22)
-	- [Release 0.2.0 - 5 October 2014](#release-020-5-october-2014)
+	- [Release 0.2.0 (5 October 2014)](#release-020-5-october-2014)
 		- [Bug Fixes](#bug-fixes-4)
 		- [Enhancements](#enhancements-23)
-	- [Release 0.1.1 - 30 September 2014](#release-011-30-september-2014)
+	- [Release 0.1.1 (30 September 2014)](#release-011-30-september-2014)
 
 <!-- tocstop -->
 
-## Release 1.0.0 - 7 May 2016
+## Release 1.0.1 (8 May 2016)
+
+### Changes
+
+ * Update `node-uuid` version to `^1.4.7`.
+
+## Release 1.0.0 (7 May 2016)
 
 ### Enhancements
 
@@ -81,7 +89,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
  * Deprecated `Util.case_insensitive_compare`, since it was always equivalent to `Util.compare`.
  * Note that in Node version 0.12, the behavior of the default `String.localeCompare` changed.  In v0.10, `"A".compare("a")` returns `-32`, yielding an sort-order like `A B C a b c`.  In v0.12 and later, `"A".compare("a")` returns `1`, yielding an sort-order like `a b c A B C`. inote-util makes no effort to "correct" for that, hence the order of strings returned by `Util.compare` will be different when run under Node v0.10 and under Node v0.12 and later.
 
-## Release 0.9.0 - 20 January 2016
+## Release 0.9.0 (20 January 2016)
 
 ### Enhancements
 
@@ -92,14 +100,14 @@ This file summarizes the changes bundled in each release of `inote-util`.
  * Adding missing `October` from date formatting methods.
 
 
-## Release 0.8.0 - 24 July 2015
+## Release 0.8.0 (24 July 2015)
 
 ### Enhancements
 
  * Added `AsyncUtil.fork` and `AsyncUtil.throttled_fork`.
 
 
-## Release 0.7.0 - 16 July 2015
+## Release 0.7.0 (16 July 2015)
 
 ### Enhancements
 
@@ -113,7 +121,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
  * Changed package.json to refer to explicit versions of dependencies, rather than just `latest`.
 
 
-## Release 0.6.1 - 20 April 2015
+## Release 0.6.1 (20 April 2015)
 
 ### Enhancements
 
@@ -131,19 +139,19 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
  * All methods of `MapUtil` have been moved to `ObjectUtil`. The `MapUtil` versions have been marked as deprecated.
 
-## Release 0.5.9 - 21 April 2015
+## Release 0.5.9 (21 April 2015)
 
 ### Bug Fixes
 
  * Ensure `IOUtil.download_to_buffer` always returns a raw-binary `Buffer` (never a `String`).
 
-## Release 0.5.6 - 21 April 2015
+## Release 0.5.6 (21 April 2015)
 
 ### Enhancements
 
  * Added `IOUtil` with `pipe_to_buffer`, `pipe_to_file`, `download_to_buffer` and `download_to_file` methods.
 
-## Release 0.5.5 - 1 April 2015
+## Release 0.5.5 (1 April 2015)
 
 ### Enhancements
 
@@ -152,13 +160,13 @@ This file summarizes the changes bundled in each release of `inote-util`.
  * Add `ignore_errors` flag to `FileUtil.load_json_file_sync` and `FileUtil.load_json_stdin_sync`.
  * Ignore `null` values in ObjectUtil.merge
 
-## Release 0.5.4 - 1 April 2015
+## Release 0.5.4 (1 April 2015)
 
 ### Enhancements
 
  * Check for `null` in `FileUtil.rm`, `FileUtil.rmdir` and `File.mkdir` and do nothing when found.
 
-## Release 0.5.3 - 1 April 2015
+## Release 0.5.3 (1 April 2015)
 
 ### Enhancements
 
@@ -166,47 +174,47 @@ This file summarizes the changes bundled in each release of `inote-util`.
  * Added `AsyncUtil.wait`, `AsyncUtil.cancel_wait`, `AsyncUtil.interval`, `AsyncUtil.cancel_interval` and related methods.
  * Added `LogUtil.tlog`, `LogUtil.terr` and related methods.
 
-## Release 0.5.2 - 25 March 2015
+## Release 0.5.2 (25 March 2015)
 
 ### Enhancements
 
  * Added `DateUtil.format_datetime_long`, `DateUtil.format_date_long` and `DateUtil.format_time_long`.
 
-## Release 0.5.1 - 25 March 2015
+## Release 0.5.1 (25 March 2015)
 
 `Util` methods divided into distinct categories (`DateUtil`, `StringUtil`, etc.).
 
 (For now) the original `Util` methods still exist, as aliases the equivalent method in the new type.
 
-## Release 0.4.7 - 21 January 2015
+## Release 0.4.7 (21 January 2015)
 
 This release is identical to Version 0.4.6.  I've updated the release number in an attempt to work around an issue with `npm publish`.
 
-## Release 0.4.6 - 21 January 2015
+## Release 0.4.6 (21 January 2015)
 
 ### Enhancements
 
  * Added `Util.to_unit` and `Util.duration`.
 
-## Release 0.4.5 - 18 December 2014
+## Release 0.4.5 (18 December 2014)
 
 ### Enhancements
 
  * Added `Util.smart_join`.
 
-## Release 0.4.4 - 17 December 2014
+## Release 0.4.4 (17 December 2014)
 
 ### Enhancements
 
  * Added `Util.iso_8601_regexp`.
 
-## Release 0.4.3 - 17 December 2014
+## Release 0.4.3 (17 December 2014)
 
 ### Enhancements
 
  * Added `Util.read_stdin_sync`,  `Util.load_json_file_sync` and `Util.load_json_stdin_sync`.
 
-## Release 0.4.2 - 12 December 2014
+## Release 0.4.2 (12 December 2014)
 
 ### Enhancements
 
@@ -216,19 +224,19 @@ This release is identical to Version 0.4.6.  I've updated the release number in 
 
  * Fixed issue with `Util.is_int(0)` returning `false`.
 
-## Release 0.4.1 - 11 December 2014
+## Release 0.4.1 (11 December 2014)
 
 ### Enhancements
 
  * `Util.compare` now (a) compares strings using `String.prototype.localeCompare` when available and (b) folds string case together such that `a` sorts before `B` and so on.  (Previously both `['B','a','A','b'].sort()` and `['B','a','A','b'].sort(Util.compare)` yielded `['A','B','a','b']`. Now `['B','a','A','b'].sort(Util.compare)` yields `['A','a','B','b']`.)
 
-## Release 0.4.0 - 14 Novemver 2014
+## Release 0.4.0 (14 Novemver 2014)
 
 ### Enhancements
 
  * Added `arrays_are_equal`, `uniquify`, `object_array_to_map`, `truthy_string` and `falsey_string` to `Util`..
 
-## Release 0.3.5 - 2 Novemver 2014
+## Release 0.3.5 (2 Novemver 2014)
 
 ### Enhancements
 
@@ -236,13 +244,13 @@ This release is identical to Version 0.4.6.  I've updated the release number in 
 
  * Added documention.
 
-## Release 0.3.3 - 20 October 2014
+## Release 0.3.3 (20 October 2014)
 
 ### Enhancements
 
  * Enhanced `Util.blank_to_null` to convert blank object attributes to `null`.
 
-## Release 0.3.2 - 20 October 2014
+## Release 0.3.2 (20 October 2014)
 
 ### Enhancements
 
@@ -250,7 +258,7 @@ This release is identical to Version 0.4.6.  I've updated the release number in 
 
  * Added option to `Util.handle_error` for throwing an error rather than invoking a callback.
 
-## Release 0.3.1 - 18 October 2014
+## Release 0.3.1 (18 October 2014)
 
 ### Bug Fixes
 
@@ -260,13 +268,13 @@ This release is identical to Version 0.4.6.  I've updated the release number in 
 
  * Added `Util.hash_password`, `Util.validate_hash_password` and `Util.slow_equals` methods.
 
-## Release 0.2.1 - 15 October 2014
+## Release 0.2.1 (15 October 2014)
 
 ### Enhancements
 
  * Added `Config` (`config.coffee`).
 
-## Release 0.2.0 - 5 October 2014
+## Release 0.2.0 (5 October 2014)
 
 ### Bug Fixes
 
@@ -280,6 +288,6 @@ This release is identical to Version 0.4.6.  I've updated the release number in 
 
  * Added "marker" parameter to `Util.truncate`, and tweaked related logic.
 
-## Release 0.1.1 - 30 September 2014
+## Release 0.1.1 (30 September 2014)
 
  * *Change log not tracked up to and including this release.*
