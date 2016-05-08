@@ -59,4 +59,4 @@ class IOUtil
     out.on 'error', callback
     request(params).pipe(out)
 
-exports.IOUtil = IOUtil
+exports.IOUtil = exports.IoUtil = IOUtil
