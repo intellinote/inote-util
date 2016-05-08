@@ -511,8 +511,8 @@ describe 'Util',->
 
   it "slow_equals takes a similar amount of time whether buffers are equal or not equal",(done)->
     @timeout(6000)
-    reps = 2000
-    length = 2048
+    reps = 1000
+    length = 8192
     a = Util.random_bytes(length)
     b = Util.random_bytes(length)
     Util.std_equals = (a,b)->[(a is b),b.length,(if (a is b) then 0 else a.length)]
