@@ -49,6 +49,45 @@ A collection of utility functions and classes for Node.js.
 * **RandomUtil.random_Alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-zA-Z]` (using the given random number generator if provided).
 * **RandomUtil.random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
 * **RandomUtil.random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).
+* **Util.slow_equals(a,b)** - constant-time comparison of two buffers for equality.
+* **Util.compare(a,b)** - a minimally-smart comparision function (allows `null`, uses `localeCompare` when available, folds case so that both `A` and `a` appear before `B`, etc.).
+* **Util.field_comparator(field\[,use_locale_compare=false])** - returns a comparator (`function(a,b)`) that compares two maps on the `field` attribute.
+* **Util.path_comparator(path\[,use_locale_compare=false])** - like `field_comparator`, but `path` may be an array of fields that will be interpreted as nested-attributes. (E.g., `["foo","bar"]` compares `a.foo.bar` with `b.foo.bar`.)
+* **Util.descending_comparator(comparator) / desc_comparator(comparator)** - reverses the order of the given `comparator`.
+* **Util.composite_comparator(list)** - generates a comparator that first compares elements by `list[0]` then (if equal) `list[1]` and so on, until a non-equal comparison is found or we run out of comparators.
+* **FileUtil.sanitize_filename(filename)** - removes invalid characters from and truncates extremely long filenames; only operates on the (last segement of) the given filename.
+* **FileUtil.uniquify_filename(dir,basename[,ext=''[,minpadwidth=3\[,maxpadwidth=5]])** - attempts to generate a unique filename in `dir` based on `basename`.
+* **FileUtil.mkdir(dir)** - `mkdir -p dir`
+* **FileUtil.touch(file)** - `touch file`
+* **FileUtil.rm(files...)** - remove one or more files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
+* **FileUtil.rmdir(dirs...)** - recursively remove one or more diretctories or files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
+* **FileUtil.read_stdin_sync([end_byte="\x04"\[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
+* **FileUtil.load_json_file_sync(file\[,ignore_errors=false])** - synchronously read and parse a JSON file. When `ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.
+* **FileUtil.load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
+* **WebUtil.remote_ip(req,name,default_value)** - attempts to discover the proper "client IP" for the given request using various approaches.
+* **WebUtil.param(req)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js
+* **Util.handle_error(err[,callback\[,throw_when_no_callback=true]])** - if `err` is not `null`, invokes `callback(err)` or `throw err` as appropriate. Returns `true` if an error was encountered, `false` otherwise. (`function my_callback(err,other,stuff) { if(!handle_error(err,callback)) { /* keep going */ } }`)
+* **Util.uuid(val\[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
+* **Util.pad_uuid(val\[,generate=false])** - normalize `val` to all a lower-case, with-dashes version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
+* **Util.b64e(buf\[,encoding='utf8']) / Base64.encode(buf\[,encoding='utf8'])** - Base64 encode the given buffer.
+* **Util.b64d(buf\[,encoding='utf8']) / Base64.decode(buf\[,encoding='utf8'])** - Base64 *decode* the given buffer.
+* **AsyncUtil.wait(delay,callback) / AsyncUtil.set_timeout(delay,callback) / AsyncUtil.setTimeout(delay,callback)** - just like `setTimeout(callback,delay)` but with a more CoffeeScript-friendly parameter order.
+* **AsyncUtil.cancel_wait(id) / AsyncUtil.clear_timeout(id) / AsyncUtil.clearTimeout(id)** - alias for `window.clearTimeout(id)`.
+* **AsyncUtil.interval(delay,callback) / AsyncUtil.set_intreval(delay,callback) / AsyncUtil.setInterval(delay,callback)** - just like `setInterval(callback,delay)` but with a more CoffeeScript-friendly parameter order.
+* **AsyncUtil.cancel_interval(id) / AsyncUtil.cancelInterval(id) / AsyncUtil.clear_interval(id) / AsyncUtil.clearlInterval(id)** - alias for `window.clearInterval(id)`.
+* **AsyncUtil.for_async(initialize,condition,action,increment,whendone)** - executes an asynchronous `for` loop. Accepts 5 function-valued parameters:
+  * `initialize` - an initialization function (no arguments passed, no return value is expected);
+  * `condition` - a predicate that indicates whether we should continue looping (no arguments passed, a boolean value is expected to be returned);
+  * `action` - the action to take (a single callback function is passed and should be invoked at the end of the action, no return value is expected);
+  * `increment` - called at the end of every `action`, prior to `condition` (no arguments passed, no return value is expected);
+  * `whendone` - called at the end of the loop (when `condition` returns `false`), (no arguments passed, no return value is expected).
+* **AsyncUtil.for_each_async(list,action,whendone)** - executes an asynchronous `forEach` loop. Accepts 3 parameters:
+  * `list` - the array to iterate over;
+  * `action` - a function with the signature `(value,index,list,next)` indicating the action to take for each element (*must* call `next` for processing to continue);
+  * `whendone` - called at the end of the loop.
+* **AsyncUtil.fork(methods, args_for_methods, callback)** - runs the given array of methods "simaltaneously" (asynchronously), invoking `callback` when they are *all* complete.
+* **AsyncUtil.throttled_fork(max_parallel, methods, args_for_methods, callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
+* **AsyncUtil.procedure()** - generates a `Sequencer` object, as described below
 
 ## Installing
 
