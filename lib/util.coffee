@@ -101,17 +101,11 @@ class DateUtil
     duration                 = result.delta
     result.in_millis         = {}
     result.in_millis.millis  = duration % (1000)
-    #duration                -= result.in_millis.millis
     result.in_millis.seconds = duration % (1000 * 60)
-    #duration                -= result.in_millis.seconds
     result.in_millis.minutes = duration % (1000 * 60 * 60)
-    #duration                -= result.in_millis.minutes
     result.in_millis.hours   = duration % (1000 * 60 * 60 * 24)
-    #duration                -= result.in_millis.hours
     result.in_millis.days    = duration % (1000 * 60 * 60 * 24 * 7)
-    #duration                -= result.in_millis.days
     result.in_millis.weeks   = duration % (1000 * 60 * 60 * 24 * 7 * 52)
-    #duration                -= result.in_millis.weeks
     result.in_millis.years   = duration
     #
     result.raw         = {}
@@ -177,12 +171,12 @@ class DateUtil
     result.array.brief.no_millis.short = []
     result.array.brief.no_millis.long  = []
     values = [].concat(values)
-    for unit in [ 'milli','second','minute','hour','day','week','year' ]
+    for unit in [ 'millisecond','second','minute','hour','day','week','year' ]
       v = values.pop()
       if v?
         result.array.brief.short.unshift "#{v}#{unit.substring(0,1)}"
         result.array.brief.long.unshift @to_unit(v,unit)
-        unless unit is 'milli'
+        unless unit is 'millisecond'
           result.array.brief.no_millis.short.unshift "#{v}#{unit.substring(0,1)}"
           result.array.brief.no_millis.long.unshift @to_unit(v,unit)
       else
@@ -202,7 +196,7 @@ class DateUtil
         result.array.min.short.push "#{v}#{unit.substring(0,1)}"
         result.array.min.long.push @to_unit(v,unit)
         result.array.min.units.push unit
-        unless unit is 'milli'
+        unless unit is 'millisecond'
           result.array.min.no_millis.short.push "#{v}#{unit.substring(0,1)}"
           result.array.min.no_millis.long.push @to_unit(v,unit)
           result.array.min.no_millis.units.push unit

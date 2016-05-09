@@ -229,6 +229,7 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
       }
     },
     "min":{                        // MIN = ONLY THE NON-ZERO VALUES
+
       "units":["hour","minute","second","millisecond"],
       "short":["12h","35m","48s","313m"],
       "long":["12 hours","35 minutes","48 seconds","313 milliseconds"],
@@ -270,10 +271,10 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
       "long":"12 hours 35 minutes 48 seconds 313 milliseconds",
       "verbose":"12 hours, 35 minutes, 48 seconds and 313 milliseconds",
       "no_millis":{
-        "micro":"12h35m48s313m",
-        "short":"12h 35m 48s 313m",
-        "long":"12 hours 35 minutes 48 seconds 313 milliseconds",
-        "verbose":"12 hours, 35 minutes, 48 seconds and 313 milliseconds"
+        "micro":"12h35m48s",
+        "short":"12h 35m 48s",
+        "long":"12 hours 35 minutes 48 seconds",
+        "verbose":"12 hours, 35 minutes, 48 seconds"
       }
     }
   }
