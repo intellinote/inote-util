@@ -170,8 +170,115 @@ To discover a configuration file (as used in step 3 above), `Config` will:
 
 ### DateUtil
 * **start_time** - timestamp at which `inote-util` was loaded (hence approximately the time the application was started in most circumstances).
-* **duration([now = Date.now(),]since)** - returns an object that breaks-down the time between `now` and `since` in several ways (see code for details).
+* **duration(end_time,begin_time)** - returns an object that breaks-down the time between `begin_time` and `end_time` in several ways (as described below).  When missing, `end_time` defaults to `Date.now()` and `begin_time` defaults to `start_time`.
 * **iso_8601_regexp()** - returns a regular expression that can be used to validate an ISO 8601 formatted date.
+
+Here is an example of the object returned by the `DateUtil.duration`, with brief annotations.
+
+```js
+{
+  "begin":1462806382444,
+  "end":1462851730757,
+  "delta":45348313,
+  "in_millis":{                     // MILLISECOND VALUE OF EACH "PART" OF THE DURATION
+    "millis":313,                   // <= delta % (1000)
+    "seconds":48313,                // <= delta % (1000 * 60)
+    "minutes":2148313,              // <= delta % (1000 * 60 * 60)
+    "hours":45348313,               // <= delta % (1000 * 60 * 60 * 24)
+    "days":45348313,                // <= delta % (1000 * 60 * 60 * 24 * 7
+    "weeks":45348313,               // <= delta % (1000 * 60 * 60 * 24 * 7 * 52
+    "years":45348313                // <= delta
+  },
+  "raw":{                           // ELEMENTS FROM `IN_MILLIS`, CONVERTED TO RELEVANT UNIT
+    "millis":313,                   // <= in_millis.millis
+    "seconds":48.313,               // <= in_millis.seconds / (1000)
+    "minutes":35.80521666666667,    // <= in_millis.minutes / (1000 * 60)
+    "hours":12.596753611111112,     // <= in_millis.hours   / (1000 * 60 * 60)
+    "days":0.5248647337962963,      // <= in_millis.days    / (1000 * 60 * 60 * 24)
+    "weeks":0.07498067625661375,    // <= in_millis.weeks   / (1000 * 60 * 60 * 24 * 7)
+    "years":0.0014419360818579568   // <= in_millis.years   / (1000 * 60 * 60 * 24 * 7 * 365)
+  },
+  "whole":{                         // RAW VALUES ROUNDED DOWN TO NEAREST INTEGER
+    "millis":313,
+    "seconds":48,
+    "minutes":35,
+    "hours":12,
+    "days":0,
+    "weeks":0,
+    "years":0
+  },
+  "array":{                         // SET OF DURATION ELEMENTS IN ARRAYS
+    "full":{                        // FULL = ALL UNITS, EVEN WHEN 0
+      "values":[0,0,0,12,35,48,313],
+      "short":["0y","0w","0d","12h","35m","48s","313m"],
+      "long":["0 years","0 weeks","0 days","12 hours","35 minutes","48 seconds","313 milliseconds"],
+      "no_millis":{                 // SAME AS PARENT BUT IGNORING MILLISECONDS
+        "values":[0,0,0,12,35,48],
+        "short":["0y","0w","0d","12h","35m","48s"],
+        "long":["0 years","0 weeks","0 days","12 hours","35 minutes","48 seconds"]
+      }
+    },
+    "brief":{                       // BRIEF = SKIP TO LARGEST NON-ZERO UNIT, THEN INCLUDE ALL
+      "values":[12,35,48,313],
+      "short":["12h","35m","48s","313m"],
+      "long":["12 hours","35 minutes","48 seconds","313 millis"],
+      "no_millis":{
+        "values":[12,35,48],
+        "short":["12h","35m","48s"],
+        "long":["12 hours","35 minutes","48 seconds"]
+      }
+    },
+    "min":{                        // MIN = ONLY THE NON-ZERO VALUES
+      "units":["hour","minute","second","millisecond"],
+      "short":["12h","35m","48s","313m"],
+      "long":["12 hours","35 minutes","48 seconds","313 milliseconds"],
+      "no_millis":{
+        "units":["hour","minute","second","millisecond"],
+        "short":["12h","35m","48s","313m"],
+        "long":["12 hours","35 minutes","48 seconds","313 milliseconds"]
+      }
+    }
+  },
+  "string":{                       // SIMILAR TO "ARRAY" BUT WITH STRINGS
+    "full":{
+      "micro":"0y0w0d12h35m48s313m",
+      "short":"0y 0w 0d 12h 35m 48s 313m",
+      "long":"0 years 0 weeks 0 days 12 hours 35 minutes 48 seconds 313 milliseconds",
+      "verbose":"0 years, 0 weeks, 0 days, 12 hours, 35 minutes, 48 seconds and 313 milliseconds",
+      "no_millis":{
+        "micro":"0y0w0d12h35m48s",
+        "short":"0y 0w 0d 12h 35m 48s",
+        "long":"0 years 0 weeks 0 days 12 hours 35 minutes 48 seconds",
+        "verbose":"0 years, 0 weeks, 0 days, 12 hours, 35 minutes and 48 seconds"
+      }
+    },
+    "brief":{
+      "micro":"12h35m48s313m",
+      "short":"12h 35m 48s 313m",
+      "long":"12 hours 35 minutes 48 seconds 313 millis",
+      "verbose":"12 hours, 35 minutes, 48 seconds and 313 millis",
+      "no_millis":{
+        "micro":"12h35m48s",
+        "short":"12h 35m 48s",
+        "long":"12 hours 35 minutes 48 seconds",
+        "verbose":"12 hours, 35 minutes and 48 seconds"
+      }
+    },
+    "min":{
+      "micro":"12h35m48s313m",
+      "short":"12h 35m 48s 313m",
+      "long":"12 hours 35 minutes 48 seconds 313 milliseconds",
+      "verbose":"12 hours, 35 minutes, 48 seconds and 313 milliseconds",
+      "no_millis":{
+        "micro":"12h35m48s313m",
+        "short":"12h 35m 48s 313m",
+        "long":"12 hours 35 minutes 48 seconds 313 milliseconds",
+        "verbose":"12 hours, 35 minutes, 48 seconds and 313 milliseconds"
+      }
+    }
+  }
+}
+```
 
 ### FileUtil
 * **sanitize_filename(filename)** - removes invalid characters from and truncates extremely long filenames; only operates on the (last segement of) the given filename.
