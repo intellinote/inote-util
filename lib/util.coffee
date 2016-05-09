@@ -689,8 +689,24 @@ class NumberUtil
 
   # **to_int** - *returns a valid integer or null*
   @to_int:(v)=>
-    if v? and @is_int(v)
+    if @is_int(v)
       v = parseInt(v)
+      if isNaN(v)
+        return null
+      else
+        return v
+    else
+      return null
+
+  @is_float:(v)=>
+    unless v?
+      return false
+    else
+      return /^-?((((0)|([1-9][0-9]*))(\.[0-9]+)?)|(\.[0-9]+))$/.test "#{v}"
+
+  @to_float:(v)=>
+    if @is_float(v)
+      v = parseFloat(v)
       if isNaN(v)
         return null
       else
@@ -1686,6 +1702,10 @@ class Util
   @round_decimal:         NumberUtil.round_decimal
   @is_int:                NumberUtil.is_int
   @to_int:                NumberUtil.to_int
+  @is_float:              NumberUtil.is_float
+  @to_float:              NumberUtil.to_float
+  @is_decimal:            NumberUtil.is_float
+  @to_decimal:            NumberUtil.to_float
 
   @remove_null:           MapUtil.remove_null
   @remove_falsey:         MapUtil.remove_falsey

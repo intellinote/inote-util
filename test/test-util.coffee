@@ -934,6 +934,53 @@ describe 'Util',->
     should.not.exist Util.to_int("xyzzy")
     done()
 
+  it "is_float identifies decimals",(done)->
+    Util.is_float(null).should.not.be.ok
+    Util.is_float("foo").should.not.be.ok
+    Util.is_float("").should.not.be.ok
+    Util.is_float("-").should.not.be.ok
+    Util.is_float(".").should.not.be.ok
+    Util.is_float("0.0").should.be.ok
+    Util.is_float(".0").should.be.ok
+    Util.is_float(3.14159).should.be.ok
+    Util.is_float("3.0").should.be.ok
+    Util.is_float(3).should.be.ok
+    Util.is_float(-3).should.be.ok
+    Util.is_float("3").should.be.ok
+    Util.is_float("-3").should.be.ok
+    Util.is_float("0").should.be.ok
+    Util.is_float(0).should.be.ok
+    Util.is_float("-0").should.be.ok
+    done()
+
+  it "to_float converts decimals",(done)->
+    should.not.exist Util.to_float(null)
+    should.not.exist Util.to_float("foo")
+    should.not.exist Util.to_float("")
+    should.not.exist Util.to_float("-")
+    should.not.exist Util.to_float(".")
+    should.not.exist Util.to_float("3.")
+    should.not.exist Util.to_float("3-5")
+    should.not.exist Util.to_float("-3-5")
+    should.not.exist Util.to_float("-3.5.5")
+    should.not.exist Util.to_float("xyzzy")
+    Util.to_float(3.14159).should.equal 3.14159
+    Util.to_float(.14159).toString().should.equal "0.14159"
+    Util.to_float(-3.14159).toString().should.equal "-3.14159"
+    Util.to_float(-.14159).toString().should.equal "-0.14159"
+    Util.to_float("0").toString().should.equal("0")
+    Util.to_float("-0").toString().should.equal("0")
+    Util.to_float("0.0").toString().should.equal("0")
+    Util.to_float(".0").toString().should.equal("0")
+    Util.to_float("-0").toString().should.equal("0")
+    Util.to_float("1").toString().should.equal("1")
+    Util.to_float("2").toString().should.equal("2")
+    Util.to_float(0).toString().should.equal("0")
+    Util.to_float(-0).toString().should.equal("0")
+    Util.to_float(1).toString().should.equal("1")
+    Util.to_float(2).toString().should.equal("2")
+    done()
+
   it "escape_for_json escapes a json substring",(done)->
     tests = [
       [ 1, '1'  ]

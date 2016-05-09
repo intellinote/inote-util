@@ -196,8 +196,10 @@ To discover a configuration file (as used in step 3 above), `Config` will:
 
 ### NumberUtil
 * **round_decimal(value[,digits=0])** - round a number to the specified number of digits to the right of the decimal point.
-* **is_int(val)** - returns `true` if and only if `val` is a simple integer (matching `/^-?[0-9]+$/`).
-* **to_int(val)** - returns `parseInt(val)` when `val` is a simple integer (matching `/^-?[0-9]+$/`), `null` otherwise. (Compare with the default behavior of `parseInt`, which returns `17` for `parseInt("17.93 meters")`).
+* **is_int(val)** - returns `true` if and only if `val` is a simple integer (matching `/^-?((0)|([1-9][0-9]*))$/`).
+* **to_int(val)** - returns `parseInt(val)` when `val` is a simple integer (matching `is_int`), `null` otherwise. (Compare with the default behavior of `parseInt`, which returns `17` for `parseInt("17.93 meters")`).
+* **is_float(val)** - returns `true` if and only if `val` is a simple decimal value (matching `/^-?((((0)|([1-9][0-9]*))(\.[0-9]+)?)|(\.[0-9]+))$/`).
+* **to_float(val)** - returns `parseFloat(val)` when `val` is a simple decimal value (matching `is_float`), `null` otherwise.
 
 ### ObjectUtil
 * **remove_null(map)** - generates a (shallow) *clone* of the map, with `null` entries removed.
