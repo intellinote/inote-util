@@ -53,7 +53,7 @@ describe 'Util',->
       found = Util.duration(test[0],0)
       found.string.brief.short.should.equal test[1]
     tests = [
-      [ 123, "123 millis" ]
+      [ 123, "123 milliseconds" ]
       [ 3*1000, "3 seconds" ]
       [ 1*60*1000, "1 minute" ]
       [ 6*60*60*1000, "6 hours" ]
@@ -932,6 +932,53 @@ describe 'Util',->
     Util.to_int(1).should.equal(1)
     Util.to_int(2).should.equal(2)
     should.not.exist Util.to_int("xyzzy")
+    done()
+
+  it "is_float identifies decimals",(done)->
+    Util.is_float(null).should.not.be.ok
+    Util.is_float("foo").should.not.be.ok
+    Util.is_float("").should.not.be.ok
+    Util.is_float("-").should.not.be.ok
+    Util.is_float(".").should.not.be.ok
+    Util.is_float("0.0").should.be.ok
+    Util.is_float(".0").should.be.ok
+    Util.is_float(3.14159).should.be.ok
+    Util.is_float("3.0").should.be.ok
+    Util.is_float(3).should.be.ok
+    Util.is_float(-3).should.be.ok
+    Util.is_float("3").should.be.ok
+    Util.is_float("-3").should.be.ok
+    Util.is_float("0").should.be.ok
+    Util.is_float(0).should.be.ok
+    Util.is_float("-0").should.be.ok
+    done()
+
+  it "to_float converts decimals",(done)->
+    should.not.exist Util.to_float(null)
+    should.not.exist Util.to_float("foo")
+    should.not.exist Util.to_float("")
+    should.not.exist Util.to_float("-")
+    should.not.exist Util.to_float(".")
+    should.not.exist Util.to_float("3.")
+    should.not.exist Util.to_float("3-5")
+    should.not.exist Util.to_float("-3-5")
+    should.not.exist Util.to_float("-3.5.5")
+    should.not.exist Util.to_float("xyzzy")
+    Util.to_float(3.14159).should.equal 3.14159
+    Util.to_float(.14159).toString().should.equal "0.14159"
+    Util.to_float(-3.14159).toString().should.equal "-3.14159"
+    Util.to_float(-.14159).toString().should.equal "-0.14159"
+    Util.to_float("0").toString().should.equal("0")
+    Util.to_float("-0").toString().should.equal("0")
+    Util.to_float("0.0").toString().should.equal("0")
+    Util.to_float(".0").toString().should.equal("0")
+    Util.to_float("-0").toString().should.equal("0")
+    Util.to_float("1").toString().should.equal("1")
+    Util.to_float("2").toString().should.equal("2")
+    Util.to_float(0).toString().should.equal("0")
+    Util.to_float(-0).toString().should.equal("0")
+    Util.to_float(1).toString().should.equal("1")
+    Util.to_float(2).toString().should.equal("2")
     done()
 
   it "escape_for_json escapes a json substring",(done)->

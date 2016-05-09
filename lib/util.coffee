@@ -101,17 +101,11 @@ class DateUtil
     duration                 = result.delta
     result.in_millis         = {}
     result.in_millis.millis  = duration % (1000)
-    duration                -= result.in_millis.millis
     result.in_millis.seconds = duration % (1000 * 60)
-    duration                -= result.in_millis.seconds
     result.in_millis.minutes = duration % (1000 * 60 * 60)
-    duration                -= result.in_millis.minutes
     result.in_millis.hours   = duration % (1000 * 60 * 60 * 24)
-    duration                -= result.in_millis.hours
     result.in_millis.days    = duration % (1000 * 60 * 60 * 24 * 7)
-    duration                -= result.in_millis.days
     result.in_millis.weeks   = duration % (1000 * 60 * 60 * 24 * 7 * 52)
-    duration                -= result.in_millis.weeks
     result.in_millis.years   = duration
     #
     result.raw         = {}
@@ -124,13 +118,13 @@ class DateUtil
     result.raw.years   = result.in_millis.years   / (1000 * 60 * 60 * 24 * 7 * 52)
     #
     result.whole         = {}
-    result.whole.millis  = Math.round(result.raw.millis)
-    result.whole.seconds = Math.round(result.raw.seconds)
-    result.whole.minutes = Math.round(result.raw.minutes)
-    result.whole.hours   = Math.round(result.raw.hours)
-    result.whole.days    = Math.round(result.raw.days)
-    result.whole.weeks   = Math.round(result.raw.weeks)
-    result.whole.years   = Math.round(result.raw.years)
+    result.whole.millis  = Math.floor(result.raw.millis)
+    result.whole.seconds = Math.floor(result.raw.seconds)
+    result.whole.minutes = Math.floor(result.raw.minutes)
+    result.whole.hours   = Math.floor(result.raw.hours)
+    result.whole.days    = Math.floor(result.raw.days)
+    result.whole.weeks   = Math.floor(result.raw.weeks)
+    result.whole.years   = Math.floor(result.raw.years)
     #
     result.array = {}
     result.array.full = {}
@@ -159,7 +153,7 @@ class DateUtil
       @to_unit(result.whole.hours,"hour")
       @to_unit(result.whole.minutes,"minute")
       @to_unit(result.whole.seconds,"second")
-      @to_unit(result.whole.millis,"milli")
+      @to_unit(result.whole.millis,"millisecond")
     ]
     result.array.full.no_millis = {}
     result.array.full.no_millis.values = [].concat(result.array.full.values[0...-1])
@@ -177,12 +171,12 @@ class DateUtil
     result.array.brief.no_millis.short = []
     result.array.brief.no_millis.long  = []
     values = [].concat(values)
-    for unit in [ 'milli','second','minute','hour','day','week','year' ]
+    for unit in [ 'millisecond','second','minute','hour','day','week','year' ]
       v = values.pop()
       if v?
         result.array.brief.short.unshift "#{v}#{unit.substring(0,1)}"
         result.array.brief.long.unshift @to_unit(v,unit)
-        unless unit is 'milli'
+        unless unit is 'millisecond'
           result.array.brief.no_millis.short.unshift "#{v}#{unit.substring(0,1)}"
           result.array.brief.no_millis.long.unshift @to_unit(v,unit)
       else
@@ -196,13 +190,13 @@ class DateUtil
     result.array.min.no_millis.units = []
     result.array.min.no_millis.short = []
     result.array.min.no_millis.long  = []
-    for unit, i in [ 'year','week','day','hour','minute','second','milli']
+    for unit, i in [ 'year','week','day','hour','minute','second','millisecond']
       v = result.array.full.values[i]
       unless v is 0
         result.array.min.short.push "#{v}#{unit.substring(0,1)}"
         result.array.min.long.push @to_unit(v,unit)
         result.array.min.units.push unit
-        unless unit is 'milli'
+        unless unit is 'millisecond'
           result.array.min.no_millis.short.push "#{v}#{unit.substring(0,1)}"
           result.array.min.no_millis.long.push @to_unit(v,unit)
           result.array.min.no_millis.units.push unit
@@ -689,8 +683,24 @@ class NumberUtil
 
   # **to_int** - *returns a valid integer or null*
   @to_int:(v)=>
-    if v? and @is_int(v)
+    if @is_int(v)
       v = parseInt(v)
+      if isNaN(v)
+        return null
+      else
+        return v
+    else
+      return null
+
+  @is_float:(v)=>
+    unless v?
+      return false
+    else
+      return /^-?((((0)|([1-9][0-9]*))(\.[0-9]+)?)|(\.[0-9]+))$/.test "#{v}"
+
+  @to_float:(v)=>
+    if @is_float(v)
+      v = parseFloat(v)
       if isNaN(v)
         return null
       else
@@ -1686,6 +1696,10 @@ class Util
   @round_decimal:         NumberUtil.round_decimal
   @is_int:                NumberUtil.is_int
   @to_int:                NumberUtil.to_int
+  @is_float:              NumberUtil.is_float
+  @to_float:              NumberUtil.to_float
+  @is_decimal:            NumberUtil.is_float
+  @to_decimal:            NumberUtil.to_float
 
   @remove_null:           MapUtil.remove_null
   @remove_falsey:         MapUtil.remove_falsey
