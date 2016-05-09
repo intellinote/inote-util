@@ -101,17 +101,17 @@ class DateUtil
     duration                 = result.delta
     result.in_millis         = {}
     result.in_millis.millis  = duration % (1000)
-    duration                -= result.in_millis.millis
+    #duration                -= result.in_millis.millis
     result.in_millis.seconds = duration % (1000 * 60)
-    duration                -= result.in_millis.seconds
+    #duration                -= result.in_millis.seconds
     result.in_millis.minutes = duration % (1000 * 60 * 60)
-    duration                -= result.in_millis.minutes
+    #duration                -= result.in_millis.minutes
     result.in_millis.hours   = duration % (1000 * 60 * 60 * 24)
-    duration                -= result.in_millis.hours
+    #duration                -= result.in_millis.hours
     result.in_millis.days    = duration % (1000 * 60 * 60 * 24 * 7)
-    duration                -= result.in_millis.days
+    #duration                -= result.in_millis.days
     result.in_millis.weeks   = duration % (1000 * 60 * 60 * 24 * 7 * 52)
-    duration                -= result.in_millis.weeks
+    #duration                -= result.in_millis.weeks
     result.in_millis.years   = duration
     #
     result.raw         = {}
@@ -124,13 +124,13 @@ class DateUtil
     result.raw.years   = result.in_millis.years   / (1000 * 60 * 60 * 24 * 7 * 52)
     #
     result.whole         = {}
-    result.whole.millis  = Math.round(result.raw.millis)
-    result.whole.seconds = Math.round(result.raw.seconds)
-    result.whole.minutes = Math.round(result.raw.minutes)
-    result.whole.hours   = Math.round(result.raw.hours)
-    result.whole.days    = Math.round(result.raw.days)
-    result.whole.weeks   = Math.round(result.raw.weeks)
-    result.whole.years   = Math.round(result.raw.years)
+    result.whole.millis  = Math.floor(result.raw.millis)
+    result.whole.seconds = Math.floor(result.raw.seconds)
+    result.whole.minutes = Math.floor(result.raw.minutes)
+    result.whole.hours   = Math.floor(result.raw.hours)
+    result.whole.days    = Math.floor(result.raw.days)
+    result.whole.weeks   = Math.floor(result.raw.weeks)
+    result.whole.years   = Math.floor(result.raw.years)
     #
     result.array = {}
     result.array.full = {}
@@ -159,7 +159,7 @@ class DateUtil
       @to_unit(result.whole.hours,"hour")
       @to_unit(result.whole.minutes,"minute")
       @to_unit(result.whole.seconds,"second")
-      @to_unit(result.whole.millis,"milli")
+      @to_unit(result.whole.millis,"millisecond")
     ]
     result.array.full.no_millis = {}
     result.array.full.no_millis.values = [].concat(result.array.full.values[0...-1])
@@ -196,7 +196,7 @@ class DateUtil
     result.array.min.no_millis.units = []
     result.array.min.no_millis.short = []
     result.array.min.no_millis.long  = []
-    for unit, i in [ 'year','week','day','hour','minute','second','milli']
+    for unit, i in [ 'year','week','day','hour','minute','second','millisecond']
       v = result.array.full.values[i]
       unless v is 0
         result.array.min.short.push "#{v}#{unit.substring(0,1)}"

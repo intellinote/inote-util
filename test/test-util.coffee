@@ -53,7 +53,7 @@ describe 'Util',->
       found = Util.duration(test[0],0)
       found.string.brief.short.should.equal test[1]
     tests = [
-      [ 123, "123 millis" ]
+      [ 123, "123 milliseconds" ]
       [ 3*1000, "3 seconds" ]
       [ 1*60*1000, "1 minute" ]
       [ 6*60*60*1000, "6 hours" ]
