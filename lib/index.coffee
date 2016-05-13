@@ -25,6 +25,7 @@ LIB_DIR   = if fs.existsSync(LIB_COV) then LIB_COV else LIB
 sources = [
   'util'
   'io-util'
+  'file-util'
   'object-util'
   'stopwatch'
   'config'
@@ -37,3 +38,6 @@ for file in sources
   exported = require path.join(LIB_DIR,file)
   for k,v of exported
     exports[k] = v
+
+for fn in ["read_stdin_sync","load_json_file_sync","load_json_stdin_sync"]
+  exports.Util[fn] = exports.FileUtil[fn]
