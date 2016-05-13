@@ -511,10 +511,12 @@ describe 'Util',->
 
   it "slow_equals takes a similar amount of time whether buffers are equal or not equal",(done)->
     @timeout(6000)
-    reps = 1000
-    length = 8192
-    a = Util.random_bytes(length)
-    b = Util.random_bytes(length)
+    reps = 300
+    prefix_length = 32768
+    length = 16384
+    prefix = Util.random_bytes(prefix_length)
+    a = prefix+Util.random_bytes(length)
+    b = prefix+Util.random_bytes(length)
     Util.std_equals = (a,b)->[(a is b),b.length,(if (a is b) then 0 else a.length)]
     # compute time to compare with the standard `==` function
     start = Date.now()
@@ -551,6 +553,7 @@ describe 'Util',->
       slow = slow_equal / slow_not_equal
     else
       slow = slow_not_equal / slow_equal
+    # console.log slow, std
     # slow version should be closer to 1 than the standard
     # console.log Math.abs(1-slow),Math.abs(1-std)
     Math.abs(1-slow).should.be.below Math.abs(1-std)
