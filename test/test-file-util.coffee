@@ -5,20 +5,25 @@ HOMEDIR  = path.join(__dirname,'..')
 LIB_COV  = path.join(HOMEDIR,'lib-cov')
 LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 FileUtil = require(path.join(LIB_DIR,'file-util')).FileUtil
+AsyncUtil     = require(path.join(LIB_DIR,'util')).AsyncUtil
 TEST_FS  = path.join HOMEDIR, "test", "data", "test-fs"
 
 describe 'FileUtil',->
 
   it "can determine the age of a file", (done)->
-    FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age)->
+    FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age1)->
       should.not.exist err
-      console.log "AGE 1:", age
-      Util.set_timeout 1000, ()->
+      AsyncUtil.set_timeout 500, ()->
         FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age2)->
           should.not.exist err
-          console.log "AGE 2:", age2
-          (age2 - age1).should.be.above(999)
-          done()
+          (age2 - age1).should.be.above(499)
+          (age2 - age1).should.be.below(600)
+          AsyncUtil.set_timeout 600, ()->
+            FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age3)->
+              should.not.exist err
+              (age3 - age2).should.be.above(599)
+              (age3 - age2).should.be.below(700)
+              done()
 
   it "can test if a file is a plain file", (done)->
     FileUtil.is_file "xyzzy.i.do.not.exist", (err, is_file)->
