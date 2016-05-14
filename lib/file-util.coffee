@@ -10,6 +10,106 @@ DEBUG      = (/(^|,)file-?util($|,)/i.test process?.env?.NODE_DEBUG)
 
 class FileUtil
 
+  # `callback(null,true)` if `file` identifies an existing file (not directory)
+  @is_file:(file,callback)=>
+    fs.stat file, (err,stat)=>
+      if err? and err.code is 'ENOENT'
+        callback(null,false)
+      else
+        callback err, ((stat?.isFile?()) ? false)
+
+  # `callback(null,true)` if `file` identifies an existing directory
+  @is_dir:(file,callback)=>
+    fs.stat file, (err,stat)=>
+      if err? and err.code is 'ENOENT'
+        callback(null,false)
+      else
+        callback err, ((stat?.isDirectory?()) ? false)
+
+  # `callback(null,true)` if `file` identifies an existing directory
+  @is_directory:(file,callback)=>
+    @is_dir(file,callback)
+
+  # internal utility: `callback(null,true)` if `file` matches the regular
+  # expression `pattern` (if any) and is one of the specified `types` (if any).
+  # * `file` - a string presenting a filename
+  # * `pattern` - a regular expression
+  # * `types` - either a string or array of strings, containing `file` or `directory`
+  @_file_matches:(dir,file,pattern,types,callback)=>
+    if typeof pattern is 'function' and not types? and not callback?
+      callback = pattern
+      pattern = null
+    else if typeof types is 'function' and not callback?
+      callback = types
+      types = null
+    if types? and typeof types is 'string'
+      types = [types]
+    if pattern? and not pattern.test(file)
+      callback null, false
+    else if types?
+      full_path = path.join(dir,file)
+      fs.stat full_path, (err,stat)=>
+        if err? and err.code is 'ENOENT'
+          callback null, false
+        else if err?
+          callback err
+        else
+          if stat.isFile() and ("file" in types)
+            callback null, true
+          else if stat.isDirectory() and (("dir" in types) or ("directory" in types))
+            callback null, true
+          else
+            callback null, false
+    else
+      callback null, true
+
+  @ls:(dir, options, callback)=>
+    if typeof options is 'function' and not callback?
+      callback = options
+      options = null
+    options ?= {}
+    recurse = Util.truthy_string(options.recurse ? false)
+    pattern = options.pattern
+    types   = options.types ? options.type
+    fs.readdir dir, (err,files)=>
+      if err? or not files?
+        callback(null,null)
+      else
+        found = []
+        # find matching files
+        action = (file, index, list, next)=>
+          @_file_matches dir, file, pattern, types, (err, matched)=>
+            if err?
+              callback(err)
+            else if matched
+              found.push path.join(dir,file)
+              next()
+            else
+              next()
+        Util.for_each_async files, action, ()=>
+          # recurse if needed
+          unless recurse
+            callback null, found
+          else
+            action = (file, index, list, next)=>
+              full_file = path.join(dir,file)
+              @is_dir full_file, (err,is_dir)=>
+                if err?
+                  callback(err)
+                else
+                  if is_dir
+                    @ls full_file, options, (err,files_in_dir)=>
+                      if err?
+                        callback(err)
+                      else
+                        if files_in_dir?
+                          found = found.concat(files_in_dir)
+                        next()
+                  else
+                    next()
+            Util.for_each_async files, action, ()=>
+              callback null, found
+
   # Replaces invalid characters from and truncates very long filenames.
   # This method will accept (and return) a full path but will only operate on the "basename".
   @sanitize_filename:(str)=>
@@ -152,6 +252,37 @@ class FileUtil
       else
         callback?()
 
+  # "manually" copy a file - works across platforms and filesystems
+  # consider using shell.exec('cp ...') instead?
+  @copy_file:(src,dest,callback)=>
+    callback_called = false
+    done = (err)=>
+      unless callback_called
+        callback_called = true
+        callback(err)
+    input = fs.createReadStream(src)
+    input.on "error", (err)=>done(err)
+    output = fs.createWriteStream(dest)
+    output.on "error", (err)=>done(err)
+    output.once "close", ()=>done()
+    input.pipe(output)
+
+  # "manually" rename a file - works across platforms and filesystems
+  # consider using shell.exec('mv ...') instead?
+  @move_file:(src,dest,callback)=>
+    callback_called = false
+    done = (err)=>
+      unless callback_called
+        callback_called = true
+        callback(err)
+    input = fs.createReadStream(src)
+    input.on "error", (err)=>done(err)
+    output = fs.createWriteStream(dest)
+    output.on "error", (err)=>done(err)
+    output.once "close", ()=>
+      @rm(src)
+      done()
+    input.pipe(output)
 ################################################################################
 
 exports.FileUtil = FileUtil
