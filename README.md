@@ -5,6 +5,26 @@ A collection of utility functions and classes for Node.js.
 
 ## Features
 
+### Index
+
+[ArrayUtil](#arrayutil) |
+[AsyncUtil](#asyncutil) |
+[ColorUtil](#colorutil) |
+[Config](#config) |
+[DateUtil](#dateutil) |
+[FileUtil](#fileutil) |
+[IOUtil](#ioutil) |
+[LogUtil](#logutil) |
+[NetUtil](#netutil) |
+[NumberUtil](#numberutil) |
+[ObjectUtil](#objectutil) |
+[RandomUtil](#randomutil) |
+[Stopwatch](#stopwatch) |
+[StringUtil](#stringutil) |
+[Util](#util) |
+[WebUtil](#webutil) |
+[WorkQueue](#workqueue)
+
 ### ArrayUtil
 * **lpad(value,width,pad)** - adds `pad` elements to the beginning of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.lpad`, which is identical.)
 * **rpad(value,width,pad)** - adds `pad` elements to the end of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.rpad`, which is identical.)
@@ -17,6 +37,8 @@ A collection of utility functions and classes for Node.js.
 * **sets_are_equal(a,b)** - compares arrays as if they were sets.
 * **arrays_are_equal(a,b)** - `true` if and only if array a and array b contain the exact same elements in the exact same order.
 * **uniquify(array[,key])** - returns a clone of `array` with duplicate values removed. When the array contains objects (maps) and a `key` is provided, two elements will be considered duplicates if they have the same value for the attribute `key`.
+
+*[Back to Index](#index)*
 
 ### AsyncUtil
 * **wait(delay,callback) / AsyncUtil.set_timeout(delay,callback) / AsyncUtil.setTimeout(delay,callback)** - just like `setTimeout(callback,delay)` but with a more CoffeeScript-friendly parameter order.
@@ -121,16 +143,20 @@ procedure.last( and_so_on )
 
 Note that the sequence is not cleared when `run` is invoked, so one may invoke `run` more than once to execute the sequence again.
 
+*[Back to Index](#index)*
+
 ### ColorUtil
 * **hex_to_rgb_triplet(hex)** - converts a hex-based `#rrggbb` string to decimal `[r,g,b]` values.
 * **hex_to_rgb_string(hex)** - converts a hex-based `#rrggbb` string to a string of the form `rgb(r,g,b)`.
 * **rgb_string_to_triplet(rgb)** - converts a string of the form `rgb(r,g,b)` to decimal `[r,g,b]` values.
 * **rgb_triplet_to_string(r,g,b)** - convert an array or sequence of r, g, b values to a string of the form `rgb(r,g,b)`.
 
+*[Back to Index](#index)*
+
 ### Config
 A thin wrapper around [`nconf`](https://github.com/flatiron/nconf) providing a consistent way to load configuration data from files or the environment.
 
-EXAMPLE OF USE
+#### Example of use
 
 ```javascript
 var config = require('inote-util').config.init();
@@ -167,6 +193,8 @@ To discover a configuration file (as used in step 3 above), `Config` will:
   the `config_dir`, that file will be used.
 
   4. If `config_file` is set, that file will be used.
+
+*[Back to Index](#index)*
 
 ### DateUtil
 * **start_time** - timestamp at which `inote-util` was loaded (hence approximately the time the application was started in most circumstances).
@@ -281,6 +309,8 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 }
 ```
 
+*[Back to Index](#index)*
+
 ### FileUtil
 * **file_age(file,callback)** - obtain the age of a file in milliseconds
 * **file_mtime(file,callback)** - obtain the Unix epoch timestamp at which a file was last modified
@@ -302,19 +332,27 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
 
+*[Back to Index](#index)*
+
 ### IOUtil
 * **pipe_to_file(readable_stream,dest,options,callback)** - write a stream to a file.
 * **pipe_to_buffer(readable_stream,callback)** - write a stream to a buffer.
 * **download_to_file(url,dest,options,callback)** - write the contents of a URL to a file.
 * **download_to_buffer(url,callback)** - write the contents of a URL to a buffer.
 
+*[Back to Index](#index)*
+
 ### LogUtil
 * **tlog(...)** - writes to stdout (`console.log`), pre-pending a timestamp.
 * **terr(...)** - writes to stderr (`console.error`), pre-pending a timestamp.
 
+*[Back to Index](#index)*
+
 ### NetUtil
 * **is_port_in_use(port,callback)** - attempt to determine whether or not a port is currently in use
 * **get_unused_port(callback)** - attempt to obtain an unused port
+
+*[Back to Index](#index)*
 
 ### NumberUtil
 * **round_decimal(value[,digits=0])** - round a number to the specified number of digits to the right of the decimal point.
@@ -322,6 +360,8 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **to_int(val)** - returns `parseInt(val)` when `val` is a simple integer (matching `is_int`), `null` otherwise. (Compare with the default behavior of `parseInt`, which returns `17` for `parseInt("17.93 meters")`).
 * **is_float(val)** - returns `true` if and only if `val` is a simple decimal value (matching `/^-?((((0)|([1-9][0-9]*))(\.[0-9]+)?)|(\.[0-9]+))$/`).
 * **to_float(val)** - returns `parseFloat(val)` when `val` is a simple decimal value (matching `is_float`), `null` otherwise.
+
+*[Back to Index](#index)*
 
 ### ObjectUtil
 * **remove_null(map)** - generates a (shallow) *clone* of the map, with `null` entries removed.
@@ -337,6 +377,8 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
     * `"merge"` - merge the objects using `Util.merge(old,new)`
     * `"skip"` - keep the old value and ignore the new one
 
+*[Back to Index](#index)*
+
 ### RandomUtil
 * **random_bytes([count=32[,encoding='hex']])** - returns `count` random bytes in the specified `encoding`.
 * **seed_rng(seed)** - returns a new `random()` function with the specified `seed` value.
@@ -348,6 +390,8 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **random_Alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-zA-Z]` (using the given random number generator if provided).
 * **random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
 * **random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).
+
+*[Back to Index](#index)*
 
 ### Stopwatch
 A simple utility that can be used to track and report the time it takes to do some thing in your JavaScript code.
@@ -384,6 +428,8 @@ console.log(timer.label,"Finish Time: ",timer.finish_time);
 console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 ```
 
+*[Back to Index](#index)*
+
 ### StringUtil
 * **trim(str)** - equivalent to `String.trim()` save that `str` can be `null`.
 * **is_blank(str)** - `true` whenever `str` is empty, composed entirely of whitespace, `null` or `undefined`.
@@ -396,6 +442,8 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **falsey_string(str)** - `true` if the given string is `f`, `false`, `no`, `off`, `0`, etc.
 * **lpad(value,width,pad)** - adds `pad` characters to the beginning of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.lpad`, which is an identical method.)
 * **rpad(value,width,pad)** - adds `pad` characters to the end of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.rpad`, which is an identical method.)
+
+*[Back to Index](#index)*
 
 ### Util
 * **slow_equals(a,b)** - constant-time comparison of two buffers for equality.
@@ -411,9 +459,110 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **b64d(buf\[,encoding='utf8']) / Base64.decode(buf\[,encoding='utf8'])** - Base64 *decode* the given buffer.
 
 
+*[Back to Index](#index)*
+
 ### WebUtil
 * **remote_ip(req,name,default_value)** - attempts to discover the proper "client IP" for the given request using various approaches.
 * **param(req)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js
+
+*[Back to Index](#index)*
+
+### WorkQueue
+
+`WorkQueue` implements a basic priority queue for asynchronous tasks.
+
+Users may add "tasks" to the work queue, which will be asynchronously executed according to priority order.
+
+Each task consists of:
+
+ * a function
+ * optionally, an array of arguments to the function
+ * optionally, a priority for the task
+ * optionally, a callback function to invoke when the task is complete
+
+The final parameter to the task-function will *always* be the WorkQueue's `done` function.  Users **must** call this function to indicate that the task is complete (or, optionally throw an exception).
+
+Any arguments passed to the `done` function will in turn be passed to the callback function registered with the task (if any).
+
+#### Example
+
+```javascript
+var WorkQueue = require("inote-util").WorkQueue;
+var wq = new WorkQueue();
+
+// A task
+function taskOne(a,b,cb) {
+  console.log("taskOne is executing. a=",a,"b=",b);
+  cb(1,false,a);
+}
+var argsOne = [ "A", "B" ];
+
+// Another task
+function taskTwo(cb) {
+  console.log("taskTwo is executing.");
+  cb(2,true,null);
+}
+
+// A callback that will be invoked after each task
+function afterTask(num, exit, a) {
+  console.log("Task number",num,"is completed. a=",a);
+  if (exit) {
+    wq.stop_working();
+  }
+}
+
+wq.enqueue_task(taskOne, argsOne, afterTask);
+wq.enqueue_task(taskTwo, afterTask);
+
+wq.start_working();
+```
+
+When run, that script generates the following output:
+
+```
+taskOne is executing. a= A b= B
+Task number 1 is completed. a= A
+taskTwo is executing.
+Task number 2 is completed. a= null
+```
+
+#### Events
+
+The WorkQueue is also an `EventEmitter`, with the following events:
+
+ * **work-beginning** - called when the queue starts processing. Arguments: the WorkQueue instance.
+
+ * **task-enqueued** - called when a task is added to the queue. Arguments: the WorkQueue instance and the task (`{priority,method,args,callback}`).
+
+ * **task-dequeued** - called when a task is selected for processing. Arguments: the WorkQueue instance and the task (`{priority,method,args,callback}`).
+
+ * **task-completed** - called when a task is done (and didn't throw an uncaught exception.) Arguments: the WorkQueue instance, the task and an array of arguments passed to the `done` function..
+
+ * **error** - called when an uncaught exception is encountered while processing the task. Arguments: the WorkQueue instance, the task and the error.
+
+ * **busy** - called when a task is deferred because the maximum number of tasks are currently active. Arguments: the WorkQueue instance.
+
+ * **work-ending** - called when the queue stops processing.  Arguments: the WorkQueue instance.
+
+#### Methods
+
+* **new WorkQueue(\[options\])** - create a new WorkQueue instance.  Options:
+  * `priority` - the default priority for tasks in the queue (when none is specified when the task is added). Defaults to 5.  Larger numbers are executed before smaller numbers.
+  * `interval` - the time (in milliseconds) between "polling" the queue for new tasks to execute.  Defautls to `200`.
+  * `fuzz` - a floating point value that will be used to "fuzz" the interval between polling runs.  When `fuzz` is a non-zero float, a random value between `-1 × fuzz × interval` and `fuzz × interval` will be added to the interval.  This is used to avoid synchronization when several WorkQueues are launched with the same configuration.  (E.g., when a node app that uses the WorkQueue is launched in a cluster.)  Defaults to `0.1`.
+  * `workers` - the maximum number of tasks that can be active at one time.  Defaults to `1`.
+
+* **pending_task_count()** - returns the number of tasks in the queue waiting to be executed.
+
+* **active_task_count()** - returns the number of tasks from the queue currently being executed.
+
+* **enqueue_task:(method\[,args\]\[,priority\]\[,callback\])** - add a task the the queue.
+
+* **start_working(\[options\])** - start queue processing.  The `options` parameter may contain `interval` or `fuzz` attributes, which will override those provided in the construction for the duration of this processing.
+
+* **stop_working()** - stop queue processing.  Note that if a queue is started but not stopped, a function will be called roughly every `interval` milliseconds via JavaScript's `setInterval` method.
+
+*[Back to Index](#index)*
 
 ## Installing
 

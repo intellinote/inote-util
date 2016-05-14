@@ -5,6 +5,9 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 - [inote-util Release Notes](#inote-util-release-notes)
+	- [Release 1.4.0 (14 May 2016)](#release-140-14-may-2016)
+		- [Enhancements](#enhancements)
+		- [Changes](#changes)
 	- [Release 1.3.0 (13 May 2016)](#release-130-13-may-2016)
 		- [Enhancements](#enhancements)
 		- [Changes](#changes)
@@ -78,6 +81,16 @@ This file summarizes the changes bundled in each release of `inote-util`.
 	- [Release 0.1.1 (30 September 2014)](#release-011-30-september-2014)
 
 <!-- tocstop -->
+
+## Release 1.4.0 (14 May 2016)
+
+### Enhancements
+
+ * Added `WorkQueue` utility.
+
+### Changes
+
+ * In support of `WorkQueue` a new dependency on [`priorityqueuejs`](https://github.com/janogonzalez/priorityqueuejs) was added.
 
 ## Release 1.3.0 (13 May 2016)
 
