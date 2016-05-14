@@ -5,21 +5,21 @@ A collection of utility functions and classes for Node.js.
 
 ## Features
 
-[ArrayUtil](#arrayutil)
-[AsyncUtil](#asyncutil)
-[ColorUtil](#colorutil)
-[Config](#config)
-[DateUtil](#dateutil)
-[FileUtil](#fileutil)
-[IOUtil](#ioutil)
-[LogUtil](#logutil)
-[NetUtil](#netutil)
-[NumberUtil](#numberutil)
-[ObjectUtil](#objectutil)
-[RandomUtil](#randomutil)
-[Stopwatch](#stopwatch)
-[StringUtil](#stringutil)
-[Util](#util)
+[ArrayUtil](#arrayutil) |
+[AsyncUtil](#asyncutil) |
+[ColorUtil](#colorutil) |
+[Config](#config) |
+[DateUtil](#dateutil) |
+[FileUtil](#fileutil) |
+[IOUtil](#ioutil) |
+[LogUtil](#logutil) |
+[NetUtil](#netutil) |
+[NumberUtil](#numberutil) |
+[ObjectUtil](#objectutil) |
+[RandomUtil](#randomutil) |
+[Stopwatch](#stopwatch) |
+[StringUtil](#stringutil) |
+[Util](#util) |
 [WebUtil](#webutil)
 
 ### ArrayUtil
