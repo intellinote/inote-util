@@ -26,6 +26,7 @@ sources = [
   'util'
   'io-util'
   'file-util'
+  'net-util'
   'object-util'
   'stopwatch'
   'config'
