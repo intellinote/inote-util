@@ -282,6 +282,12 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 ```
 
 ### FileUtil
+* **ls(dir\[,options\],callback)** - list the files in a directory; options:
+  * `recurse` - when `true`, perform the operation recursively
+  * `pattern` - when a non-`null` RegExp, only list files matching the specified pattern
+  * `types` - an array or string containing `file` or `directory`
+* **is_dir(filename,callback)**   - test if the specified filename is a directory
+* **is_file(filename,callback)** - test if the specified filename is a plain file (not a directory).
 * **sanitize_filename(filename)** - removes invalid characters from and truncates extremely long filenames; only operates on the (last segement of) the given filename.
 * **uniquify_filename(dir,basename[,ext=''[,minpadwidth=3\[,maxpadwidth=5]])** - attempts to generate a unique filename in `dir` based on `basename`.
 * **mkdir(dir)** - `mkdir -p dir`
@@ -291,6 +297,8 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **read_stdin_sync([end_byte="\x04"\[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
 * **load_json_file_sync(file\[,ignore_errors=false])** - synchronously read and parse a JSON file. When `ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.
 * **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
+* **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
+* **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
 
 ### IOUtil
 * **pipe_to_file(readable_stream,dest,options,callback)** - write a stream to a file.

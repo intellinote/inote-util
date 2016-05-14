@@ -139,25 +139,4 @@ class ObjectUtil
 
 ################################################################################
 
-class MapUtil
-  @_deprecation_warned: false
-  @_deprecation_warning:()=>
-    unless @_deprecation_warned
-      console.error "WARNING: MapUtil is deprecated. Please use ObjectUtil instead."
-      @_deprecation_warned = true
-  @_deprecated_wrapper:(method)=>
-    return (args...)=>
-      @_deprecation_warning()
-      method.call(ObjectUtil,args...)
-  @remove_null: @_deprecated_wrapper(ObjectUtil.remove_null)
-  @remove_falsey: @_deprecated_wrapper(ObjectUtil.remove_falsey)
-  @merge: @_deprecated_wrapper(ObjectUtil.merge)
-  @shallow_clone: @_deprecated_wrapper(ObjectUtil.shallow_clone)
-  @deep_clone: @_deprecated_wrapper(ObjectUtil.deep_clone)
-  @object_array_to_map: @_deprecated_wrapper(ObjectUtil.object_array_to_map)
-
-
-################################################################################
-
-exports.ObjectUtil     = ObjectUtil
-exports.MapUtil        = MapUtil
+exports.ObjectUtil = exports.MapUtil = ObjectUtil

@@ -5,7 +5,7 @@ HOMEDIR  = path.join(__dirname,'..')
 LIB_COV  = path.join(HOMEDIR,'lib-cov')
 LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 IOUtil   = require(path.join(LIB_DIR,'io-util')).IOUtil
-FileUtil = require(path.join(LIB_DIR,'util')).FileUtil
+FileUtil = require(path.join(LIB_DIR,'file-util')).FileUtil
 
 
 describe 'IOUtil',->
