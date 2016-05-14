@@ -13,7 +13,8 @@
     "remove"                : "^0.1",
     "request"               : "^2.58",
     "seedrandom"            : "^2.4",
-    "shelljs"               : "^0.7"
+    "shelljs"               : "^0.7",
+    "priorityqueuejs"       : "latest"
   },
   "devDependencies": {
     "coffee-coverage"       : "^1.0",

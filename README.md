@@ -22,7 +22,8 @@ A collection of utility functions and classes for Node.js.
 [Stopwatch](#stopwatch) |
 [StringUtil](#stringutil) |
 [Util](#util) |
-[WebUtil](#webutil)
+[WebUtil](#webutil) |
+[WorkQueue](#workqueue)
 
 ### ArrayUtil
 * **lpad(value,width,pad)** - adds `pad` elements to the beginning of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.lpad`, which is identical.)
@@ -463,6 +464,103 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 ### WebUtil
 * **remote_ip(req,name,default_value)** - attempts to discover the proper "client IP" for the given request using various approaches.
 * **param(req)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js
+
+*[Back to Index](#index)*
+
+### WorkQueue
+
+`WorkQueue` implements a basic priority queue for asynchronous tasks.
+
+Users may add "tasks" to the work queue, which will be asynchronously executed according to priority order.
+
+Each task consists of:
+
+ * a function
+ * optionally, an array of arguments to the function
+ * optionally, a priority for the task
+ * optionally, a callback function to invoke when the task is complete
+
+The final parameter to the task-function will *always* be the WorkQueue's `done` function.  Users **must** call this function to indicate that the task is complete (or, optionally throw an exception).
+
+Any arguments passed to the `done` function will in turn be passed to the callback function registered with the task (if any).
+
+#### Example
+
+```javascript
+var WorkQueue = require("inote-util").WorkQueue;
+var wq = new WorkQueue();
+
+// A task
+function taskOne(a,b,cb) {
+  console.log("taskOne is executing. a=",a,"b=",b);
+  cb(1,false,a);
+}
+var argsOne = [ "A", "B" ];
+
+// Another task
+function taskTwo(cb) {
+  console.log("taskTwo is executing.");
+  cb(2,true,null);
+}
+
+// A callback that will be invoked after each task
+function afterTask(num, exit, a) {
+  console.log("Task number",num,"is completed. a=",a);
+  if (exit) {
+    wq.stop_working();
+  }
+}
+
+wq.enqueue_task(taskOne, argsOne, afterTask);
+wq.enqueue_task(taskTwo, afterTask);
+
+wq.start_working();
+```
+
+When run, that script generates the following output:
+
+```
+taskOne is executing. a= A b= B
+Task number 1 is completed. a= A
+taskTwo is executing.
+Task number 2 is completed. a= null
+```
+
+#### Events
+
+The WorkQueue is also an `EventEmitter`, with the following events:
+
+ * **work-beginning** - called when the queue starts processing. Arguments: the WorkQueue instance.
+
+ * **task-enqueued** - called when a task is added to the queue. Arguments: the WorkQueue instance and the task (`{priority,method,args,callback}`).
+
+ * **task-dequeued** - called when a task is selected for processing. Arguments: the WorkQueue instance and the task (`{priority,method,args,callback}`).
+
+ * **task-completed** - called when a task is done (and didn't throw an uncaught exception.) Arguments: the WorkQueue instance, the task and an array of arguments passed to the `done` function..
+
+ * **error** - called when an uncaught exception is encountered while processing the task. Arguments: the WorkQueue instance, the task and the error.
+
+ * **busy** - called when a task is deferred because the maximum number of tasks are currently active. Arguments: the WorkQueue instance.
+
+ * **work-ending** - called when the queue stops processing.  Arguments: the WorkQueue instance.
+
+#### Methods
+
+* **new WorkQueue(\[options\])** - create a new WorkQueue instance.  Options:
+  * `priority` - the default priority for tasks in the queue (when none is specified when the task is added). Defaults to 5.  Larger numbers are executed before smaller numbers.
+  * `interval` - the time (in milliseconds) between "polling" the queue for new tasks to execute.  Defautls to `200`.
+  * `fuzz` - a floating point value that will be used to "fuzz" the interval between polling runs.  When `fuzz` is a non-zero float, a random value between `-1 × fuzz × interval` and `fuzz × interval` will be added to the interval.  This is used to avoid synchronization when several WorkQueues are launched with the same configuration.  (E.g., when a node app that uses the WorkQueue is launched in a cluster.)  Defaults to `0.1`.
+  * `workers` - the maximum number of tasks that can be active at one time.  Defaults to `1`.
+
+* **pending_task_count()** - returns the number of tasks in the queue waiting to be executed.
+
+* **active_task_count()** - returns the number of tasks from the queue currently being executed.
+
+* **enqueue_task:(method\[,args\]\[,priority\]\[,callback\])** - add a task the the queue.
+
+* **start_working(\[options\])** - start queue processing.  The `options` parameter may contain `interval` or `fuzz` attributes, which will override those provided in the construction for the duration of this processing.
+
+* **stop_working()** - stop queue processing.  Note that if a queue is started but not stopped, a function will be called roughly every `interval` milliseconds via JavaScript's `setInterval` method.
 
 *[Back to Index](#index)*
 
