@@ -282,6 +282,8 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 ```
 
 ### FileUtil
+* **file_age(file,callback)** - obtain the age of a file in milliseconds
+* **file_mtime(file,callback)** - obtain the Unix epoch timestamp at which a file was last modified
 * **ls(dir\[,options\],callback)** - list the files in a directory; options:
   * `recurse` - when `true`, perform the operation recursively
   * `pattern` - when a non-`null` RegExp, only list files matching the specified pattern
@@ -309,6 +311,10 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 ### LogUtil
 * **tlog(...)** - writes to stdout (`console.log`), pre-pending a timestamp.
 * **terr(...)** - writes to stderr (`console.error`), pre-pending a timestamp.
+
+### NetUtil
+* **is_port_in_use(port,callback)** - attempt to determine whether or not a port is currently in use
+* **get_unused_port(callback)** - attempt to obtain an unused port
 
 ### NumberUtil
 * **round_decimal(value[,digits=0])** - round a number to the specified number of digits to the right of the decimal point.
