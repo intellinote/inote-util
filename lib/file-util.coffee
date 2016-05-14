@@ -283,6 +283,29 @@ class FileUtil
       @rm(src)
       done()
     input.pipe(output)
+
+
+  @file_age:(file,callback)=>
+    @file_mtime file, (err, mtime)=>
+      if err?
+        callback err
+      else unless mtime?
+        callback null, null
+      else
+        callback null, Date.now() - mtime
+
+
+  @file_mtime:(file,callback)=>
+    fs.exists file, (exists)=>
+      unless exists
+        callback null, false
+      else
+        fs.stat file, (err,stats)=>
+          if err?
+            callback err
+          else
+            callback null, stats.mtime?.getTime?() ? stats.ctime?.getTime?()
+
 ################################################################################
 
 exports.FileUtil = FileUtil

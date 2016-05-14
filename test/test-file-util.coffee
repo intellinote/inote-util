@@ -9,6 +9,17 @@ TEST_FS  = path.join HOMEDIR, "test", "data", "test-fs"
 
 describe 'FileUtil',->
 
+  it "can determine the age of a file", (done)->
+    FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age)->
+      should.not.exist err
+      console.log "AGE 1:", age
+      Util.set_timeout 1000, ()->
+        FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age2)->
+          should.not.exist err
+          console.log "AGE 2:", age2
+          (age2 - age1).should.be.above(999)
+          done()
+
   it "can test if a file is a plain file", (done)->
     FileUtil.is_file "xyzzy.i.do.not.exist", (err, is_file)->
       should.not.exist err
