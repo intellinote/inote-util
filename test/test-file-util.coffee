@@ -38,7 +38,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 5
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one","dir-two","file-one.txt", "file-two.xyz", "file-three.txt"]
         (f in basenames).should.equal true
       done()
@@ -48,7 +48,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 5
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one","dir-two","file-one.txt", "file-two.xyz", "file-three.txt"]
         (f in basenames).should.equal true
       done()
@@ -58,7 +58,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 10
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one","dir-two","file-one.txt", "file-two.xyz", "file-three.txt","file-one-a.txt","file-one-b.txt","file-one-c.xyz","file-two-a.xyz","file-two-b.txt"]
         (f in basenames).should.equal true
       done()
@@ -68,7 +68,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 5
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one","file-one.txt","file-one-a.txt","file-one-b.txt","file-one-c.xyz"]
         (f in basenames).should.equal true
       done()
@@ -78,7 +78,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 3
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["file-two.xyz","file-one-c.xyz","file-two-a.xyz"]
         (f in basenames).should.equal true
       done()
@@ -88,7 +88,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 3
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["file-one.txt", "file-two.xyz", "file-three.txt"]
         (f in basenames).should.equal true
       done()
@@ -98,7 +98,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 2
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one", "dir-two" ]
         (f in basenames).should.equal true
       done()
