@@ -5,9 +5,25 @@ HOMEDIR  = path.join(__dirname,'..')
 LIB_COV  = path.join(HOMEDIR,'lib-cov')
 LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 FileUtil = require(path.join(LIB_DIR,'file-util')).FileUtil
+AsyncUtil     = require(path.join(LIB_DIR,'util')).AsyncUtil
 TEST_FS  = path.join HOMEDIR, "test", "data", "test-fs"
 
 describe 'FileUtil',->
+
+  it "can determine the age of a file", (done)->
+    FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age1)->
+      should.not.exist err
+      AsyncUtil.set_timeout 500, ()->
+        FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age2)->
+          should.not.exist err
+          (age2 - age1).should.be.above(499)
+          (age2 - age1).should.be.below(600)
+          AsyncUtil.set_timeout 600, ()->
+            FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age3)->
+              should.not.exist err
+              (age3 - age2).should.be.above(599)
+              (age3 - age2).should.be.below(700)
+              done()
 
   it "can test if a file is a plain file", (done)->
     FileUtil.is_file "xyzzy.i.do.not.exist", (err, is_file)->
@@ -38,7 +54,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 5
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one","dir-two","file-one.txt", "file-two.xyz", "file-three.txt"]
         (f in basenames).should.equal true
       done()
@@ -48,7 +64,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 5
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one","dir-two","file-one.txt", "file-two.xyz", "file-three.txt"]
         (f in basenames).should.equal true
       done()
@@ -58,7 +74,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 10
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one","dir-two","file-one.txt", "file-two.xyz", "file-three.txt","file-one-a.txt","file-one-b.txt","file-one-c.xyz","file-two-a.xyz","file-two-b.txt"]
         (f in basenames).should.equal true
       done()
@@ -68,7 +84,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 5
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one","file-one.txt","file-one-a.txt","file-one-b.txt","file-one-c.xyz"]
         (f in basenames).should.equal true
       done()
@@ -78,7 +94,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 3
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["file-two.xyz","file-one-c.xyz","file-two-a.xyz"]
         (f in basenames).should.equal true
       done()
@@ -88,7 +104,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 3
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["file-one.txt", "file-two.xyz", "file-three.txt"]
         (f in basenames).should.equal true
       done()
@@ -98,7 +114,7 @@ describe 'FileUtil',->
       should.not.exist err
       should.exist files
       files.length.should.equal 2
-      basenames = files.map path.basename
+      basenames = files.map (x)->path.basename(x)
       for f in ["dir-one", "dir-two" ]
         (f in basenames).should.equal true
       done()
