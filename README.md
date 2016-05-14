@@ -5,6 +5,23 @@ A collection of utility functions and classes for Node.js.
 
 ## Features
 
+[ArrayUtil](#arrayutil)
+[AsyncUtil](#asyncutil)
+[ColorUtil](#colorutil)
+[Config](#config)
+[DateUtil](#dateutil)
+[FileUtil](#fileutil)
+[IOUtil](#ioutil)
+[LogUtil](#logutil)
+[NetUtil](#netutil)
+[NumberUtil](#numberutil)
+[ObjectUtil](#objectutil)
+[RandomUtil](#randomutil)
+[Stopwatch](#stopwatch)
+[StringUtil](#stringutil)
+[Util](#util)
+[WebUtil](#webutil)
+
 ### ArrayUtil
 * **lpad(value,width,pad)** - adds `pad` elements to the beginning of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.lpad`, which is identical.)
 * **rpad(value,width,pad)** - adds `pad` elements to the end of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.rpad`, which is identical.)
