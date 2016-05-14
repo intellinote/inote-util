@@ -11,6 +11,7 @@ FileUtil = require(path.join(LIB_DIR,'file-util')).FileUtil
 describe 'IOUtil',->
 
   it "can download URL content to a buffer",(done)->
+    @timeout 5000
     IOUtil.download_to_buffer "https://www.intellinote.net/", (err,buffer)=>
       should.not.exist err
       should.exist buffer
@@ -21,6 +22,7 @@ describe 'IOUtil',->
       done()
 
   it "can download URL content to a file",(done)->
+    @timeout 5000
     dest_file = path.join(HOMEDIR,'test','IOUTIL-TEST-FILE.TXT')
     IOUtil.download_to_file "https://www.intellinote.net/", dest_file, (err)=>
       should.not.exist err
