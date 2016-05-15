@@ -30,6 +30,7 @@ sources = [
   'object-util'
   'stopwatch'
   'config'
+  'work-queue'
 ]
 
 # Now we simply load (`require`) the requisite files and pass along whatever

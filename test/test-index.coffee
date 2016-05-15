@@ -25,3 +25,7 @@ describe "index",->
   it "exports IOUtil", (done)->
     index.IOUtil.should.exist
     done()
+
+  it "exports WorkQueue", (done)->
+    index.WorkQueue.should.exist
+    done()
