@@ -180,6 +180,8 @@ describe 'FileUtil',->
       [ "foo.foo", "foo" ]
       [ "foo.foo.foo", "foo.foo" ]
       [ "/foo/bar.xxx/file.ext", "/foo/bar.xxx/file" ]
+      [ "/foo/bar.xxx/file", "/foo/bar.xxx/file" ]
+      [ "/foo/bar.xxx-file", "/foo/bar" ]
     ]
     for test in tests
       FileUtil.strip_extension(test[0]).should.equal test[1]
