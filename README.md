@@ -23,7 +23,8 @@ A collection of utility functions and classes for Node.js.
 [StringUtil](#stringutil) |
 [Util](#util) |
 [WebUtil](#webutil) |
-[WorkQueue](#workqueue)
+[WorkQueue](#workqueue) |
+[ZipUtil](#ziputil)
 
 ### ArrayUtil
 * **lpad(value,width,pad)** - adds `pad` elements to the beginning of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.lpad`, which is identical.)
@@ -331,6 +332,8 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
+* **strip_extension(fname)** - returns a version of `fname` with the file extension removed.
+* **replace_extension(fname,ext)** - returns a version of `fname` with the file extension changed to `ext`.
 
 *[Back to Index](#index)*
 
@@ -438,6 +441,7 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **truncate(str,width[,marker='…'])** - a minimally "smart" truncation that attempts to truncate a string at a word boundaries. The specified `marker` will be added if and only if the string was actually truncated.
 * **escape_for_json(str)** - escapes a (possibly `null`) string for use as literal characters in a JSON string.
 * **escape_for_regexp(str)** - escapes a (possibly `null`) string for use as literal characters in a regular expression.
+* **escape_for_bash(param,esc_specials=false)** - escapes a (possibly `null`) string for use as command-line parameter. When `esc_specials` is `false` (the default) parameters such as `<`, `>`, `&&`, etc. are not escaped.
 * **truthy_string(str)** - `true` if the given string is `t`, `true`, `y`, `yes`, `on`, `1`, etc.
 * **falsey_string(str)** - `true` if the given string is `f`, `false`, `no`, `off`, `0`, etc.
 * **lpad(value,width,pad)** - adds `pad` characters to the beginning of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.lpad`, which is an identical method.)
@@ -563,6 +567,14 @@ The WorkQueue is also an `EventEmitter`, with the following events:
 * **stop_working()** - stop queue processing.  Note that if a queue is started but not stopped, a function will be called roughly every `interval` milliseconds via JavaScript's `setInterval` method.
 
 *[Back to Index](#index)*
+
+### ZipUtil
+* **zip(\[wd\],zipfile,inputs,callback)** - creates (or appends to `zipfile`), adding the file or array of files in `inputs`.  When `wd` is specified the action will take place relative to that directory.
+* **unzip(\[wd\],zipfile,dest,callback)** - unzips `zipfile` into the specified `dest`.
+* **contents(zipfile,callback)** - obtains a list of files within `zipfile`.
+
+*[Back to Index](#index)*
+
 
 ## Installing
 
