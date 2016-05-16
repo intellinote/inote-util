@@ -4,8 +4,8 @@ path     = require 'path'
 HOMEDIR  = path.join(__dirname,'..')
 LIB_COV  = path.join(HOMEDIR,'lib-cov')
 LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
-FileUtil = require(path.join(LIB_DIR,'file-util')).FileUtil
-AsyncUtil     = require(path.join(LIB_DIR,'util')).AsyncUtil
+FileUtil = require(path.join(LIB_DIR,'index')).FileUtil
+AsyncUtil = require(path.join(LIB_DIR,'index')).AsyncUtil
 TEST_FS  = path.join HOMEDIR, "test", "data", "test-fs"
 
 describe 'FileUtil',->
@@ -160,4 +160,29 @@ describe 'FileUtil',->
     fs.existsSync(path.join(HOMEDIR,"foo")).should.be.ok
     (FileUtil.rmdir(path.join(HOMEDIR,"foo"))).should.be.ok
     fs.existsSync(path.join(HOMEDIR,"foo")).should.not.be.ok
+    done()
+
+  it "can change file extensions",(done)->
+    tests = [
+      [ "foo.foo", ".bar", "foo.bar" ]
+      [ "foo.foo", "bar", "foo.bar" ]
+      [ "foo.foo.foo", "bar", "foo.foo.bar" ]
+      [ "foo.foo.foo", "bar.bar", "foo.foo.bar.bar" ]
+      [ "/foo/bar.xxx/file.ext", ".txt", "/foo/bar.xxx/file.txt" ]
+      [ "/foo/bar.xxx/file.ext", "txt", "/foo/bar.xxx/file.txt" ]
+    ]
+    for test in tests
+      FileUtil.replace_extension(test[0],test[1]).should.equal test[2]
+    done()
+
+  it "can strip file extensions",(done)->
+    tests = [
+      [ "foo.foo", "foo" ]
+      [ "foo.foo.foo", "foo.foo" ]
+      [ "/foo/bar.xxx/file.ext", "/foo/bar.xxx/file" ]
+      [ "/foo/bar.xxx/file", "/foo/bar.xxx/file" ]
+      [ "/foo/bar.xxx-file", "/foo/bar" ]
+    ]
+    for test in tests
+      FileUtil.strip_extension(test[0]).should.equal test[1]
     done()
