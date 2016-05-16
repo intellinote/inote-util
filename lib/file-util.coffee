@@ -284,7 +284,6 @@ class FileUtil
       done()
     input.pipe(output)
 
-
   @file_age:(file,callback)=>
     @file_mtime file, (err, mtime)=>
       if err?
@@ -293,7 +292,6 @@ class FileUtil
         callback null, null
       else
         callback null, Date.now() - mtime
-
 
   @file_mtime:(file,callback)=>
     fs.exists file, (exists)=>
@@ -305,6 +303,25 @@ class FileUtil
             callback err
           else
             callback null, stats.mtime?.getTime?() ? stats.ctime?.getTime?()
+
+  @replace_extension:(filename,ext)=>
+    if ext? and not /^\./.test ext
+      ext = ".#{ext}"
+    new_filename = @strip_extension(filename)
+    if ext?
+      new_filename = "#{new_filename}#{ext}"
+    return new_filename
+
+  @strip_extension:(filename)=>
+    if filename?
+      dir = path.dirname(filename)
+      file = path.basename(filename)
+      ext = path.extname(file)
+      if ext? and ext.length > 0
+        file = file.substring(0, file.length - ext.length)
+      return path.join(dir,file)
+    else
+      return filename
 
 ################################################################################
 
