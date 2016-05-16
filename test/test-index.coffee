@@ -33,3 +33,7 @@ describe "index",->
   it "exports StringUtil", (done)->
     index.StringUtil.should.exist
     done()
+
+  it "exports ZipUtil", (done)->
+    index.ZipUtil.should.exist
+    done()
