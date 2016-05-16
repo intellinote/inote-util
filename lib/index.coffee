@@ -23,13 +23,14 @@ LIB_DIR   = if fs.existsSync(LIB_COV) then LIB_COV else LIB
 # `sources` enumerates the files from which we'll load objects to export.
 
 sources = [
-  'util'
-  'io-util'
+  'config'
   'file-util'
+  'io-util'
   'net-util'
   'object-util'
   'stopwatch'
-  'config'
+  'string-util'
+  'util'
   'work-queue'
 ]
 
@@ -43,3 +44,6 @@ for file in sources
 
 for fn in ["read_stdin_sync","load_json_file_sync","load_json_stdin_sync"]
   exports.Util[fn] = exports.FileUtil[fn]
+
+for fn in ['trim', 'isnt_blank', 'is_blank', 'blank_to_null', 'truncate', 'escape_for_json', 'escape_for_regexp', 'truthy_string', 'falsey_string', 'lpad', 'lpad_string', 'rpad', 'rpad_string' ]
+  exports.Util[fn] = exports.StringUtil[fn]

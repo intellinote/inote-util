@@ -29,3 +29,7 @@ describe "index",->
   it "exports WorkQueue", (done)->
     index.WorkQueue.should.exist
     done()
+
+  it "exports StringUtil", (done)->
+    index.StringUtil.should.exist
+    done()
