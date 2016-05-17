@@ -5,27 +5,29 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 - [inote-util Release Notes](#inote-util-release-notes)
+	- [Release 1.5.1 (16 May 2016)](#release-151-16-may-2016)
+		- [Changes](#changes)
 	- [Release 1.5.0 (16 May 2016)](#release-150-16-may-2016)
 		- [Enhancements](#enhancements)
 	- [Release 1.4.1 (15 May 2016)](#release-141-15-may-2016)
 		- [Bug Fixes](#bug-fixes)
 	- [Release 1.4.0 (14 May 2016)](#release-140-14-may-2016)
 		- [Enhancements](#enhancements-1)
-		- [Changes](#changes)
+		- [Changes](#changes-1)
 	- [Release 1.3.0 (13 May 2016)](#release-130-13-may-2016)
 		- [Enhancements](#enhancements-2)
-		- [Changes](#changes-1)
+		- [Changes](#changes-2)
 	- [Release 1.2.0 (13 May 2016)](#release-120-13-may-2016)
 		- [Enhancements](#enhancements-3)
 	- [Release 1.1.0 (9 May 2016)](#release-110-9-may-2016)
 		- [Enhancements](#enhancements-4)
-		- [Changes](#changes-2)
+		- [Changes](#changes-3)
 		- [Bug Fixes](#bug-fixes-1)
 	- [Release 1.0.1 (8 May 2016)](#release-101-8-may-2016)
-		- [Changes](#changes-3)
+		- [Changes](#changes-4)
 	- [Release 1.0.0 (7 May 2016)](#release-100-7-may-2016)
 		- [Enhancements](#enhancements-5)
-		- [Changes](#changes-4)
+		- [Changes](#changes-5)
 	- [Release 0.9.0 (20 January 2016)](#release-090-20-january-2016)
 		- [Enhancements](#enhancements-6)
 		- [Bug Fixes](#bug-fixes-2)
@@ -86,6 +88,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+## Release 1.5.1 (16 May 2016)
+
+### Changes
+
+ * `-o` option added to `ZipUtil.unzip`. Note that this will cause `unzip` to overwrite existing files (without prompting).
+
 ## Release 1.5.0 (16 May 2016)
 
 ### Enhancements
@@ -93,7 +101,6 @@ This file summarizes the changes bundled in each release of `inote-util`.
  * Added `ZipUtil` with `zip`, `unzip` and `contents` methods.
  * Added `StringUtil.escape_for_bash` (also aliased as `escape_for_shell`).
  * Added `FileUtil.replace_extension` and `FileUtil.strip_extension`.
-
 
 ## Release 1.4.1 (15 May 2016)
 
