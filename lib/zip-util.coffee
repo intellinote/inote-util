@@ -53,10 +53,11 @@ class ZipUtil
         args.push path.dirname outdir
         args.push "&&"
       args.push "unzip"
-      args.push zipfile
+      args.push "-o"
       if outdir?
         args.push "-d"
         args.push outdir
+      args.push zipfile
       args = args.map (p)->StringUtil.escape_for_bash(p)
       cmd = args.join ' '
       # console.log cmd
