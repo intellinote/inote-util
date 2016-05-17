@@ -346,8 +346,10 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 *[Back to Index](#index)*
 
 ### LogUtil
-* **tlog(...)** - writes to stdout (`console.log`), pre-pending a timestamp.
-* **terr(...)** - writes to stderr (`console.error`), pre-pending a timestamp.
+* **tlog(...)** - writes to stdout (`console.log`), pre-pending a timestamp (E.g., `[2015-05-17T22:03:58.569Z] Hello World!`)
+* **terr(...)** - writes to stderr (`console.error`), pre-pending a timestamp.  (E.g., `[2015-05-17T22:03:58.569Z] Hello World!`)
+* **tplog(...)** - writes to stdout (`console.log`), pre-pending a timestamp and process ID (E.g., `[2015-05-17T22:03:58.569Z] [p:123] Hello World!`)
+* **tperr(...)** - writes to stderr (`console.error`), pre-pending a timestamp and process ID.  (E.g., `[2015-05-17T22:03:58.569Z] [p:123] Hello World!`)
 
 *[Back to Index](#index)*
 

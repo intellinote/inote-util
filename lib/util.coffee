@@ -15,11 +15,6 @@ DEBUG      = (/(^|,)inote-?util($|,)/i.test process?.env?.NODE_DEBUG) or (/(^|,)
 
 ################################################################################
 
-class LogUtil
-  @_fdt:(d)=>"[#{(d ? new Date()).toISOString()}]"
-  @tlog:(args...)=>console.log @_fdt(),args...
-  @terr:(args...)=>console.error @_fdt(),args...
-
 class DateUtil
 
   @DAY_OF_WEEK = [
@@ -1445,7 +1440,6 @@ exports.ComparatorUtil = ComparatorUtil
 exports.DateUtil       = DateUtil
 exports.ErrorUtil      = ErrorUtil
 exports.IdUtil         = IdUtil
-exports.LogUtil        = LogUtil
 exports.MapUtil        = MapUtil
 exports.NumberUtil     = NumberUtil
 exports.PasswordUtil   = PasswordUtil

@@ -33,6 +33,7 @@ sources = [
   'util'
   'work-queue'
   'zip-util'
+  'log-util'
 ]
 
 # Now we simply load (`require`) the requisite files and pass along whatever

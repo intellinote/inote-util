@@ -37,3 +37,7 @@ describe "index",->
   it "exports ZipUtil", (done)->
     index.ZipUtil.should.exist
     done()
+
+  it "exports LogUtil", (done)->
+    index.LogUtil.should.exist
+    done()
