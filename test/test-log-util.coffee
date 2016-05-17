@@ -46,3 +46,33 @@ describe 'LogUtil',=>
     err[0][3].should.equal 2
     err[0][4].should.equal 3
     done()
+
+  it 'can log to stdout with a timestamp and pid', (done)=>
+    log = []
+    console.log = (args...)->log.push args
+    LogUtil.tplog "This is a message for stdout.", 1, 2, 3
+    restore_console()
+    log.length.should.equal 1
+    log[0].length.should.equal 6
+    log[0][0].should.match /^\[[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*\]$/
+    log[0][1].should.match /^\[p:[0-9]+\]$/
+    log[0][2].should.equal "This is a message for stdout."
+    log[0][3].should.equal 1
+    log[0][4].should.equal 2
+    log[0][5].should.equal 3
+    done()
+
+  it 'can log to stderr with a timestamp and pid', (done)=>
+    err  = []
+    console.error = (args...)->err.push args
+    LogUtil.tperr "This is a message for stderr.", 1, 2, 3
+    restore_console()
+    err.length.should.equal 1
+    err[0].length.should.equal 6
+    err[0][0].should.match /^\[[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*\]$/
+    err[0][1].should.match /^\[p:[0-9]+\]$/
+    err[0][2].should.equal "This is a message for stderr."
+    err[0][3].should.equal 1
+    err[0][4].should.equal 2
+    err[0][5].should.equal 3
+    done()
