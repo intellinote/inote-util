@@ -1,0 +1,6 @@
+class LogUtil
+  @_fdt:(d)=>"[#{(d ? new Date()).toISOString()}]"
+  @tlog:(args...)=>console.log @_fdt(),args...
+  @terr:(args...)=>console.error @_fdt(),args...
+
+exports.LogUtil = LogUtil
