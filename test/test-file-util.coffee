@@ -190,5 +190,5 @@ describe 'FileUtil',->
   it "can test the MIME type of a file", (done)->
     FileUtil.get_file_mime_type path.join(HOMEDIR, "package.json"), (err, type)->
       should.not.exist err
-      console.log type
+      type.should.equal 'text/plain'
       done()

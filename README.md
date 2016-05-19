@@ -42,10 +42,11 @@ A collection of utility functions and classes for Node.js.
 *[Back to Index](#index)*
 
 ### AsyncUtil
-* **wait(delay,callback) / AsyncUtil.set_timeout(delay,callback) / AsyncUtil.setTimeout(delay,callback)** - just like `setTimeout(callback,delay)` but with a more CoffeeScript-friendly parameter order.
-* **cancel_wait(id) / AsyncUtil.clear_timeout(id) / AsyncUtil.clearTimeout(id)** - alias for `window.clearTimeout(id)`.
-* **interval(delay,callback) / AsyncUtil.set_intreval(delay,callback) / AsyncUtil.setInterval(delay,callback)** - just like `setInterval(callback,delay)` but with a more CoffeeScript-friendly parameter order.
-* **cancel_interval(id) / AsyncUtil.cancelInterval(id) / AsyncUtil.clear_interval(id) / AsyncUtil.clearlInterval(id)** - alias for `window.clearInterval(id)`.
+* **wait_until(predicate\[,interval],callback)** / **wait_for(predicate\[,interval],callback)** - polls `predicate()` every `interval` milliseconds until it returns `true` (or throws an exception). Callback signature is `(err,complete)` where `complete` is `true` if and only if `predicate()` returned `true`. `interval` defaults to `100`.
+* **wait(delay,callback)** / **set_timeout(delay,callback)** / **setTimeout(delay,callback)** - just like `setTimeout(callback,delay)` but with a more CoffeeScript-friendly parameter order.
+* **cancel_wait(id)** / **clear_timeout(id)** / **clearTimeout(id)** - alias for `window.clearTimeout(id)`.
+* **interval(delay,callback)** / **set_interval(delay,callback)** / **setInterval(delay,callback)** - just like `setInterval(callback,delay)` but with a more CoffeeScript-friendly parameter order.
+* **cancel_interval(id)** / **cancelInterval(id)** / **clear_interval(id)** / **clearlInterval(id)** - alias for `window.clearInterval(id)`.
 * **for_async(initialize,condition,action,increment,whendone)** - executes an asynchronous `for` loop. Accepts 5 function-valued parameters:
   * `initialize` - an initialization function (no arguments passed, no return value is expected);
   * `condition` - a predicate that indicates whether we should continue looping (no arguments passed, a boolean value is expected to be returned);
@@ -79,7 +80,7 @@ method_one( function(e,a,b) {
 We can flatten the calls out like this:
 
 ```javascript
-var procedure = Util.procedure();
+var procedure = AsyncUtil.procedure();
 procedure.first( method_one );
 procedure.then( method_two );
 procedure.then( method_three );
