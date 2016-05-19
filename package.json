@@ -8,13 +8,14 @@
   "author"      : "Intellinote <https://www.intellinote.net/>",
   "dependencies": {
     "mkdirp"                : "^0.5",
+    "mmmagic"               : "^0.4",
     "nconf"                 : "^0.8",
     "node-uuid"             : "^1.4.7",
     "remove"                : "^0.1",
     "request"               : "^2.58",
     "seedrandom"            : "^2.4",
     "shelljs"               : "^0.7",
-    "priorityqueuejs"       : "latest"
+    "priorityqueuejs"       : "^1.0"
   },
   "devDependencies": {
     "coffee-coverage"       : "^1.0",
