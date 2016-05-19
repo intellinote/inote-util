@@ -41,3 +41,10 @@ describe "index",->
   it "exports LogUtil", (done)->
     index.LogUtil.should.exist
     done()
+
+  it "exports AsyncUtil", (done)->
+    index.AsyncUtil.should.exist
+    index.Sequencer.should.exist
+    index.Util.for_each_async.should.exist
+    index.Util.procedure.should.exist
+    done()
