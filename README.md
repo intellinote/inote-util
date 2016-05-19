@@ -332,8 +332,12 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
+* **get_extension(fname)** - equivalent to `path.extname`.
 * **strip_extension(fname)** - returns a version of `fname` with the file extension removed.
 * **replace_extension(fname,ext)** - returns a version of `fname` with the file extension changed to `ext`.
+* **get_file_mime_type(file,callback)** - determines MIME type of `file`.
+* **file_is_mime(file,pattern,callback)** - calls-back with `null, true` when the MIME type of `file` matches `pattern.`
+* **file_is_pdf(file,callback)** - calls-back with `null, true` when the MIME type of `file` is `application/pdf`.
 
 *[Back to Index](#index)*
 

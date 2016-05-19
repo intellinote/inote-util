@@ -186,3 +186,9 @@ describe 'FileUtil',->
     for test in tests
       FileUtil.strip_extension(test[0]).should.equal test[1]
     done()
+
+  it "can test the MIME type of a file", (done)->
+    FileUtil.get_file_mime_type path.join(HOMEDIR, "package.json"), (err, type)->
+      should.not.exist err
+      console.log type
+      done()

@@ -7,6 +7,8 @@ Util       = require(path.join(LIB_DIR,'util')).Util
 mkdirp     = require 'mkdirp'
 remove     = require 'remove'
 DEBUG      = (/(^|,)file-?util($|,)/i.test process?.env?.NODE_DEBUG)
+mmmagic    = require('mmmagic')
+magic      = new mmmagic.Magic(mmmagic.MAGIC_MIME_TYPE)
 
 class FileUtil
 
@@ -322,6 +324,36 @@ class FileUtil
       return path.join(dir,file)
     else
       return filename
+
+  @get_extension:(filename)=>
+    return path.extname(filename)
+
+  # callback:(err, mime-type)
+  @get_file_mime_type:(filename, callback)=>
+    magic.detectFile(filename,callback)
+
+  # callback:(err, is_pdf)
+  @is_pdf:(filename, callback)=>@file_is_pdf(filename,callback)
+
+  # callback:(err, is_pdf)
+  @file_is_pdf:(filename, callback)=>@file_is_mime(filename,/^application\/pdf/i,callback)
+
+  # callback:(err, is_mime_type)
+  @is_mime:(filename, mime_pattern, callback)=>
+    @file_is_mime(filename, mime_pattern, callback)
+
+  # callback:(err, is_mime_type)
+  @file_is_mime:(filename, mime_pattern, callback)=>
+    @get_file_mime_type filename, (err,mime)=>
+      if err?
+        callback(err)
+      else
+        if typeof mime_pattern is 'string'
+          callback null, (mime is mime_pattern)
+        else
+          callback null, (mime_pattern.test(mime))
+
+
 
 ################################################################################
 
