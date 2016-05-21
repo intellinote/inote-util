@@ -25,6 +25,18 @@ describe 'FileUtil',->
               (age3 - age2).should.be.below(700)
               done()
 
+  it "can synchronously determine the age of a file", (done)->
+    age1 = FileUtil.file_age_sync path.join(HOMEDIR, "package.json")
+    AsyncUtil.set_timeout 500, ()->
+      age2 = FileUtil.file_age_sync path.join(HOMEDIR, "package.json")
+      (age2 - age1).should.be.above(499)
+      (age2 - age1).should.be.below(600)
+      AsyncUtil.set_timeout 600, ()->
+        age3 = FileUtil.file_age_sync path.join(HOMEDIR, "package.json")
+        (age3 - age2).should.be.above(599)
+        (age3 - age2).should.be.below(700)
+        done()
+
   it "can test if a file is a plain file", (done)->
     FileUtil.is_file "xyzzy.i.do.not.exist", (err, is_file)->
       should.not.exist err

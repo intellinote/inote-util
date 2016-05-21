@@ -306,6 +306,20 @@ class FileUtil
           else
             callback null, stats.mtime?.getTime?() ? stats.ctime?.getTime?()
 
+  @file_age_sync:(file,callback)=>
+    mtime = @file_mtime_sync(file)
+    if mtime
+      return Date.now() - mtime
+    else
+      return mtime
+
+  @file_mtime_sync:(file)=>
+    unless fs.existsSync file
+      return false
+    else
+      stat = fs.statSync file
+      return stat.mtime?.getTime?() ? stat.ctime?.getTime?()
+
   @replace_extension:(filename,ext)=>
     if ext? and not /^\./.test ext
       ext = ".#{ext}"

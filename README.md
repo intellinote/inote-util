@@ -314,8 +314,8 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 *[Back to Index](#index)*
 
 ### FileUtil
-* **file_age(file,callback)** - obtain the age of a file in milliseconds
-* **file_mtime(file,callback)** - obtain the Unix epoch timestamp at which a file was last modified
+* **file_age(file,callback)** / **file_age_sync(file)** - obtain the age of a file  (time since last modfied) in milliseconds
+* **file_mtime(file,callback)** / **file_mtime_sync(file)**- obtain the Unix epoch timestamp at which a file was last modified
 * **ls(dir\[,options\],callback)** - list the files in a directory; options:
   * `recurse` - when `true`, perform the operation recursively
   * `pattern` - when a non-`null` RegExp, only list files matching the specified pattern
