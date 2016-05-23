@@ -11,6 +11,7 @@ mkdirp     = require 'mkdirp'
 request    = require 'request'
 remove     = require 'remove'
 seedrandom = require 'seedrandom'
+semver     = require 'semver'
 DEBUG      = (/(^|,)inote-?util($|,)/i.test process?.env?.NODE_DEBUG) or (/(^|,)Util($|,)/.test process?.env?.NODE_DEBUG)
 
 ################################################################################
@@ -1103,6 +1104,13 @@ class Base64
 
 # **Util** - *collects assorted utility functions*
 class Util
+
+  @version_satisfies:(verstr,rangestr)=>
+    unless rangestr?
+      rangestr = verstr
+      verstr = null
+    verstr ?= process.version
+    return semver.satisfies(verstr,rangestr)
 
   @to_unit:               DateUtil.to_unit
   @start_time:            DateUtil.start_time
