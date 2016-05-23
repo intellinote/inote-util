@@ -14,6 +14,7 @@
     "remove"                : "^0.1",
     "request"               : "^2.58",
     "seedrandom"            : "^2.4",
+    "semver    "            : "^5.1",
     "shelljs"               : "^0.7",
     "priorityqueuejs"       : "^1.0"
   },

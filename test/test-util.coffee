@@ -11,6 +11,21 @@ zipstream = require 'zipstream'
 
 describe 'Util',->
 
+  it "can check semver ranges",(done)->
+    tests = [
+      [ "v0.10.33", ">=0.10.45", false ]
+      [ "0.10.33",  ">=0.10.45", false ]
+      [ "v0.10.45", ">=0.10.45", true  ]
+      [ "0.10.45",  ">=0.10.45", true  ]
+      [ "v4.4.4",   ">=0.10.45", true  ]
+      [ "4.4.4",    ">=0.10.45", true  ]
+      [ "v0.10.33", "0.10.33",   true  ]
+      [ "0.10.33",  "0.10.33",   true  ]
+    ]
+    for test in tests
+      found = Util.version_satisfies test[0], test[1]
+      found.should.equal test[2]
+    done()
 
   it "to_unit uses singular or plural as appropriate",(done)->
     tests = [
