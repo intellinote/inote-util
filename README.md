@@ -696,6 +696,8 @@ guidelines can help streamline the process for everyone.
    or more [unit tests](./test) that demonstrate the bug or
    exercise the new feature.
 
+ * This repository follows the ["git flow"](http://nvie.com/posts/a-successful-git-branching-model/) branching convention.  The `master` branch contains snapshots of each stable release.  New development occurs within the `develop` branch.  We'd prefer most pull-requests to be based off the `develop` branch.
+
 **Please Note:** We'd rather have a contribution that doesn't follow
 these guidelines than no contribution at all.  If you are confused
 or put-off by any of the above, your contribution is still welcome.
