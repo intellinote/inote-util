@@ -333,12 +333,28 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
-* **get_extension(fname)** - equivalent to `path.extname`.
-* **strip_extension(fname)** - returns a version of `fname` with the file extension removed.
-* **replace_extension(fname,ext)** - returns a version of `fname` with the file extension changed to `ext`.
-* **get_file_mime_type(file,callback)** - determines MIME type of `file`.
+
+*[Back to Index](#index)*
+
+### FileUtil - MIME and File-Extension related
+
+* **get_ext(fname)**  / **get_extension(fname)** - equivalent to `path.extname`, save that `fname` can be the extension itself.  (E.g., both `path.extname('.foo')` and `path.extname('foo')` return `''` while `FileUtil.get_ext('.foo')` and `FileUtil.get_ext('foo')` return `'foo'`).
+* **strip_ext(fname)**  / **strip_extension(fname)** - returns a version of `fname` with the file extension removed.
+* **replace_ext(fname,ext)**  / **replace_extension(fname,ext)** - returns a version of `fname` with the file extension changed to `ext`.
+* **get_mime_for_ext(ext)** / **get_mime_for_extension(ext)**  - returns the "standard" MIME type based on the extension found in `ext`.  (`ext` may be a full filename or just the extension).
+* **get_ext_for_mime(mime)** / **get_extension_for_mime(mime)**  - returns the "standard" file extension for the given MIME type.
+* **get_mime_via_magic(file,callback)** / **get_mime_type_via_magic(file,callback)** / **get_file_mime_type_via_magic(file,callback)** - determines MIME type of `file` by magic number (ignoring the file extension if any).
+* **get_mime(file,callback)** / **get_mime_type(file,callback)** / **get_file_mime_type(file,callback)** - determines MIME type of `file` by magic number or extension. Given a choice, the specific type is selected (e.g., `application/json` vs. `text/plain`).  The magic-number-based MIME type is used if the two MIME types seem equally specific.
 * **file_is_mime(file,pattern,callback)** - calls-back with `null, true` when the MIME type of `file` matches `pattern.`
 * **file_is_pdf(file,callback)** - calls-back with `null, true` when the MIME type of `file` is `application/pdf`.
+* **get_mime_to_ext_map()** / **get_mime_to_extension_map()** - returns the MIME-type to "standard" file-extension mapping used for the other methods.
+* **get_ext_to_mime_map()** / **get_extension_to_mime_map()** - returns the file-extension to "standard" MIME-type mapping used for the other methods.
+* **set_mime_to_ext_map(map)** / **set_mime_to_extension_map(map)** - sets the MIME-type to "standard" file-extension mapping used for the other methods. Extensions should NOT contain a leading dot (`.`). Set to `null` to restore the default mapping.
+* **set_ext_to_mime_map(map)** / **set_extension_to_mime_map(map)** - sets the file-extension to "standard" MIME-type mapping used for the other methods. Extensions should NOT contain a leading dot (`.`). Set to `null` to restore the default mapping.
+* **add_to_mime_to_ext_map(map | mime, ext)** / **add_to_mime_to_ext_map(map | mime, ext)** - adds a collection or a single instance of a mime-to-file-extension mapping to the currently active set.
+* **add_to_ext_to_mime_map(map | ext, mime)** / **add_to_extension_to_mime_map(map | ext, mime)** - adds a collection or a single instance of a file-extension-to-mime-type mapping to the currently active set.
+
+Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext( EXT )) == EXT` and vice-versa.  See the `data` directory for the default mappings.
 
 *[Back to Index](#index)*
 

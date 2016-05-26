@@ -3,6 +3,7 @@ path       = require 'path'
 HOMEDIR    = path.join(__dirname,'..')
 LIB_COV    = path.join(HOMEDIR,'lib-cov')
 LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
+DATA       = path.join HOMEDIR, "data"
 Util       = require(path.join(LIB_DIR,'util')).Util
 mkdirp     = require 'mkdirp'
 remove     = require 'remove'
@@ -327,6 +328,7 @@ class FileUtil
     if ext?
       new_filename = "#{new_filename}#{ext}"
     return new_filename
+  @replace_ext:(filename,ext)=>@replace_extension(filename,ext)
 
   @strip_extension:(filename)=>
     if filename?
@@ -338,13 +340,63 @@ class FileUtil
       return path.join(dir,file)
     else
       return filename
+  @strip_ext:(filename)=>@strip_extension(filename)
 
   @get_extension:(filename)=>
-    return path.extname(filename)
+    ext = Util.blank_to_null(path.extname(filename)) ? filename
+    if /^\./.test ext
+      ext = ext.substring(1,ext.length)
+    return ext
+  @get_ext:(filename)=>@get_extension(filename)
+
+
+
+  @_rank_mime:(mime)=>
+    unless mime?
+      return 0
+    else if mime is "application/unknown"
+      return 10
+    else if mime is "application/octet-stream"
+      return 20
+    else if mime in ["text/text","image/image","audio/audio","video/video","application/application"]
+      return 30
+    else if mime in ["text/plain",]
+      return 40
+    else if mime in ["text/html","text/xml"]
+      return 100
+    else
+      return 99999
+
+  @_choose_mime:(mime_a,mime_b)=>
+    norm_a = @_normalize_mime(mime_a)
+    norm_b = @_normalize_mime(mime_b)
+    rank_a = @_rank_mime(norm_a)
+    rank_b = @_rank_mime(norm_b)
+    if rank_a > rank_b
+      return mime_a
+    else if rank_b > rank_a
+      return mime_b
+    else # rank_a == rank_b
+      # try un-normed
+      rank_a = @_rank_mime(mime_a)
+      rank_b = @_rank_mime(mime_b)
+      if rank_a >= rank_b
+        return mime_a
+      else
+        return mime_b
 
   # callback:(err, mime-type)
-  @get_file_mime_type:(filename, callback)=>
+  @get_mime:(filename, callback)=>
+    @get_mime_via_magic filename, (err, by_magic)=>
+      by_ext = @get_mime_for_ext(filename)
+      callback err, @_choose_mime(by_magic, by_ext)
+  @get_mime_type:(filename,callback)=>@get_mime(filename,callback)
+  @get_file_mime_type:(filename,callback)=>@get_mime(filename,callback)
+
+  @get_mime_via_magic:(filename, callback)=>
     magic.detectFile(filename,callback)
+  @get_mime_type_via_magic:(filename,callback)=>@get_mime_via_magic(filename,callback)
+  @get_file_mime_type_via_magic:(filename,callback)=>@get_mime_via_magic(filename,callback)
 
   # callback:(err, is_pdf)
   @is_pdf:(filename, callback)=>@file_is_pdf(filename,callback)
@@ -358,7 +410,7 @@ class FileUtil
 
   # callback:(err, is_mime_type)
   @file_is_mime:(filename, mime_pattern, callback)=>
-    @get_file_mime_type filename, (err,mime)=>
+    @get_mime filename, (err,mime)=>
       if err?
         callback(err)
       else
@@ -367,6 +419,98 @@ class FileUtil
         else
           callback null, (mime_pattern.test(mime))
 
+  @_normalize_ext:(ext)=>
+    if ext?
+      if /^\./.test ext        # strip the leading `.` if any
+        ext = ext.substring(1)
+      ext = ext?.toLowerCase() # downcase
+    return ext
+
+  @_normalize_mime:(mime)=>
+    if mime?
+      # strip the encoding info if any (`application/json; charset=utf-8` => `application/json`)
+      match = mime.match /^\s*([^\/\s]+\/[^\s;\/]+)\s*(;.*)?$/
+      if match?[1]?
+        mime = match[1]
+      mime = mime?.toLowerCase() # downcase
+    return mime
+
+  # returns the MIME type associated with the given filename or extension
+  # ("associated" in @_ext_to_mime map)
+  @get_mime_for_ext:(ext)=>
+    ext = @get_extension(ext)
+    return @get_ext_to_mime_map()[ext] ? @get_ext_to_mime_map()[@_normalize_ext(ext)]
+  @get_mime_for_extension:(ext)=>@get_mime_for_ext(ext)
+
+  # returns the file extension (no leading `.`)  associated with the given MIME type
+  # ("associated" in @_mime_to_ext_map)
+  @get_ext_for_mime:(mime)=>
+    return @get_mime_to_ext_map()[mime] ? @get_mime_to_ext_map()[@_normalize_mime(mime)]
+  @get_extension_for_mime:(mime)=>@get_ext_for_mime(mime)
+
+  # mapping of file extensions to mime types
+  @_ext_to_mime_map:null
+  @_EXT_TO_MIME_MAP:null
+
+  # mapping of mime types to file extensions
+  @_mime_to_ext_map:null
+  @_MIME_TO_EXT_MAP:null
+
+  # get the currently active extension-to-mime mapping
+  @get_ext_to_mime_map:()=>
+    @_ext_to_mime_map ?= @_get_EXT_TO_MIME_MAP()
+    return @_ext_to_mime_map
+  @get_extension_to_mime_map:()=>@get_ext_to_mime_map()
+
+  # get the currently active mime-to-extension mapping
+  @get_mime_to_ext_map:()=>
+    @_mime_to_ext_map ?= @_get_MIME_TO_EXT_MAP()
+    return @_mime_to_ext_map
+  @get_mime_to_extension_map:()=>@get_mime_to_ext_map()
+
+  # set the currently active extension-to-mime mapping.
+  # set to `null` to reset to default mapping
+  @set_ext_to_mime_map:(mapping)=>
+    @_ext_to_mime_map = mapping
+  @set_extension_to_mime_map:(mapping)=>@set_ext_to_mime_map(mapping)
+
+  # set the currently active mime-to-extension mapping
+  # set to `null` to reset to default mapping
+  @set_mime_to_ext_map:(mapping)=>
+    @_mime_to_ext_map = mapping
+  @set_mime_to_extension_map:()=>@set_mime_to_ext_map(mapping)
+
+  # add to the currently active mime-to-extension mapping
+  # accepts a pair of strings (mime,ext) or one or more maps
+  @add_to_mime_to_ext_map:(mappings...)=>
+    if mappings?.length is 2 and ((typeof mappings[0]) is 'string') and ((typeof mappings[1]) is 'string')
+      pair = {}
+      pair[mappings[0]] = mappings[1]
+      mappings = [pair]
+    @_mime_to_ext_map = Util.merge(@get_mime_to_ext_map(),mappings...)
+  @add_to_mime_to_extension_map:(mappings...)=>@add_mime_to_ext_map(mappings...)
+
+  # add to the currently active extension-to-mime mapping
+  # accepts a pair of strings (ext,mime) or one or more maps
+  @add_to_ext_to_mime_map:(mappings...)=>
+    if mappings?.length is 2 and ((typeof mappings[0]) is 'string') and ((typeof mappings[1]) is 'string')
+      pair = {}
+      pair[mappings[0]] = mappings[1]
+      mappings = [pair]
+    @_ext_to_mime_map = Util.merge(@get_ext_to_mime_map(),mappings...)
+  @add_to_extension_to_mime_map:(mappings...)=>@add_ext_to_mime_map(mappings...)
+
+  # Lazily load the `ext-to-mime.json` file into the `_EXT_TO_MIME_MAP` map.
+  @_get_EXT_TO_MIME_MAP:()=>
+    unless @_EXT_TO_MIME_MAP?
+      @_EXT_TO_MIME_MAP = JSON.parse(fs.readFileSync(path.join(DATA,"ext-to-mime.json")))
+    return @_EXT_TO_MIME_MAP
+
+  # Lazily load the `mime-to-ext.json` file into the `_MIME_TO_EXT_MAP` map.
+  @_get_MIME_TO_EXT_MAP:()=>
+    unless @_MIME_TO_EXT_MAP?
+      @_MIME_TO_EXT_MAP = JSON.parse(fs.readFileSync(path.join(DATA,"mime-to-ext.json")))
+    return @_MIME_TO_EXT_MAP
 
 
 ################################################################################

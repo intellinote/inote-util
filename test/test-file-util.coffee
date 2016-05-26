@@ -199,8 +199,49 @@ describe 'FileUtil',->
       FileUtil.strip_extension(test[0]).should.equal test[1]
     done()
 
-  it "can test the MIME type of a file", (done)->
-    FileUtil.get_file_mime_type path.join(HOMEDIR, "package.json"), (err, type)->
+  it "can test the MIME type of a file via magic", (done)->
+    FileUtil.get_mime_via_magic path.join(HOMEDIR, "package.json"), (err, type)->
       should.not.exist err
       type.should.equal 'text/plain'
-      done()
+      FileUtil.get_mime_type_via_magic path.join(HOMEDIR, "package.json"), (err, type)->
+        should.not.exist err
+        type.should.equal 'text/plain'
+        FileUtil.get_file_mime_type_via_magic path.join(HOMEDIR, "package.json"), (err, type)->
+          should.not.exist err
+          type.should.equal 'text/plain'
+          done()
+
+  it "can test the MIME type of a file via magic or extension", (done)->
+    FileUtil.get_mime path.join(HOMEDIR, "package.json"), (err, type)->
+      should.not.exist err
+      type.should.equal 'application/json'
+      FileUtil.get_mime_type path.join(HOMEDIR, "package.json"), (err, type)->
+        should.not.exist err
+        type.should.equal 'application/json'
+        FileUtil.get_file_mime_type path.join(HOMEDIR, "package.json"), (err, type)->
+          should.not.exist err
+          type.should.equal 'application/json'
+          done()
+
+  it "can get the MIME type for a given filename or extension", (done)->
+    tests = [
+      [ path.join(HOMEDIR, "package.json"), "application/json" ]
+      [ "package.json", "application/json" ]
+      [ ".json", "application/json" ]
+      [ "json", "application/json" ]
+      [ "", null ]
+      [ null, null ]
+      [ ".xadf2345zaerazerqer", null ]
+    ]
+    for test in tests
+      found = FileUtil.get_mime_for_ext(test[0])
+      if test[1]?
+        found.should.equal test[1]
+      else
+        should.not.exist found
+      found = FileUtil.get_mime_for_extension(test[0])
+      if test[1]?
+        found.should.equal test[1]
+      else
+        should.not.exist found
+    done()
