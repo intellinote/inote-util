@@ -13,6 +13,7 @@ A collection of utility functions and classes for Node.js.
 [Config](#config) |
 [DateUtil](#dateutil) |
 [FileUtil](#fileutil) |
+[FileUtil MIME](#fileutil---mime-and-file-extension-related) |
 [IOUtil](#ioutil) |
 [LogUtil](#logutil) |
 [NetUtil](#netutil) |
