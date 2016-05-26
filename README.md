@@ -1,5 +1,8 @@
 # inote-util [![Build Status](https://travis-ci.org/intellinote/inote-util.svg?branch=master)](https://travis-ci.org/intellinote/inote-util) [![Dependencies](https://david-dm.org/intellinote/inote-util.svg)](https://david-dm.org/intellinote/inote-util) [![NPM version](https://badge.fury.io/js/inote-util.svg)](http://badge.fury.io/js/inote-util)
 
+> *Regarding the "build error" badge above: For some reason [travis-ci](https://travis-ci.org/intellinote/inote-util) is having problems installing (compiling) [mmmagic](https://github.com/mscdex/mmmagic) on some (but not all) versions of Node. As far as we can tell this is Travis-specific issue.  We regularly compile and run the mmmagic package on those versions of Node on both OSX and Linux without any problem.*
+>
+> *Any suggestions about how to make Travis successfully build mmmagic on under all node.js versions are welcome.*
 
 A collection of utility functions and classes for Node.js.
 
