@@ -3,9 +3,17 @@
 
 A collection of utility functions and classes for Node.js.
 
+### Contents
+
+ * [Features](#features) - method-by-method description of the utilities.
+ * [Installing](#installing) - how to install from npm or source.
+ * [Licensing](#licensing) - `inote-util` is made available under an MIT License.
+ * [How to Contribute](#how-to-contribute) - tips on reporting issues, creating pull-requests for or just generally hacking `inote-util`.
+ * [About Intellinote](#about-intellinote) - a little background on [Intellinote](https://www.intellinote.net/), a collaboration platform for teams.
+
 ## Features
 
-### Index
+### Feature Index
 
 [ArrayUtil](#arrayutil) |
 [AsyncUtil](#asyncutil) |
@@ -603,11 +611,19 @@ The WorkQueue is also an `EventEmitter`, with the following events:
 
 ## Installing
 
+### From Source
+
 The source code and documentation for inote-util is available on GitHub at [intellinote/inote-util](https://github.com/intellinote/inote-util).  You can clone the repository via:
 
 ```bash
 git clone git@github.com:intellinote/inote-util
 ```
+
+Assuming you have node installed, you can then install the remaining dependencies by running `npm install` from the root repository directory.
+
+A `Makefile` is provided.  Run `make install` to install. Run `make test` to run the unit test suite.  Run `make help` for a list of other useful Make targets.
+
+### From npm
 
 inote-util is deployed as an [npm module](https://npmjs.org/) under the name [`inote-util`](https://npmjs.org/package/inote-util). Hence you can install a pre-packaged version with the command:
 
