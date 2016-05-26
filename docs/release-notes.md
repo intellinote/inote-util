@@ -5,100 +5,134 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 - [inote-util Release Notes](#inote-util-release-notes)
-	- [Release 1.6.3 (23 May 2016)](#release-163-23-may-2016)
+	- [Release 1.7.0 (25 May 2016)](#release-170-25-may-2016)
 		- [Enhancements](#enhancements)
 		- [Changes](#changes)
-	- [Release 1.6.2 (20 May 2016)](#release-162-20-may-2016)
+	- [Release 1.6.3 (23 May 2016)](#release-163-23-may-2016)
 		- [Enhancements](#enhancements-1)
-	- [Release 1.6.1 (20 May 2016)](#release-161-20-may-2016)
-		- [Enhancements](#enhancements-2)
-	- [Release 1.6 (19 May 2016)](#release-16-19-may-2016)
-		- [Enhancements](#enhancements-3)
 		- [Changes](#changes-1)
-	- [Release 1.5.2 (17 May 2016)](#release-152-17-may-2016)
+	- [Release 1.6.2 (20 May 2016)](#release-162-20-may-2016)
+		- [Enhancements](#enhancements-2)
+	- [Release 1.6.1 (20 May 2016)](#release-161-20-may-2016)
+		- [Enhancements](#enhancements-3)
+	- [Release 1.6 (19 May 2016)](#release-16-19-may-2016)
 		- [Enhancements](#enhancements-4)
-	- [Release 1.5.1 (16 May 2016)](#release-151-16-may-2016)
 		- [Changes](#changes-2)
-	- [Release 1.5.0 (16 May 2016)](#release-150-16-may-2016)
+	- [Release 1.5.2 (17 May 2016)](#release-152-17-may-2016)
 		- [Enhancements](#enhancements-5)
+	- [Release 1.5.1 (16 May 2016)](#release-151-16-may-2016)
+		- [Changes](#changes-3)
+	- [Release 1.5.0 (16 May 2016)](#release-150-16-may-2016)
+		- [Enhancements](#enhancements-6)
 	- [Release 1.4.1 (15 May 2016)](#release-141-15-may-2016)
 		- [Bug Fixes](#bug-fixes)
 	- [Release 1.4.0 (14 May 2016)](#release-140-14-may-2016)
-		- [Enhancements](#enhancements-6)
-		- [Changes](#changes-3)
-	- [Release 1.3.0 (13 May 2016)](#release-130-13-may-2016)
 		- [Enhancements](#enhancements-7)
 		- [Changes](#changes-4)
-	- [Release 1.2.0 (13 May 2016)](#release-120-13-may-2016)
+	- [Release 1.3.0 (13 May 2016)](#release-130-13-may-2016)
 		- [Enhancements](#enhancements-8)
-	- [Release 1.1.0 (9 May 2016)](#release-110-9-may-2016)
-		- [Enhancements](#enhancements-9)
 		- [Changes](#changes-5)
+	- [Release 1.2.0 (13 May 2016)](#release-120-13-may-2016)
+		- [Enhancements](#enhancements-9)
+	- [Release 1.1.0 (9 May 2016)](#release-110-9-may-2016)
+		- [Enhancements](#enhancements-10)
+		- [Changes](#changes-6)
 		- [Bug Fixes](#bug-fixes-1)
 	- [Release 1.0.1 (8 May 2016)](#release-101-8-may-2016)
-		- [Changes](#changes-6)
-	- [Release 1.0.0 (7 May 2016)](#release-100-7-may-2016)
-		- [Enhancements](#enhancements-10)
 		- [Changes](#changes-7)
-	- [Release 0.9.0 (20 January 2016)](#release-090-20-january-2016)
+	- [Release 1.0.0 (7 May 2016)](#release-100-7-may-2016)
 		- [Enhancements](#enhancements-11)
+		- [Changes](#changes-8)
+	- [Release 0.9.0 (20 January 2016)](#release-090-20-january-2016)
+		- [Enhancements](#enhancements-12)
 		- [Bug Fixes](#bug-fixes-2)
 	- [Release 0.8.0 (24 July 2015)](#release-080-24-july-2015)
-		- [Enhancements](#enhancements-12)
-	- [Release 0.7.0 (16 July 2015)](#release-070-16-july-2015)
 		- [Enhancements](#enhancements-13)
+	- [Release 0.7.0 (16 July 2015)](#release-070-16-july-2015)
+		- [Enhancements](#enhancements-14)
 		- [Other](#other)
 	- [Release 0.6.1 (20 April 2015)](#release-061-20-april-2015)
-		- [Enhancements](#enhancements-14)
-	- [Release 0.6.0 - 21 April 2015](#release-060-21-april-2015)
 		- [Enhancements](#enhancements-15)
+	- [Release 0.6.0 - 21 April 2015](#release-060-21-april-2015)
+		- [Enhancements](#enhancements-16)
 		- [Deprecated Methods](#deprecated-methods)
 	- [Release 0.5.9 (21 April 2015)](#release-059-21-april-2015)
 		- [Bug Fixes](#bug-fixes-3)
 	- [Release 0.5.6 (21 April 2015)](#release-056-21-april-2015)
-		- [Enhancements](#enhancements-16)
-	- [Release 0.5.5 (1 April 2015)](#release-055-1-april-2015)
 		- [Enhancements](#enhancements-17)
-	- [Release 0.5.4 (1 April 2015)](#release-054-1-april-2015)
+	- [Release 0.5.5 (1 April 2015)](#release-055-1-april-2015)
 		- [Enhancements](#enhancements-18)
-	- [Release 0.5.3 (1 April 2015)](#release-053-1-april-2015)
+	- [Release 0.5.4 (1 April 2015)](#release-054-1-april-2015)
 		- [Enhancements](#enhancements-19)
-	- [Release 0.5.2 (25 March 2015)](#release-052-25-march-2015)
+	- [Release 0.5.3 (1 April 2015)](#release-053-1-april-2015)
 		- [Enhancements](#enhancements-20)
+	- [Release 0.5.2 (25 March 2015)](#release-052-25-march-2015)
+		- [Enhancements](#enhancements-21)
 	- [Release 0.5.1 (25 March 2015)](#release-051-25-march-2015)
 	- [Release 0.4.7 (21 January 2015)](#release-047-21-january-2015)
 	- [Release 0.4.6 (21 January 2015)](#release-046-21-january-2015)
-		- [Enhancements](#enhancements-21)
-	- [Release 0.4.5 (18 December 2014)](#release-045-18-december-2014)
 		- [Enhancements](#enhancements-22)
-	- [Release 0.4.4 (17 December 2014)](#release-044-17-december-2014)
+	- [Release 0.4.5 (18 December 2014)](#release-045-18-december-2014)
 		- [Enhancements](#enhancements-23)
-	- [Release 0.4.3 (17 December 2014)](#release-043-17-december-2014)
+	- [Release 0.4.4 (17 December 2014)](#release-044-17-december-2014)
 		- [Enhancements](#enhancements-24)
-	- [Release 0.4.2 (12 December 2014)](#release-042-12-december-2014)
+	- [Release 0.4.3 (17 December 2014)](#release-043-17-december-2014)
 		- [Enhancements](#enhancements-25)
+	- [Release 0.4.2 (12 December 2014)](#release-042-12-december-2014)
+		- [Enhancements](#enhancements-26)
 		- [Bug Fixes](#bug-fixes-4)
 	- [Release 0.4.1 (11 December 2014)](#release-041-11-december-2014)
-		- [Enhancements](#enhancements-26)
-	- [Release 0.4.0 (14 Novemver 2014)](#release-040-14-novemver-2014)
 		- [Enhancements](#enhancements-27)
-	- [Release 0.3.5 (2 Novemver 2014)](#release-035-2-novemver-2014)
+	- [Release 0.4.0 (14 Novemver 2014)](#release-040-14-novemver-2014)
 		- [Enhancements](#enhancements-28)
-	- [Release 0.3.3 (20 October 2014)](#release-033-20-october-2014)
+	- [Release 0.3.5 (2 Novemver 2014)](#release-035-2-novemver-2014)
 		- [Enhancements](#enhancements-29)
-	- [Release 0.3.2 (20 October 2014)](#release-032-20-october-2014)
+	- [Release 0.3.3 (20 October 2014)](#release-033-20-october-2014)
 		- [Enhancements](#enhancements-30)
+	- [Release 0.3.2 (20 October 2014)](#release-032-20-october-2014)
+		- [Enhancements](#enhancements-31)
 	- [Release 0.3.1 (18 October 2014)](#release-031-18-october-2014)
 		- [Bug Fixes](#bug-fixes-5)
-		- [Enhancements](#enhancements-31)
-	- [Release 0.2.1 (15 October 2014)](#release-021-15-october-2014)
 		- [Enhancements](#enhancements-32)
+	- [Release 0.2.1 (15 October 2014)](#release-021-15-october-2014)
+		- [Enhancements](#enhancements-33)
 	- [Release 0.2.0 (5 October 2014)](#release-020-5-october-2014)
 		- [Bug Fixes](#bug-fixes-6)
-		- [Enhancements](#enhancements-33)
+		- [Enhancements](#enhancements-34)
 	- [Release 0.1.1 (30 September 2014)](#release-011-30-september-2014)
 
 <!-- tocstop -->
+
+## Release 1.7.0 (25 May 2016)
+
+### Enhancements
+
+ * Added:
+   * a file-extension-to-MIME-type mapping (`FileUtil.get_mime_for_extension`),
+   * a MIME-type-to-file-extension-mapping (`FileUtil.get_extension_for_mime`)
+   * a default collection of more than 1000 MIME/file-extension pairs.
+   * various methods for changing or controlling the mappings (`FileUtil.get_extension_to_mime_map`, `FileUtil.get_mime_to_extenion_map`, `FileUtil.set_extension_to_mime_map`, `FileUtil.set_mime_to_extension_map`, `FileUtil.add_to_extension_to_mime_map`, `FileUtil.add_to_mime_to_extension_map`)
+ * Several aliases were created for new and existing `FileUtil` methods:
+   * `get_mime` = `get_mime_type` = `get_file_mime_type`
+   * `get_mime_via_magic` = `get_mime_type_via_magic` = `get_file_mime_type_via_magic`
+   * `get_mime_for_extension` = `get_mime_for_ext`
+   * `get_extension_for_mime` = `get_ext_for_mime`
+   * `get_extension_to_mime_map` = `get_ext_to_mime_map`
+   * `get_mime_to_extension_map` = `get_mime_to_ext_map`
+   * `set_extension_to_mime_map` = `set_ext_to_mime_map`
+   * `set_mime_to_extension_map` = `set_mime_to_ext_map`
+   * `add_to_extension_to_mime_map` = `add_to_ext_to_mime_map`
+   * `add_to_mime_to_extension_map` = `add_to_mime_to_ext_map`
+   * etc.
+
+### Changes
+
+ * The existing `FileUtil.get_extension(filename)` method now accepts a file extension (e.g., `.pdf` or `pdf`) in addition to a filename (`foobar.pdf`).
+ * The existing  `FileUtil.get_file_mime_type` has been extended to test the file-extension if the "magic number"-based approach fails to obtain a specific MIME type.
+   * The newly added `get_file_mime_type_via_magic` method can be used to avoid this extension-based lookup and only rely upon the contents of the file.
+   * The newly added `get_mime_for_extension` can be used to avoid the magic-number-based lookup and only rely upon the file name itself.
+
+
 
 ## Release 1.6.3 (23 May 2016)
 
