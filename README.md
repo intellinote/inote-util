@@ -1,11 +1,22 @@
 # inote-util [![Build Status](https://travis-ci.org/intellinote/inote-util.svg?branch=master)](https://travis-ci.org/intellinote/inote-util) [![Dependencies](https://david-dm.org/intellinote/inote-util.svg)](https://david-dm.org/intellinote/inote-util) [![NPM version](https://badge.fury.io/js/inote-util.svg)](http://badge.fury.io/js/inote-util)
 
+> *Regarding the "build error" badge above: For some reason [travis-ci](https://travis-ci.org/intellinote/inote-util) is having problems installing (compiling) [mmmagic](https://github.com/mscdex/mmmagic) on some (but not all) versions of Node. As far as we can tell this is Travis-specific issue.  We regularly compile and run the mmmagic package on those versions of Node on both OSX and Linux without any problem.*
+>
+> *Any suggestions about how to make Travis successfully build mmmagic on under all node.js versions are welcome.*
 
 A collection of utility functions and classes for Node.js.
 
+### Contents
+
+ * [Features](#features) - method-by-method description of the utilities.
+ * [Installing](#installing) - how to install from npm or source.
+ * [Licensing](#licensing) - `inote-util` is made available under an MIT License.
+ * [How to Contribute](#how-to-contribute) - tips on reporting issues, creating pull-requests for or just generally hacking `inote-util`.
+ * [About Intellinote](#about-intellinote) - a little background on [Intellinote](https://www.intellinote.net/), a collaboration platform for teams.
+
 ## Features
 
-### Index
+### Feature Index
 
 [ArrayUtil](#arrayutil) |
 [AsyncUtil](#asyncutil) |
@@ -13,6 +24,7 @@ A collection of utility functions and classes for Node.js.
 [Config](#config) |
 [DateUtil](#dateutil) |
 [FileUtil](#fileutil) |
+[FileUtil MIME](#fileutil---mime-and-file-extension-related) |
 [IOUtil](#ioutil) |
 [LogUtil](#logutil) |
 [NetUtil](#netutil) |
@@ -333,12 +345,28 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
-* **get_extension(fname)** - equivalent to `path.extname`.
-* **strip_extension(fname)** - returns a version of `fname` with the file extension removed.
-* **replace_extension(fname,ext)** - returns a version of `fname` with the file extension changed to `ext`.
-* **get_file_mime_type(file,callback)** - determines MIME type of `file`.
+
+*[Back to Index](#index)*
+
+### FileUtil - MIME and File-Extension related
+
+* **get_ext(fname)**  / **get_extension(fname)** - equivalent to `path.extname`, save that `fname` can be the extension itself.  (E.g., both `path.extname('.foo')` and `path.extname('foo')` return `''` while `FileUtil.get_ext('.foo')` and `FileUtil.get_ext('foo')` return `'foo'`).
+* **strip_ext(fname)**  / **strip_extension(fname)** - returns a version of `fname` with the file extension removed.
+* **replace_ext(fname,ext)**  / **replace_extension(fname,ext)** - returns a version of `fname` with the file extension changed to `ext`.
+* **get_mime_for_ext(ext)** / **get_mime_for_extension(ext)**  - returns the "standard" MIME type based on the extension found in `ext`.  (`ext` may be a full filename or just the extension).
+* **get_ext_for_mime(mime)** / **get_extension_for_mime(mime)**  - returns the "standard" file extension for the given MIME type.
+* **get_mime_via_magic(file,callback)** / **get_mime_type_via_magic(file,callback)** / **get_file_mime_type_via_magic(file,callback)** - determines MIME type of `file` by magic number (ignoring the file extension if any).
+* **get_mime(file,callback)** / **get_mime_type(file,callback)** / **get_file_mime_type(file,callback)** - determines MIME type of `file` by magic number or extension. Given a choice, the specific type is selected (e.g., `application/json` vs. `text/plain`).  The magic-number-based MIME type is used if the two MIME types seem equally specific.
 * **file_is_mime(file,pattern,callback)** - calls-back with `null, true` when the MIME type of `file` matches `pattern.`
 * **file_is_pdf(file,callback)** - calls-back with `null, true` when the MIME type of `file` is `application/pdf`.
+* **get_mime_to_ext_map()** / **get_mime_to_extension_map()** - returns the MIME-type to "standard" file-extension mapping used for the other methods.
+* **get_ext_to_mime_map()** / **get_extension_to_mime_map()** - returns the file-extension to "standard" MIME-type mapping used for the other methods.
+* **set_mime_to_ext_map(map)** / **set_mime_to_extension_map(map)** - sets the MIME-type to "standard" file-extension mapping used for the other methods. Extensions should NOT contain a leading dot (`.`). Set to `null` to restore the default mapping.
+* **set_ext_to_mime_map(map)** / **set_extension_to_mime_map(map)** - sets the file-extension to "standard" MIME-type mapping used for the other methods. Extensions should NOT contain a leading dot (`.`). Set to `null` to restore the default mapping.
+* **add_to_mime_to_ext_map(map | mime, ext)** / **add_to_mime_to_ext_map(map | mime, ext)** - adds a collection or a single instance of a mime-to-file-extension mapping to the currently active set.
+* **add_to_ext_to_mime_map(map | ext, mime)** / **add_to_extension_to_mime_map(map | ext, mime)** - adds a collection or a single instance of a file-extension-to-mime-type mapping to the currently active set.
+
+Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext( EXT )) == EXT` and vice-versa.  See the `data` directory for the default mappings.
 
 *[Back to Index](#index)*
 
@@ -583,14 +611,24 @@ The WorkQueue is also an `EventEmitter`, with the following events:
 
 *[Back to Index](#index)*
 
+*[Up to ToC](#contents)*
+
 
 ## Installing
+
+### From Source
 
 The source code and documentation for inote-util is available on GitHub at [intellinote/inote-util](https://github.com/intellinote/inote-util).  You can clone the repository via:
 
 ```bash
 git clone git@github.com:intellinote/inote-util
 ```
+
+Assuming you have node installed, you can then install the remaining dependencies by running `npm install` from the root repository directory.
+
+A `Makefile` is provided.  Run `make install` to install. Run `make test` to run the unit test suite.  Run `make help` for a list of other useful Make targets.
+
+### From npm
 
 inote-util is deployed as an [npm module](https://npmjs.org/) under the name [`inote-util`](https://npmjs.org/package/inote-util). Hence you can install a pre-packaged version with the command:
 
@@ -606,10 +644,14 @@ and you can add it to your project as a dependency by adding a line like:
 
 to the `dependencies` or `devDependencies` part of your `package.json` file.
 
+*[Up to ToC](#contents)*
+
 ## Licensing
 
 The inote-util library and related documentation are made available
 under an [MIT License](http://opensource.org/licenses/MIT).  For details, please see the file [LICENSE.txt](LICENSE.txt) in the root directory of the repository.
+
+*[Up to ToC](#contents)*
 
 ## How to contribute
 
@@ -654,10 +696,14 @@ guidelines can help streamline the process for everyone.
    or more [unit tests](./test) that demonstrate the bug or
    exercise the new feature.
 
+ * This repository follows the ["git flow"](http://nvie.com/posts/a-successful-git-branching-model/) branching convention.  The `master` branch contains snapshots of each stable release.  New development occurs within the `develop` branch.  We'd prefer most pull-requests to be based off the `develop` branch.
+
 **Please Note:** We'd rather have a contribution that doesn't follow
 these guidelines than no contribution at all.  If you are confused
 or put-off by any of the above, your contribution is still welcome.
 Feel free to contribute or comment in whatever channel works for you.
+
+*[Up to ToC](#contents)*
 
 ---
 
@@ -686,3 +732,5 @@ Interested in working for Intellinote?  Visit
 to see our latest technical (and non-technical) openings.
 
 ---
+
+*[Up to ToC](#contents)*
