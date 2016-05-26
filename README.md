@@ -608,6 +608,8 @@ The WorkQueue is also an `EventEmitter`, with the following events:
 
 *[Back to Index](#index)*
 
+*[Up to ToC](#contents)*
+
 
 ## Installing
 
@@ -639,10 +641,14 @@ and you can add it to your project as a dependency by adding a line like:
 
 to the `dependencies` or `devDependencies` part of your `package.json` file.
 
+*[Up to ToC](#contents)*
+
 ## Licensing
 
 The inote-util library and related documentation are made available
 under an [MIT License](http://opensource.org/licenses/MIT).  For details, please see the file [LICENSE.txt](LICENSE.txt) in the root directory of the repository.
+
+*[Up to ToC](#contents)*
 
 ## How to contribute
 
@@ -692,6 +698,8 @@ these guidelines than no contribution at all.  If you are confused
 or put-off by any of the above, your contribution is still welcome.
 Feel free to contribute or comment in whatever channel works for you.
 
+*[Up to ToC](#contents)*
+
 ---
 
 [![Intellinote](https://www.intellinote.net/wp-content/themes/intellinote/images/logo@2x.png)](https://www.intellinote.net/)
@@ -719,3 +727,5 @@ Interested in working for Intellinote?  Visit
 to see our latest technical (and non-technical) openings.
 
 ---
+
+*[Up to ToC](#contents)*
