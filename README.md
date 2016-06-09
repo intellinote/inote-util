@@ -1,6 +1,6 @@
 # inote-util [![Build Status](https://travis-ci.org/intellinote/inote-util.svg?branch=master)](https://travis-ci.org/intellinote/inote-util) [![Dependencies](https://david-dm.org/intellinote/inote-util.svg)](https://david-dm.org/intellinote/inote-util) [![NPM version](https://badge.fury.io/js/inote-util.svg)](http://badge.fury.io/js/inote-util)
 
-> *Regarding the "build error" badge above: For some reason [travis-ci](https://travis-ci.org/intellinote/inote-util) is having problems installing (compiling) [mmmagic](https://github.com/mscdex/mmmagic) on some (but not all) versions of Node. As far as we can tell this is Travis-specific issue.  We regularly compile and run the mmmagic package on those versions of Node on both OSX and Linux without any problem.*
+> *Regarding the "build error" badge above: For some reason [travis-ci](https://travis-ci.org/intellinote/inote-util) is having problems installing (compiling) [mmmagic](https://github.com/mscdex/mmmagic) on some (but not all) versions of Node. As far as we can tell this is a Travis-specific issue.  We regularly compile and run the mmmagic package on those versions of Node on both OSX and Linux without any problem.*
 >
 > *Any suggestions about how to make Travis successfully build mmmagic on under all node.js versions are welcome.*
 
@@ -14,11 +14,45 @@ A collection of utility functions and classes for Node.js.
  * [How to Contribute](#how-to-contribute) - tips on reporting issues, creating pull-requests for or just generally hacking `inote-util`.
  * [About Intellinote](#about-intellinote) - a little background on [Intellinote](https://www.intellinote.net/), a collaboration platform for teams.
 
+## Using
+
+`note-util` exports a number of objects, each containing several utility functions.
+
+Hence, `require(‘note-util’)` will return a map with several sub-objects (`ArrayUtil`, `AsyncUtil`, etc.)
+
+There are two common idioms for handling this.
+
+**Idiom 1:** Keep a handle to this “parent” object:
+
+```js
+var IU = require(“note-util”);
+
+IU.LogUtil.tlog(“Here is a random string:”, IU.RandomUtil.random_alphanumeric());
+```
+
+
+**Idiom 2:** Keep a handle to the individual utilities:
+
+```js
+var LogUtil = require(“note-util”).LogUtil;
+var RandomUtil = require(“note-util”).RandomUtil;
+
+LogUtil.tlog(“Here is a random string:”, RandomUtil.random_alphanumeric());
+```
+
+Personally, the author prefers the second approach, but the difference is almost entirely cosmetic. In particular, note that in Node.js `require`-ing the same module multiple times DOES NOT reload or reparse the files in the module.  The file is only load once.
+
+The following section lists methods under the associated object.  E.g., under `NetUtil` you’ll find `get_unused_port()`.  This means that the `get_unused_port` method is exported within the top-level object named “NetUtil” and could be accessed via:
+
+```js
+var gup = require(“note-util”).NetUtil.get_unused_port;
+```
+
 ## Features
 
 ### Feature Index
 
-[ArrayUtil](#arrayutil) |
+[ArrayUtil](#arerayutil) |
 [AsyncUtil](#asyncutil) |
 [ColorUtil](#colorutil) |
 [Config](#config) |
@@ -51,7 +85,7 @@ A collection of utility functions and classes for Node.js.
 * **arrays_are_equal(a,b)** - `true` if and only if array a and array b contain the exact same elements in the exact same order.
 * **uniquify(array[,key])** - returns a clone of `array` with duplicate values removed. When the array contains objects (maps) and a `key` is provided, two elements will be considered duplicates if they have the same value for the attribute `key`.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### AsyncUtil
 * **wait_until(predicate\[,interval],callback)** / **wait_for(predicate\[,interval],callback)** - polls `predicate()` every `interval` milliseconds until it returns `true` (or throws an exception). Callback signature is `(err,complete)` where `complete` is `true` if and only if `predicate()` returned `true`. `interval` defaults to `100`.
@@ -157,7 +191,7 @@ procedure.last( and_so_on )
 
 Note that the sequence is not cleared when `run` is invoked, so one may invoke `run` more than once to execute the sequence again.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### ColorUtil
 * **hex_to_rgb_triplet(hex)** - converts a hex-based `#rrggbb` string to decimal `[r,g,b]` values.
@@ -165,7 +199,7 @@ Note that the sequence is not cleared when `run` is invoked, so one may invoke `
 * **rgb_string_to_triplet(rgb)** - converts a string of the form `rgb(r,g,b)` to decimal `[r,g,b]` values.
 * **rgb_triplet_to_string(r,g,b)** - convert an array or sequence of r, g, b values to a string of the form `rgb(r,g,b)`.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### Config
 A thin wrapper around [`nconf`](https://github.com/flatiron/nconf) providing a consistent way to load configuration data from files or the environment.
@@ -208,7 +242,7 @@ To discover a configuration file (as used in step 3 above), `Config` will:
 
   4. If `config_file` is set, that file will be used.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### DateUtil
 * **start_time** - timestamp at which `inote-util` was loaded (hence approximately the time the application was started in most circumstances).
@@ -219,30 +253,30 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 
 ```js
 {
-  "begin":1462806382444,
+  "begin":1462806430444,
   "end":1462851730757,
-  "delta":45348313,
+  "delta":45300313,
   "in_millis":{                     // MILLISECOND VALUE OF EACH "PART" OF THE DURATION
     "millis":313,                   // <= delta % (1000)
-    "seconds":48313,                // <= delta % (1000 * 60)
-    "minutes":2148313,              // <= delta % (1000 * 60 * 60)
-    "hours":45348313,               // <= delta % (1000 * 60 * 60 * 24)
-    "days":45348313,                // <= delta % (1000 * 60 * 60 * 24 * 7
-    "weeks":45348313,               // <= delta % (1000 * 60 * 60 * 24 * 7 * 52
-    "years":45348313                // <= delta
+    "seconds":313,                // <= delta % (1000 * 60)
+    "minutes":2100313,              // <= delta % (1000 * 60 * 60)
+    "hours":45300313,               // <= delta % (1000 * 60 * 60 * 24)
+    "days":45300313,                // <= delta % (1000 * 60 * 60 * 24 * 7
+    "weeks":45300313,               // <= delta % (1000 * 60 * 60 * 24 * 7 * 52
+    "years":45300313                // <= delta
   },
   "raw":{                           // ELEMENTS FROM `IN_MILLIS`, CONVERTED TO RELEVANT UNIT
     "millis":313,                   // <= in_millis.millis
-    "seconds":48.313,               // <= in_millis.seconds / (1000)
-    "minutes":35.80521666666667,    // <= in_millis.minutes / (1000 * 60)
-    "hours":12.596753611111112,     // <= in_millis.hours   / (1000 * 60 * 60)
-    "days":0.5248647337962963,      // <= in_millis.days    / (1000 * 60 * 60 * 24)
-    "weeks":0.07498067625661375,    // <= in_millis.weeks   / (1000 * 60 * 60 * 24 * 7)
-    "years":0.0014419360818579568   // <= in_millis.years   / (1000 * 60 * 60 * 24 * 7 * 365)
+    "seconds":0.313,                // <= in_millis.seconds / (1000)
+    "minutes":35.00521666666667,    // <= in_millis.minutes / (1000 * 60)
+    "hours":12.583420277777778,     // <= in_millis.hours   / (1000 * 60 * 60)
+    "days":0.5243091782407407,      // <= in_millis.days    / (1000 * 60 * 60 * 24)
+    "weeks":0.07490131117724867,    // <= in_millis.weeks   / (1000 * 60 * 60 * 24 * 7)
+    "years":0.00020520907171848953   // <= in_millis.years   / (1000 * 60 * 60 * 24 * 7 * 365)
   },
   "whole":{                         // RAW VALUES ROUNDED DOWN TO NEAREST INTEGER
     "millis":313,
-    "seconds":48,
+    "seconds":0,
     "minutes":35,
     "hours":12,
     "days":0,
@@ -251,79 +285,79 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
   },
   "array":{                         // SET OF DURATION ELEMENTS IN ARRAYS
     "full":{                        // FULL = ALL UNITS, EVEN WHEN 0
-      "values":[0,0,0,12,35,48,313],
-      "short":["0y","0w","0d","12h","35m","48s","313m"],
-      "long":["0 years","0 weeks","0 days","12 hours","35 minutes","48 seconds","313 milliseconds"],
+      "values":[0,0,0,12,35,0,313],
+      "short":["0y","0w","0d","12h","35m","0s","313m"],
+      "long":["0 years","0 weeks","0 days","12 hours","35 minutes","0 seconds","313 milliseconds"],
       "no_millis":{                 // SAME AS PARENT BUT IGNORING MILLISECONDS
-        "values":[0,0,0,12,35,48],
-        "short":["0y","0w","0d","12h","35m","48s"],
-        "long":["0 years","0 weeks","0 days","12 hours","35 minutes","48 seconds"]
+        "values":[0,0,0,12,35,0],
+        "short":["0y","0w","0d","12h","35m","0s"],
+        "long":["0 years","0 weeks","0 days","12 hours","35 minutes","0 seconds"]
       }
     },
     "brief":{                       // BRIEF = SKIP TO LARGEST NON-ZERO UNIT, THEN INCLUDE ALL
-      "values":[12,35,48,313],
-      "short":["12h","35m","48s","313m"],
-      "long":["12 hours","35 minutes","48 seconds","313 millis"],
+      "values":[12,35,0,313],
+      "short":["12h","35m","0s","313m"],
+      "long":["12 hours","35 minutes","0 seconds","313 millis"],
       "no_millis":{
-        "values":[12,35,48],
-        "short":["12h","35m","48s"],
-        "long":["12 hours","35 minutes","48 seconds"]
+        "values":[12,35,0],
+        "short":["12h","35m","0s"],
+        "long":["12 hours","35 minutes","0 seconds"]
       }
     },
     "min":{                        // MIN = ONLY THE NON-ZERO VALUES
 
-      "units":["hour","minute","second","millisecond"],
-      "short":["12h","35m","48s","313m"],
-      "long":["12 hours","35 minutes","48 seconds","313 milliseconds"],
+      "units":["hour","minute","millisecond"],
+      "short":["12h","35m","313m"],
+      "long":["12 hours","35 minutes","313 milliseconds"],
       "no_millis":{
-        "units":["hour","minute","second","millisecond"],
-        "short":["12h","35m","48s","313m"],
-        "long":["12 hours","35 minutes","48 seconds","313 milliseconds"]
+        "units":["hour","minute"],
+        "short":["12h","35m"],
+        "long":["12 hours","35 minutes"]
       }
     }
   },
   "string":{                       // SIMILAR TO "ARRAY" BUT WITH STRINGS
     "full":{
-      "micro":"0y0w0d12h35m48s313m",
-      "short":"0y 0w 0d 12h 35m 48s 313m",
-      "long":"0 years 0 weeks 0 days 12 hours 35 minutes 48 seconds 313 milliseconds",
-      "verbose":"0 years, 0 weeks, 0 days, 12 hours, 35 minutes, 48 seconds and 313 milliseconds",
+      "micro":"0y0w0d12h35m0s313m",
+      "short":"0y 0w 0d 12h 35m 0s 313m",
+      "long":"0 years 0 weeks 0 days 12 hours 35 minutes 0 seconds 313 milliseconds",
+      "verbose":"0 years, 0 weeks, 0 days, 12 hours, 35 minutes, 0 seconds and 313 milliseconds",
       "no_millis":{
-        "micro":"0y0w0d12h35m48s",
-        "short":"0y 0w 0d 12h 35m 48s",
-        "long":"0 years 0 weeks 0 days 12 hours 35 minutes 48 seconds",
-        "verbose":"0 years, 0 weeks, 0 days, 12 hours, 35 minutes and 48 seconds"
+        "micro":"0y0w0d12h35m0s",
+        "short":"0y 0w 0d 12h 35m 0s",
+        "long":"0 years 0 weeks 0 days 12 hours 35 minutes 0 seconds",
+        "verbose":"0 years, 0 weeks, 0 days, 12 hours, 35 minutes and 0 seconds"
       }
     },
     "brief":{
-      "micro":"12h35m48s313m",
-      "short":"12h 35m 48s 313m",
-      "long":"12 hours 35 minutes 48 seconds 313 millis",
-      "verbose":"12 hours, 35 minutes, 48 seconds and 313 millis",
+      "micro":"12h35m0s313m",
+      "short":"12h 35m 0s 313m",
+      "long":"12 hours 35 minutes 0 seconds 313 millis",
+      "verbose":"12 hours, 35 minutes, 0 seconds and 313 millis",
       "no_millis":{
-        "micro":"12h35m48s",
-        "short":"12h 35m 48s",
-        "long":"12 hours 35 minutes 48 seconds",
-        "verbose":"12 hours, 35 minutes and 48 seconds"
+        "micro":"12h35m0s",
+        "short":"12h 35m 0s",
+        "long":"12 hours 35 minutes 0 seconds",
+        "verbose":"12 hours, 35 minutes and 0 seconds"
       }
     },
     "min":{
-      "micro":"12h35m48s313m",
-      "short":"12h 35m 48s 313m",
-      "long":"12 hours 35 minutes 48 seconds 313 milliseconds",
-      "verbose":"12 hours, 35 minutes, 48 seconds and 313 milliseconds",
+      "micro":"12h35m313m",
+      "short":"12h 35m 313m",
+      "long":"12 hours 35 minutes 313 milliseconds",
+      "verbose":"12 hours, 35 minutes and 313 milliseconds",
       "no_millis":{
-        "micro":"12h35m48s",
-        "short":"12h 35m 48s",
-        "long":"12 hours 35 minutes 48 seconds",
-        "verbose":"12 hours, 35 minutes, 48 seconds"
+        "micro":"12h35m",
+        "short":"12h 35m",
+        "long":"12 hours 35 minutes",
+        "verbose":"12 hours, 35 minutes and 48 seconds"
       }
     }
   }
 }
 ```
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### FileUtil
 * **file_age(file,callback)** / **file_age_sync(file)** - obtain the age of a file  (time since last modfied) in milliseconds
@@ -334,23 +368,23 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
   * `types` - an array or string containing `file` or `directory`
 * **is_dir(filename,callback)**   - test if the specified filename is a directory
 * **is_file(filename,callback)** - test if the specified filename is a plain file (not a directory).
-* **sanitize_filename(filename)** - removes invalid characters from and truncates extremely long filenames; only operates on the (last segement of) the given filename.
+* **sanitize_filename(filename)** - removes invalid characters from and truncates extremely long filenames; only operates on the last segement of the given path. That is, if `filename` is `/foo/bar/xyz`, only the `xyz` part of the string will be modified.
 * **uniquify_filename(dir,basename[,ext=''[,minpadwidth=3\[,maxpadwidth=5]])** - attempts to generate a unique filename in `dir` based on `basename`.
 * **mkdir(dir)** - `mkdir -p dir`
 * **touch(file)** - `touch file`
 * **rm(files...)** - remove one or more files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
-* **rmdir(dirs...)** - recursively remove one or more diretctories or files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
+* **rmdir(dirs...)** - recursively remove one or more directories or files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
 * **read_stdin_sync([end_byte="\x04"\[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
 * **load_json_file_sync(file\[,ignore_errors=false])** - synchronously read and parse a JSON file. When `ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.
 * **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### FileUtil - MIME and File-Extension related
 
-* **get_ext(fname)**  / **get_extension(fname)** - equivalent to `path.extname`, save that `fname` can be the extension itself.  (E.g., both `path.extname('.foo')` and `path.extname('foo')` return `''` while `FileUtil.get_ext('.foo')` and `FileUtil.get_ext('foo')` return `'foo'`).
+* **get_ext(fname)**  / **get_extension(fname)** - equivalent to `path.extname`, save that `fname` can be the extension itself.  (E.g., both `path.extname('.foo')` and `path.extname('foo')` return `''` while `FileUtil.get_ext('.foo')` and `FileUtil.get_ext('foo')` return `'foo'`).  Specifically, returns the part of `fname` following the final dot (`.`), _unless_ `fname` contains *no* dot, in which case the entire `fname` value is returned.
 * **strip_ext(fname)**  / **strip_extension(fname)** - returns a version of `fname` with the file extension removed.
 * **replace_ext(fname,ext)**  / **replace_extension(fname,ext)** - returns a version of `fname` with the file extension changed to `ext`.
 * **get_mime_for_ext(ext)** / **get_mime_for_extension(ext)**  - returns the "standard" MIME type based on the extension found in `ext`.  (`ext` may be a full filename or just the extension).
@@ -368,7 +402,7 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 
 Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext( EXT )) == EXT` and vice-versa.  See the `data` directory for the default mappings.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### IOUtil
 * **pipe_to_file(readable_stream,dest,options,callback)** - write a stream to a file.
@@ -376,7 +410,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **download_to_file(url,dest,options,callback)** - write the contents of a URL to a file.
 * **download_to_buffer(url,callback)** - write the contents of a URL to a buffer.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### LogUtil
 * **tlog(...)** - writes to stdout (`console.log`), pre-pending a timestamp (E.g., `[2015-05-17T22:03:58.569Z] Hello World!`)
@@ -384,13 +418,13 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **tplog(...)** - writes to stdout (`console.log`), pre-pending a timestamp and process ID (E.g., `[2015-05-17T22:03:58.569Z] [p:123] Hello World!`)
 * **tperr(...)** - writes to stderr (`console.error`), pre-pending a timestamp and process ID.  (E.g., `[2015-05-17T22:03:58.569Z] [p:123] Hello World!`)
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### NetUtil
 * **is_port_in_use(port,callback)** - attempt to determine whether or not a port is currently in use
 * **get_unused_port(callback)** - attempt to obtain an unused port
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### NumberUtil
 * **round_decimal(value[,digits=0])** - round a number to the specified number of digits to the right of the decimal point.
@@ -399,7 +433,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **is_float(val)** - returns `true` if and only if `val` is a simple decimal value (matching `/^-?((((0)|([1-9][0-9]*))(\.[0-9]+)?)|(\.[0-9]+))$/`).
 * **to_float(val)** - returns `parseFloat(val)` when `val` is a simple decimal value (matching `is_float`), `null` otherwise.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### ObjectUtil
 * **remove_null(map)** - generates a (shallow) *clone* of the map, with `null` entries removed.
@@ -415,7 +449,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
     * `"merge"` - merge the objects using `Util.merge(old,new)`
     * `"skip"` - keep the old value and ignore the new one
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### RandomUtil
 * **random_bytes([count=32[,encoding='hex']])** - returns `count` random bytes in the specified `encoding`.
@@ -429,7 +463,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
 * **random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### Stopwatch
 A simple utility that can be used to track and report the time it takes to do some thing in your JavaScript code.
@@ -482,7 +516,7 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **lpad(value,width,pad)** - adds `pad` characters to the beginning of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.lpad`, which is an identical method.)
 * **rpad(value,width,pad)** - adds `pad` characters to the end of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.rpad`, which is an identical method.)
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### Util
 * **version_satisfies(\[version_string,\]range_string)** - returns `true` if the given `version_string` satisfies the [semver criteria](https://www.npmjs.com/package/semver) specified in `range_string`.  When `version_string` is omitted, the Node version (the value of `process.version`) is used.  E.g., `if(!Util.version_satisifes(">=0.12.3")) { console.error("Expected version 0.12.3 or later."); }`.
@@ -499,13 +533,13 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **b64d(buf\[,encoding='utf8']) / Base64.decode(buf\[,encoding='utf8'])** - Base64 *decode* the given buffer.
 
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### WebUtil
 * **remote_ip(req,name,default_value)** - attempts to discover the proper "client IP" for the given request using various approaches.
 * **param(req)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### WorkQueue
 
@@ -588,7 +622,7 @@ The WorkQueue is also an `EventEmitter`, with the following events:
 
 * **new WorkQueue(\[options\])** - create a new WorkQueue instance.  Options:
   * `priority` - the default priority for tasks in the queue (when none is specified when the task is added). Defaults to 5.  Larger numbers are executed before smaller numbers.
-  * `interval` - the time (in milliseconds) between "polling" the queue for new tasks to execute.  Defautls to `200`.
+  * `interval` - the time (in milliseconds) between "polling" the queue for new tasks to execute.  Defaults to `200`.
   * `fuzz` - a floating point value that will be used to "fuzz" the interval between polling runs.  When `fuzz` is a non-zero float, a random value between `-1 × fuzz × interval` and `fuzz × interval` will be added to the interval.  This is used to avoid synchronization when several WorkQueues are launched with the same configuration.  (E.g., when a node app that uses the WorkQueue is launched in a cluster.)  Defaults to `0.1`.
   * `workers` - the maximum number of tasks that can be active at one time.  Defaults to `1`.
 
@@ -602,14 +636,14 @@ The WorkQueue is also an `EventEmitter`, with the following events:
 
 * **stop_working()** - stop queue processing.  Note that if a queue is started but not stopped, a function will be called roughly every `interval` milliseconds via JavaScript's `setInterval` method.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 ### ZipUtil
-* **zip(\[wd\],zipfile,inputs,callback)** - creates (or appends to `zipfile`), adding the file or array of files in `inputs`.  When `wd` is specified the action will take place relative to that directory.
+* **zip(\[wd\],zipfile,inputs,callback)** - creates (or appends to) `zipfile`, adding the file or array of files in `inputs`.  When `wd` is specified the action will take place relative to that directory.
 * **unzip(\[wd\],zipfile,dest,callback)** - unzips `zipfile` into the specified `dest`.
 * **contents(zipfile,callback)** - obtains a list of files within `zipfile`.
 
-*[Back to Index](#index)*
+*[Back to Index](#feature-index)*
 
 *[Up to ToC](#contents)*
 

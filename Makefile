@@ -135,7 +135,7 @@ clean-module:
 	rm -rf $(PACKAGE_DIR).tgz
 
 clean-node-modules:
-	$(NPM_EXE) $(NPM_ARGS) prune && $(NPM_EXE) $(NPM_ARGS) install semver@5.1.0 # re-install node-semver because `npm prune` seems to insist on deleting it
+	$(NPM_EXE) $(NPM_ARGS) prune
 
 really-clean: clean really-clean-node-modules
 
