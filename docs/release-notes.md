@@ -5,6 +5,8 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 - [inote-util Release Notes](#inote-util-release-notes)
+	- [Release 1.7.1 (8 June 2016)](#release-171-8-june-2016)
+		- [Bug Fixes](#bug-fixes)
 	- [Release 1.7.0 (25 May 2016)](#release-170-25-may-2016)
 		- [Enhancements](#enhancements)
 		- [Changes](#changes)
@@ -25,7 +27,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 	- [Release 1.5.0 (16 May 2016)](#release-150-16-may-2016)
 		- [Enhancements](#enhancements-6)
 	- [Release 1.4.1 (15 May 2016)](#release-141-15-may-2016)
-		- [Bug Fixes](#bug-fixes)
+		- [Bug Fixes](#bug-fixes-1)
 	- [Release 1.4.0 (14 May 2016)](#release-140-14-may-2016)
 		- [Enhancements](#enhancements-7)
 		- [Changes](#changes-4)
@@ -37,7 +39,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 	- [Release 1.1.0 (9 May 2016)](#release-110-9-may-2016)
 		- [Enhancements](#enhancements-10)
 		- [Changes](#changes-6)
-		- [Bug Fixes](#bug-fixes-1)
+		- [Bug Fixes](#bug-fixes-2)
 	- [Release 1.0.1 (8 May 2016)](#release-101-8-may-2016)
 		- [Changes](#changes-7)
 	- [Release 1.0.0 (7 May 2016)](#release-100-7-may-2016)
@@ -45,7 +47,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 		- [Changes](#changes-8)
 	- [Release 0.9.0 (20 January 2016)](#release-090-20-january-2016)
 		- [Enhancements](#enhancements-12)
-		- [Bug Fixes](#bug-fixes-2)
+		- [Bug Fixes](#bug-fixes-3)
 	- [Release 0.8.0 (24 July 2015)](#release-080-24-july-2015)
 		- [Enhancements](#enhancements-13)
 	- [Release 0.7.0 (16 July 2015)](#release-070-16-july-2015)
@@ -57,7 +59,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 		- [Enhancements](#enhancements-16)
 		- [Deprecated Methods](#deprecated-methods)
 	- [Release 0.5.9 (21 April 2015)](#release-059-21-april-2015)
-		- [Bug Fixes](#bug-fixes-3)
+		- [Bug Fixes](#bug-fixes-4)
 	- [Release 0.5.6 (21 April 2015)](#release-056-21-april-2015)
 		- [Enhancements](#enhancements-17)
 	- [Release 0.5.5 (1 April 2015)](#release-055-1-april-2015)
@@ -80,7 +82,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 		- [Enhancements](#enhancements-25)
 	- [Release 0.4.2 (12 December 2014)](#release-042-12-december-2014)
 		- [Enhancements](#enhancements-26)
-		- [Bug Fixes](#bug-fixes-4)
+		- [Bug Fixes](#bug-fixes-5)
 	- [Release 0.4.1 (11 December 2014)](#release-041-11-december-2014)
 		- [Enhancements](#enhancements-27)
 	- [Release 0.4.0 (14 Novemver 2014)](#release-040-14-novemver-2014)
@@ -92,16 +94,22 @@ This file summarizes the changes bundled in each release of `inote-util`.
 	- [Release 0.3.2 (20 October 2014)](#release-032-20-october-2014)
 		- [Enhancements](#enhancements-31)
 	- [Release 0.3.1 (18 October 2014)](#release-031-18-october-2014)
-		- [Bug Fixes](#bug-fixes-5)
+		- [Bug Fixes](#bug-fixes-6)
 		- [Enhancements](#enhancements-32)
 	- [Release 0.2.1 (15 October 2014)](#release-021-15-october-2014)
 		- [Enhancements](#enhancements-33)
 	- [Release 0.2.0 (5 October 2014)](#release-020-5-october-2014)
-		- [Bug Fixes](#bug-fixes-6)
+		- [Bug Fixes](#bug-fixes-7)
 		- [Enhancements](#enhancements-34)
 	- [Release 0.1.1 (30 September 2014)](#release-011-30-september-2014)
 
 <!-- tocstop -->
+
+## Release 1.7.1 (8 June 2016)
+
+### Bug Fixes
+
+ * Fixed an issue in `package.son` that would cause `npm prune` to remove the `semver` package (even though it was listed in the package’s dependencies).
 
 ## Release 1.7.0 (25 May 2016)
 
