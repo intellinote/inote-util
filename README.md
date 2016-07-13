@@ -1,8 +1,10 @@
-# inote-util [![Build Status](https://travis-ci.org/intellinote/inote-util.svg?branch=master)](https://travis-ci.org/intellinote/inote-util) [![Dependencies](https://david-dm.org/intellinote/inote-util.svg)](https://david-dm.org/intellinote/inote-util) [![NPM version](https://badge.fury.io/js/inote-util.svg)](http://badge.fury.io/js/inote-util)
+# inote-util <!-- [![Build Status](https://travis-ci.org/intellinote/inote-util.svg?branch=master)](https://travis-ci.org/intellinote/inote-util) --> [![Dependencies](https://david-dm.org/intellinote/inote-util.svg)](https://david-dm.org/intellinote/inote-util) [![NPM version](https://badge.fury.io/js/inote-util.svg)](http://badge.fury.io/js/inote-util)
 
+<!--
 > *Regarding the "build error" badge above: For some reason [travis-ci](https://travis-ci.org/intellinote/inote-util) is having problems installing (compiling) [mmmagic](https://github.com/mscdex/mmmagic) on some (but not all) versions of Node. As far as we can tell this is a Travis-specific issue.  We regularly compile and run the mmmagic package on those versions of Node on both OSX and Linux without any problem.*
 >
 > *Any suggestions about how to make Travis successfully build mmmagic on under all node.js versions are welcome.*
+--!>
 
 A collection of utility functions and classes for Node.js.
 
@@ -405,10 +407,11 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 *[Back to Index](#feature-index)*
 
 ### IOUtil
-* **pipe_to_file(readable_stream,dest,options,callback)** - write a stream to a file.
-* **pipe_to_buffer(readable_stream,callback)** - write a stream to a buffer.
-* **download_to_file(url,dest,options,callback)** - write the contents of a URL to a file.
-* **download_to_buffer(url,callback)** - write the contents of a URL to a buffer.
+* **pipe_to_file(readable_stream,dest,options,callback)** - write a stream to a file. (`callback(err,file)`).
+* **pipe_to_buffer(readable_stream,callback)** - write a stream to a buffer. (`callback(err,buffer)`).
+* **download_to_file(url,dest,options,callback)** - write the contents of a URL to a file. (`callback(err,file)`).
+* **download_to_buffer(url,callback)** - write the contents of a URL to a buffer.  (`callback(err,buffer)`).
+* **download_to_data_uri(url,callback)** - convert the contents of a URL to a data-uri. (`callback(err,uri)`).
 
 *[Back to Index](#feature-index)*
 
