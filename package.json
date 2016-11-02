@@ -16,7 +16,8 @@
     "seedrandom"            : "^2.4",
     "semver"                : "^5.1",
     "shelljs"               : "^0.7",
-    "priorityqueuejs"       : "^1.0"
+    "priorityqueuejs"       : "^1.0",
+    "comment-json"          : "^1.1"
   },
   "devDependencies": {
     "coffee-coverage"       : "^1.0",

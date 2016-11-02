@@ -37,6 +37,23 @@ describe 'Config',=>
         delete require.cache[key]
     done()
 
+  it 'supports comments in JSON files', (done)=>
+    process.env.NODE_ENV = 'unit-testing-with-comments'
+    config  = require(path.join(LIB_DIR,'config')).config.init()
+    config.get('mock-config').should.be.ok
+    config.get('mock-config:bool-value').should.equal true
+    config.get('mock-config:int-value').should.equal 17
+    config.get('mock-config:float-value').should.equal 3.14159
+    config.get('mock-config:string-value').should.equal 'Lorem Ipsum'
+    (config.get('mock-config:null-value')?).should.not.be.ok
+    config.get('mock-config:array-value')[0].should.equal true
+    config.get('mock-config:array-value')[1].should.equal 17
+    config.get('mock-config:array-value')[2].should.equal 3.14159
+    config.get('mock-config:array-value')[3].should.equal 'Lorem Ipsum'
+    config.get('mock-config:map-value')['int-value'].should.equal 19
+    config.get('mock-config:map-value:int-value').should.equal 19
+    done()
+
   it 'can load configuration file based on NODE_ENV', (done)=>
     process.env.NODE_ENV = 'unit-testing'
     config  = require(path.join(LIB_DIR,'config')).config.init()
