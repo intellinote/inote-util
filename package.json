@@ -1,6 +1,6 @@
 {
   "name"        : "inote-util",
-  "version"     : "1.7.2",
+  "version"     : "1.7.3",
   "description" : "A collection of utility functions and classes.",
   "repository"  : { "type": "git", "url": "https://github.com/intellinote/inote-util.git" },
   "bugs"        : { "url": "https://github.com/intellinote/inote-util/issues" },
@@ -16,7 +16,8 @@
     "seedrandom"            : "^2.4",
     "semver"                : "^5.1",
     "shelljs"               : "^0.7",
-    "priorityqueuejs"       : "^1.0"
+    "priorityqueuejs"       : "^1.0",
+    "comment-json"          : "^1.1"
   },
   "devDependencies": {
     "coffee-coverage"       : "^1.0",

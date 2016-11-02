@@ -1,6 +1,13 @@
-fs               = require 'fs'
-path             = require 'path'
-CONFIG_DIR       = path.join(process.cwd(),'config')
+fs                 = require 'fs'
+path               = require 'path'
+cjson              = require 'comment-json'
+nconf              = require 'nconf'
+CONFIG_DIR         = path.join(process.cwd(),'config')
+# strips comments from JSON before handing off ot nconf
+JSON_WITH_COMMENTS = {
+  parse:(str)->cjson.parse(str, null, true)
+  stringify:(args...)->cjson.stringify(args...)
+}
 
 # **Config** - *encapsulates certain [`nconf`](https://github.com/flatiron/nconf)
 # behaviors for a consistent way to load configuration data from files
@@ -50,13 +57,13 @@ class Config
 
   _load_if_exists:(file)=>
     if file? and fs.existsSync(file)
-      @nconf.file(file)
+      @nconf.file {file:file, format:JSON_WITH_COMMENTS}
       return true
     else
       return false
 
   init:(defaults=null,overrides=null)->
-    @nconf = require 'nconf'
+    @nconf = nconf
     @nconf.overrides(overrides) if overrides?                           # First, use any overrides that are provided.
     @nconf.argv()                                                       # Next, command line parameters.
     @nconf.env ['NODE_ENV','config_file','config_dir']                  # Then, fetch certain values from the environment variables (but nothing else yet), if they aren't already set.
