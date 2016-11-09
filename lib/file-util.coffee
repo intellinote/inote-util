@@ -343,10 +343,13 @@ class FileUtil
   @strip_ext:(filename)=>@strip_extension(filename)
 
   @get_extension:(filename)=>
-    ext = Util.blank_to_null(path.extname(filename)) ? filename
-    if /^\./.test ext
-      ext = ext.substring(1,ext.length)
-    return ext
+    if filename?
+      ext = Util.blank_to_null(path.extname(filename)) ? filename
+      if /^\./.test ext
+        ext = ext.substring(1,ext.length)
+      return ext
+    else
+      return null
   @get_ext:(filename)=>@get_extension(filename)
 
 
