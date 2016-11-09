@@ -200,6 +200,8 @@ Note that the sequence is not cleared when `run` is invoked, so one may invoke `
 ### Config
 A thin wrapper around [`nconf`](https://github.com/flatiron/nconf) providing a consistent way to load configuration data from files or the environment.
 
+Note that config now allows `//` and `/* */` style comments in JSON files.
+
 #### Example of use
 
 ```javascript
@@ -738,30 +740,11 @@ Feel free to contribute or comment in whatever channel works for you.
 
 ---
 
-[![Intellinote](https://www.intellinote.net/wp-content/themes/intellinote/images/logo@2x.png)](https://www.intellinote.net/)
+[![Intellinote](https://app.intellinote.net/auth/img/broadsoft_teamone_color.svg)](https://www.intellinote.net/)
 
-## About Intellinote
+## About <strike>Intellinote</strike> BroadSoft Team-One.
 
-Intellinote is a multi-platform (web, mobile, and tablet) software
-application that helps businesses of all sizes capture, collaborate
-and complete work, quickly and easily.
-
-Users can start with capturing any type of data into a note, turn it
-into a task, assign it to others, start a discussion around it, add a
-file and share – with colleagues, managers, team members, customers,
-suppliers, vendors and even classmates. Since all of this is done in
-the context of private and public workspaces, users retain end-to-end
-control, visibility and security.
-
-For more information about Intellinote, visit
-<https://www.intellinote.net/>.
-
-### Work with Us
-
-Interested in working for Intellinote?  Visit
-[the careers section of our website](https://www.intellinote.net/careers/)
-to see our latest technical (and non-technical) openings.
-
+Intellinote is now [BroadSoft Team-One](https://www.team-one.com/).
 ---
 
 *[Up to ToC](#contents)*
