@@ -14,12 +14,14 @@ describe "Stopwatch",->
     @method_finished = false
     @a_slow_method = ()=>
       @method_started = true
-      foo = [1]
-      for i in [1...1000]
-        sum = 0
-        for j in [0...i]
-          sum += foo[j]
-        foo[i] = j
+      ts = Date.now()
+      while Date.now() - ts  < 300
+        foo = [1]
+        for i in [1...1000]
+          sum = 0
+          for j in [0...i]
+            sum += foo[j]
+          foo[i] = j
       @method_finished = true
     done()
 
