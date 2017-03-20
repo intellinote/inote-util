@@ -198,6 +198,7 @@ Note that the sequence is not cleared when `run` is invoked, so one may invoke `
 *[Back to Index](#feature-index)*
 
 ### Config
+
 A thin wrapper around [`nconf`](https://github.com/flatiron/nconf) providing a consistent way to load configuration data from files or the environment.
 
 Note that config now allows `//` and `/* */` style comments in JSON files.
@@ -217,10 +218,10 @@ In order of precedence:
 
 2. Command line parameters (`--name value`).
 
-3. A JSON-format configuration file (from a location deterimined by
-  `NODE_ENV`, `config_dir` or `config_file`).
+3. Environment variables.  Note that `__` can be used in place of `:` as a delimiter.
 
-4. Environment variables.
+4. A JSON-format configuration file (from a location deterimined by
+  `NODE_ENV`, `config_dir` or `config_file`).
 
 5. A "default" JSON-format configuration file at `${config_dir}/config.json`.
 
@@ -422,6 +423,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 ### NetUtil
 * **is_port_in_use(port,callback)** - attempt to determine whether or not a port is currently in use
 * **get_unused_port(callback)** - attempt to obtain an unused port
+* **normalize_url**
 
 *[Back to Index](#feature-index)*
 
@@ -510,6 +512,9 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **escape_for_json(str)** - escapes a (possibly `null`) string for use as literal characters in a JSON string.
 * **escape_for_regexp(str)** - escapes a (possibly `null`) string for use as literal characters in a regular expression.
 * **escape_for_bash(param,esc_specials=false)** - escapes a (possibly `null`) string for use as command-line parameter. When `esc_specials` is `false` (the default) parameters such as `<`, `>`, `&&`, etc. are not escaped.
+* **sanitize_for_html**
+* **json_or_null**
+* **StringUtil.sanitize_for_sql_like**
 * **truthy_string(str)** - `true` if the given string is `t`, `true`, `y`, `yes`, `on`, `1`, etc.
 * **falsey_string(str)** - `true` if the given string is `f`, `false`, `no`, `off`, `0`, etc.
 * **lpad(value,width,pad)** - adds `pad` characters to the beginning of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.lpad`, which is an identical method.)
@@ -526,7 +531,9 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **descending_comparator(comparator) / desc_comparator(comparator)** - reverses the order of the given `comparator`.
 * **composite_comparator(list)** - generates a comparator that first compares elements by `list[0]` then (if equal) `list[1]` and so on, until a non-equal comparison is found or we run out of comparators.
 * **handle_error(err[,callback\[,throw_when_no_callback=true]])** - if `err` is not `null`, invokes `callback(err)` or `throw err` as appropriate. Returns `true` if an error was encountered, `false` otherwise. (`function my_callback(err,other,stuff) { if(!handle_error(err,callback)) { /* keep going */ } }`)
-* **uuid(val\[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
+* **uuid(val\[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario. (DEPRECATED)
+* **normalize_uuid(val\[,generate=false])** - non-deprecated replacement for `uuid(val,generate)`.
+* **make_uuid([val])**, **make_uuid_v1([val])**, **make_uuid_v4([val])** - return a normalized version of the specified UUID, creating a new one if none is proivded.
 * **pad_uuid(val\[,generate=false])** - normalize `val` to all a lower-case, with-dashes version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
 * **b64e(buf\[,encoding='utf8']) / Base64.encode(buf\[,encoding='utf8'])** - Base64 encode the given buffer.
 * **b64d(buf\[,encoding='utf8']) / Base64.decode(buf\[,encoding='utf8'])** - Base64 *decode* the given buffer.

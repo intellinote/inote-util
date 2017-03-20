@@ -20,6 +20,7 @@ describe 'Config',=>
       process.env.NODE_ENV = @original_node_env
     else
       delete process.env.NODE_ENV
+    delete process.env["mock-config__string-value"]
     if @original_config_file?
       process.env.config_file = @original_config_file
     else
@@ -142,4 +143,13 @@ describe 'Config',=>
     config = require(path.join(LIB_DIR,'config')).config.init(null,overrides)
     config.get('mock-config').should.be.ok
     config.get('mock-config:source').should.equal 'test/mock-config.json'
+    done()
+
+  it 'environment varibles take precedence over files; __ acts as delimiter in env vars', (done)=>
+    process.env.NODE_ENV = 'unit-testing'
+    process.env["mock-config__string-value"] = "from env!"
+    config  = require(path.join(LIB_DIR,'config')).config.init()
+    config.get('mock-config').should.be.ok
+    config.get('mock-config:int-value').should.equal 17
+    config.get('mock-config:string-value').should.equal "from env!"
     done()

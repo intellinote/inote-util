@@ -7,9 +7,12 @@ Util    = require(path.join(LIB_DIR,'util')).Util
 shell   = require 'shelljs'
 cluster = require 'cluster'
 net     = require 'net'
-DEBUG   = (/(^|,)inote-?util($|,)/i.test process?.env?.NODE_DEBUG) or (/(^|,)NetUtil($|,)/.test process?.env?.NODE_DEBUG)
+URL     = require 'url'
 
 class NetUtil
+
+  @normalize_url:(url)=>
+    return URL.parse(url)?.href ? url
 
   # returns the (cluster-aware) PID, or a random number if no PID is available
   @get_pid:()=>

@@ -1,6 +1,6 @@
 {
   "name"        : "inote-util",
-  "version"     : "1.8.0",
+  "version"     : "1.8.1",
   "description" : "A collection of utility functions and classes.",
   "repository"  : { "type": "git", "url": "https://github.com/intellinote/inote-util.git" },
   "bugs"        : { "url": "https://github.com/intellinote/inote-util/issues" },
@@ -10,7 +10,7 @@
     "mkdirp"                : "^0.5",
     "mmmagic"               : "^0.4",
     "nconf"                 : "^0.8",
-    "node-uuid"             : "^1.4.7",
+    "uuid"                  : "^3.0",
     "remove"                : "^0.1",
     "request"               : "^2.58",
     "seedrandom"            : "^2.4",

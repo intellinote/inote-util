@@ -26,10 +26,10 @@ JSON_WITH_COMMENTS = {
 #
 # 2. Command line parameters (`--name value`).
 #
-# 3. A JSON-format configuration file (from a location deterimined by
-#    `NODE_ENV`, `config_dir` or `config_file`).
+# 3. Environment variables.
 #
-# 4. Environment variables.
+# 4. A JSON-format configuration file (from a location deterimined by
+#    `NODE_ENV`, `config_dir` or `config_file`).
 #
 # 5. A "default" JSON-format configuration file at `${config_dir}/config.json`.
 #
@@ -49,6 +49,8 @@ JSON_WITH_COMMENTS = {
 #
 # d. If `config_file` is set, that file will be used.
 #
+
+ENV_DELIMITER = "__" # value used in place of `:` in environment variables
 
 class Config
 
@@ -83,7 +85,7 @@ class Config
       unless @_load_if_exists(config_file)
         console.error "Custom config_file #{config_file} not found; aborting."
         process.exit(1)
-    @nconf.env()                                                        # Pull remaining values from the environment variables
+    @nconf.env(ENV_DELIMITER)                                           # Pull remaining values from the environment variables
     @_load_if_exists(path.join(config_dir,'config.json'))               # Finally if there is a `[CONFIG_DIR]/config.json` configuration file, use that.
     @nconf.defaults(defaults) if defaults?                              # ...and use any provided defaults.
     return @nconf
