@@ -198,6 +198,7 @@ Note that the sequence is not cleared when `run` is invoked, so one may invoke `
 *[Back to Index](#feature-index)*
 
 ### Config
+
 A thin wrapper around [`nconf`](https://github.com/flatiron/nconf) providing a consistent way to load configuration data from files or the environment.
 
 Note that config now allows `//` and `/* */` style comments in JSON files.
@@ -217,10 +218,10 @@ In order of precedence:
 
 2. Command line parameters (`--name value`).
 
-3. A JSON-format configuration file (from a location deterimined by
-  `NODE_ENV`, `config_dir` or `config_file`).
+3. Environment variables.  Note that `__` can be used in place of `:` as a delimiter.
 
-4. Environment variables.
+4. A JSON-format configuration file (from a location deterimined by
+  `NODE_ENV`, `config_dir` or `config_file`).
 
 5. A "default" JSON-format configuration file at `${config_dir}/config.json`.
 

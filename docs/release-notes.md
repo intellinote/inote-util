@@ -107,6 +107,16 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+## Release 1.8.1 (20 March 2017)
+
+### Enhancements
+
+  * `__` is now supported as a delimiter for environment-variable based configuration parameters. (E.g., `foo__bar=X` sets the configuration parameter that can be accessed as `config.get("foo:bar")`)
+
+## Release 1.8.0
+
+*TODO: release notes missing*
+
 ## Release 1.7.2 (13 July 2016)
 
 ### Enhancements
