@@ -53,6 +53,19 @@ class StringUtil
           short_width--
       return "#{text.substring(0,max_width)}#{marker}"
 
+  # If the given object is a string that starts with `[`, `{` or `"` and ends with `]`, `}` or `"`
+  # respectively, attempt to parse it as a JSON string and return the resulting object.
+  # If that fails, return `null` rather than throwing an exception.
+  #
+  # If `obj` is a non-string object, the value is returned as-is.
+  json_or_null:(obj)=>
+    if obj? and typeof obj is 'string' and /^\s*[\"\[\{].*[\"\]\}]\s*$/.test obj
+      try
+        obj = JSON.parse(obj)
+      catch err
+        obj = null
+    else
+      return obj
 
   # **escape_for_json** - *escapes a string for use as literal characters in a JSON string.*
   #
@@ -107,6 +120,29 @@ class StringUtil
 
   # **escape_for_regexp** - *escapes a string for use as literal characters in regular expression.*
   @escape_for_regexp:(str)=>str?.replace(/([.?*+^$[\]\/\\(){}|-])/g, "\\$1")
+
+
+  normalize_url:(url)=>
+    return URL.parse(url)?.href ? url
+
+  # sanitize the given string so that it can be used in (a LIKE query within) a SQL string
+  # (used for generating `LIKE '%foo%` queries where the `foo` part is user-provided; a regular `?` won't work here)
+  # replaces ' " \ / ? and % with `_`
+  sanitize_for_sql_like:(str)=>
+    str = str.replace /[\'\"\\\/\?\%]/g, '_'
+    return str
+
+  # sanitize the given string so that it can be used directly in an HTML document
+  # replaces & " ' < and > with their HTML-entity equivalentgi
+  sanitize_for_html:(str)=>
+    if str?
+      str = "#{str}"
+      str = str.replace /&/g, '&amp;'
+      str = str.replace /"/g, '&quot;'
+      str = str.replace /'/g, '&#39;'
+      str = str.replace /</g, '&lt;'
+      str = str.replace />/g, '&gt;'
+    return str
 
   # Returns true if the given string is `t`, `true`, `y`, `yes`, `on`, `1`, etc.
   @truthy_string:(s)=>/^((T(rue)?)|(Y(es)?)|(ON)|1)$/i.test("#{s}")

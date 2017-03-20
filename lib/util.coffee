@@ -5,7 +5,7 @@ LIB_COV    = path.join(HOMEDIR,'lib-cov')
 LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 MapUtil    = require(path.join(LIB_DIR,'object-util')).MapUtil
 StringUtil = require(path.join(LIB_DIR,'string-util')).StringUtil
-uuid       = require 'node-uuid'
+uuid       = require 'uuid'
 crypto     = require 'crypto'
 mkdirp     = require 'mkdirp'
 request    = require 'request'
@@ -1044,6 +1044,10 @@ class IdUtil
   #
   # E.g., given `02823B75-8C4A-3BC4-7F03-0A8482D5A9AB`, returns `02823b758c4a3bc47f030a8482d5a9ab`.
   # If `generate` is `true` and `v` is `null`, a new (normalized) UUID value is generated and returned.
+  #
+  # DEPRECATED the `generate=false` default will be changed in some future release; to
+  #            maintain the same behavior switch to `normalize_uuid`.  To switch to the
+  #            new behavior now, use `make_uuid` (or variants).
   @uuid:(v,generate=false)=>
     unless v?
       if generate
@@ -1055,6 +1059,18 @@ class IdUtil
     else unless /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test v
       throw new Error("Encountered invalid UUID format #{v}.")
     return v.replace(/-/g,'').toLowerCase()
+
+  @normalize_uuid:(v,generate=false)=>
+    @uuid v, generate
+
+  @make_uuid:(v)=>
+    @uuid(v ? uuid.v1())
+
+  @make_uuid_v1:(v)=>
+    @uuid(v ? uuid.v1())
+
+  @make_uuid_v4:(v)=>
+    @uuid(v ? uuid.v4())
 
   # **pad_uuid** - *normalize or generate a *padded* UUID value*
   #
