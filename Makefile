@@ -161,9 +161,10 @@ clean-markdown:
 ################################################################################
 # NPM TARGETS
 
-module: js test docs coverage
+module: clean-module js test docs #coverage
 	mkdir -p $(MODULE_DIR)
 	cp -r lib $(MODULE_DIR)
+	cp -r data $(MODULE_DIR)
 	cp $(PACKAGE_JSON) $(MODULE_DIR)
 	cp LICENSE.txt $(MODULE_DIR)
 	cp README.md $(MODULE_DIR)
