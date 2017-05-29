@@ -440,6 +440,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **remove_null(map)** - generates a (shallow) *clone* of the map, with `null` entries removed.
 * **remove_falsey(map)** - generates a (shallow) *clone* of the map, with "falsey" entries removed (see `falsey_string`).
 * **merge(maps...)** - given two or more maps `a` and `b`, creates new new map containing the union of elements from each. If `a` and `b` share a key, the value in `b` will overwrite the value in `a`.
+* **deep_merge(maps...)** - just like `merge` except that sub-maps are recursively merged (e.g., merging `{a:{a1:1}}` and `{a:{a2:2}}` yields `{a:{a1:1,a2:2}}` rather than `{a:{a2:2}}`).
 * **shallow_clone(obj)** - create a shallow clone of the given map or array.
 * **deep_clone(obj)** - recursively copy the elements `obj` into a new map (or array)
 * **object_array_to_map(array,key_field[,options={})])** - Given a list of objects, creates a map from `elt[key_field]` to `elt` for each `elt` in the array.
@@ -532,6 +533,7 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **composite_comparator(list)** - generates a comparator that first compares elements by `list[0]` then (if equal) `list[1]` and so on, until a non-equal comparison is found or we run out of comparators.
 * **handle_error(err[,callback\[,throw_when_no_callback=true]])** - if `err` is not `null`, invokes `callback(err)` or `throw err` as appropriate. Returns `true` if an error was encountered, `false` otherwise. (`function my_callback(err,other,stuff) { if(!handle_error(err,callback)) { /* keep going */ } }`)
 * **uuid(val\[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario. (DEPRECATED)
+    * As of v1.8.2, when called with no arguments `uuid()` generates a UUID value, while `uuid(null)` retains the original behavior.
 * **normalize_uuid(val\[,generate=false])** - non-deprecated replacement for `uuid(val,generate)`.
 * **make_uuid([val])**, **make_uuid_v1([val])**, **make_uuid_v4([val])** - return a normalized version of the specified UUID, creating a new one if none is proivded.
 * **pad_uuid(val\[,generate=false])** - normalize `val` to all a lower-case, with-dashes version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.

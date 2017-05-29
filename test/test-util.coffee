@@ -1054,8 +1054,8 @@ describe 'Util',->
 
 
   it "can generate and unpad UUID values", (done)->
+    Util.uuid().should.be.ok
     # by default, Util.uuid doesn't generate anything
-    should.not.exist Util.uuid()
     should.not.exist Util.uuid(null)
     should.not.exist Util.uuid(null,null)
     should.not.exist Util.uuid(null,false)

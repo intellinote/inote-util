@@ -1039,6 +1039,8 @@ class IdUtil
 
   # **uuid** - *normalize or generate a UUID value*
   #
+  # When called with no arguments, generates a new UUID value.
+  #
   # When a UUID value `v` is provided, a normalized value is returned (downcased and
   # with any dashes (`-`) removed, matching `/^[0-9a-f]{32}$/`).
   #
@@ -1049,6 +1051,8 @@ class IdUtil
   #            maintain the same behavior switch to `normalize_uuid`.  To switch to the
   #            new behavior now, use `make_uuid` (or variants).
   @uuid:(v,generate=false)=>
+    if arguments.length is 0
+      generate = true
     unless v?
       if generate
         v = @uuid(uuid.v1())
