@@ -5,7 +5,8 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 - [inote-util Release Notes](#inote-util-release-notes)
-	- [Release 1.8.2 (28 May 2017)](#release-182-28-may-2017)
+	- [Release 1.8.3 (28 May 2017)](#release-183-28-may-2017)
+	- [Release 1.8.2](#release-182)
 	- [Release 1.8.1 (20 March 2017)](#release-181-20-march-2017)
 	- [Release 1.8.0](#release-180)
 	- [Release 1.7.2 (13 July 2016)](#release-172-13-july-2016)
@@ -55,7 +56,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
-## Release 1.8.2 (28 May 2017)
+## Release 1.8.3 (28 May 2017)
 
   * When called with zero arguments, `uuid()` now generates a UUID value (while `uuid(null)` still returns `null` and `uuid(null,true)` still generates a UUID value).
 

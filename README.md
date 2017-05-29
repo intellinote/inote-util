@@ -533,7 +533,7 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **composite_comparator(list)** - generates a comparator that first compares elements by `list[0]` then (if equal) `list[1]` and so on, until a non-equal comparison is found or we run out of comparators.
 * **handle_error(err[,callback\[,throw_when_no_callback=true]])** - if `err` is not `null`, invokes `callback(err)` or `throw err` as appropriate. Returns `true` if an error was encountered, `false` otherwise. (`function my_callback(err,other,stuff) { if(!handle_error(err,callback)) { /* keep going */ } }`)
 * **uuid(val\[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario. (DEPRECATED)
-    * As of v1.8.2, when called with no arguments `uuid()` generates a UUID value, while `uuid(null)` retains the original behavior.
+    * As of v1.8.3, when called with no arguments `uuid()` generates a UUID value, while `uuid(null)` retains the original behavior.
 * **normalize_uuid(val\[,generate=false])** - non-deprecated replacement for `uuid(val,generate)`.
 * **make_uuid([val])**, **make_uuid_v1([val])**, **make_uuid_v4([val])** - return a normalized version of the specified UUID, creating a new one if none is proivded.
 * **pad_uuid(val\[,generate=false])** - normalize `val` to all a lower-case, with-dashes version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
