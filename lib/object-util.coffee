@@ -56,6 +56,22 @@ class ObjectUtil
         map[n] = v
     return map
 
+  # **deep_merge** - *recursively merge multiple maps into a new, combined map*
+  @deep_merge:(args...)=>
+    map = {}
+    if args.length is 1 and Array.isArray(args[0])
+      args = args[0]
+    for m in args ? []
+      for n,v of m ? {}
+        if v? and (typeof v is 'object') and (not Array.isArray(v))
+          unless map[n]? and (typeof map[n] is 'object') and (not Array.isArray(v))
+            map[n] = @shallow_clone(v)
+          else
+            map[n] = @deep_merge map[n], v
+        else
+          map[n] = v
+    return map
+
   # **shallow_clone** - *create a "shallow" copy of a mqp*
   #
   # Creates an independent map with the same keys as `map`.

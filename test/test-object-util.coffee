@@ -8,7 +8,6 @@ ObjectUtil    = require(path.join(LIB_DIR,'object-util')).ObjectUtil
 
 describe 'ObjectUtil',->
 
-
   it "remove_null ignores non-array, non-map objects",(done)->
     ObjectUtil.remove_null("foo").should.equal "foo"
     ObjectUtil.remove_null(8).should.equal 8
@@ -121,6 +120,76 @@ describe 'ObjectUtil',->
       m.d.should.equal 'four'
       m.e.should.equal 'five'
       m.f.should.equal 'vi'
+    done()
+
+  it "merge is shallow; deep_merge is deep",(done)->
+    list = [
+      {
+        a: 1
+        b: {
+          b0: "First"
+          b1: [ false, false ]
+        }
+      },
+      {
+        a: {
+          a1: true
+          a2: {
+            a21: true
+          }
+          a3: "X"
+        }
+        b: {
+          b1: true
+          b2: {
+            b21: true
+          }
+          b3: "X"
+        }
+        c: {
+          c1: "SECOND"
+        }
+      },
+      {
+        a: {
+          a2: {
+            a22: true
+          }
+        }
+        b: {
+          b2: {
+            b22: 17
+          }
+          b3: "Y"
+          b4: "Z"
+        }
+        c: {
+          c1: {
+            c11: "THIRD"
+          }
+        }
+      }
+    ]
+    for m in [ObjectUtil.merge(list),ObjectUtil.merge(list...)]
+      should.not.exist m.a.a1
+      should.not.exist m.a.a2.a21
+      m.a.a2.a22.should.equal true
+      should.not.exist m.b.b0
+      should.not.exist m.b.b1
+      should.not.exist m.b.b2.b21
+      m.b.b2.b22.should.equal 17
+    for m in [ObjectUtil.deep_merge(list),ObjectUtil.deep_merge(list...)]
+      m.a.a1.should.equal true
+      m.a.a2.a21.should.equal true
+      m.a.a2.a22.should.equal true
+      m.a.a2.a22.should.equal true
+      m.b.b0.should.equal 'First'
+      m.b.b1.should.equal true
+      m.b.b2.b21.should.equal true
+      m.b.b2.b22.should.equal 17
+      m.b.b3.should.equal 'Y'
+      m.b.b4.should.equal 'Z'
+      m.c.c1.c11.should.equal 'THIRD'
     done()
 
   it "remove_falsey returns null for null",(done)->
