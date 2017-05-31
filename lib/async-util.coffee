@@ -120,14 +120,14 @@ class AsyncUtil
     args = []
     for elt,i in list
       args.push [ elt, i, list ]
-    @fork methods, list, when_done
+    @fork methods, list, whendone
 
   @throttled_fork_for_each_async:(max_parallel,list,action,whendone)=>
     methods = list.map ()->action
     args = []
     for elt,i in list
       args.push [ elt, i, list ]
-    @throttled_fork max_parallel, methods, list, when_done
+    @throttled_fork max_parallel, methods, list, whendone
 
   # Run the given array of methods asynchronously, invoking `callback` when done
   # - `methods` - an array of methods

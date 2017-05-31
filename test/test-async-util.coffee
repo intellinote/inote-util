@@ -163,7 +163,7 @@ describe 'AsyncUtil',->
       # at t=500 : end 1, start 4 running for 200
       # at t=600 : end 0
       # at t=700 : end 4
-      for step, i in [ 2, 1, 0, 3, 4 ]
+      for step, i in [ 2, 1, 0 ]
         order_done[i].should.equal step
       for i in args
         results[i][0].should.equal i
