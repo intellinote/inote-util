@@ -115,7 +115,19 @@ class AsyncUtil
     act  = (next)-> action(list[i],i,list,next)
     @for_async(init, cond, act, incr, whendone)
 
+  @fork_for_each_async:(list,action,whendone)=>
+    methods = list.map ()->action
+    args = []
+    for elt,i in list
+      args.push [ elt, i, list ]
+    @fork methods, list, when_done
 
+  @throttled_fork_for_each_async:(max_parallel,list,action,whendone)=>
+    methods = list.map ()->action
+    args = []
+    for elt,i in list
+      args.push [ elt, i, list ]
+    @throttled_fork max_parallel, methods, list, when_done
 
   # Run the given array of methods asynchronously, invoking `callback` when done
   # - `methods` - an array of methods
@@ -130,6 +142,8 @@ class AsyncUtil
     for method, index in methods
       do (method,index)->
         method_args = args_for_methods?[index] ? []
+        unless Array.isArray(method_args)
+          method_args = [method_args]
         method method_args..., (callback_args...)->
           results[index] = callback_args
           remaining_callbacks--
@@ -152,6 +166,8 @@ class AsyncUtil
         next_to_run++
         do (index)->
           method_args = args_for_methods?[index] ? []
+          unless Array.isArray(method_args)
+            method_args = [method_args]
           method = methods[index]
           method method_args..., (callback_args...)->
             results[index] = callback_args

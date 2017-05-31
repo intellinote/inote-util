@@ -95,12 +95,15 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
   * `action` - the action to take (a single callback function is passed and should be invoked at the end of the action, no return value is expected);
   * `increment` - called at the end of every `action`, prior to `condition` (no arguments passed, no return value is expected);
   * `whendone` - called at the end of the loop (when `condition` returns `false`), (no arguments passed, no return value is expected).
-* **for_each_async(list,action,whendone)** - executes an asynchronous `forEach` loop. Accepts 3 parameters:
-  * `list` - the array to iterate over;
-  * `action` - a function with the signature `(value,index,list,next)` indicating the action to take for each element (*must* call `next` for processing to continue);
-  * `whendone` - called at the end of the loop.
-* **fork(methods, args_for_methods, callback)** - runs the given array of methods "simaltaneously" (asynchronously), invoking `callback` when they are *all* complete.
-* **throttled_fork(max_parallel, methods, args_for_methods, callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
+  * **for_each_async(list,action,whendone)** - executes an asynchronous `forEach` loop. Accepts 3 parameters:
+    * `list` - the array to iterate over;
+    * `action` - a function with the signature `(value,index,list,next)` indicating the action to take for each element (*must* call `next` for processing to continue);
+    * `whendone` - called at the end of the loop.
+  * **fork(methods, args_for_methods, callback)** - runs the given array of methods "simultaneously" (asynchronously), invoking `callback` when they are *all* complete.
+  * **throttled_fork(max_parallel, methods, args_for_methods, callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
+  * **throttled_fork(max_parallel, methods, args_for_methods, callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
+  * **fork_for_each_async(list, action, whendone)** - like `for_each_async` but running `action` in parallel for each element of the `list`.  The `whendone` callback is provided with a list of "responses", in the same order as the original list.
+  * **throttled_fork_for_each_async(max_parallel,list, action, whendone)** - like `fork_for_each_async` but running at most `max_parallel` methods at any one time.
 * **procedure()** - generates a `Sequencer` object, as described below
 
 #### The Sequencer
