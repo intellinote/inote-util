@@ -171,7 +171,7 @@ module: clean-module js test docs #coverage
 	mv module $(PACKAGE_DIR)
 	tar -czf $(PACKAGE_DIR).tgz $(PACKAGE_DIR)
 
-test-module-install: clean-test-module-install js test docs coverage module $(PACKAGE_DIR).tgz
+test-module-install: clean-test-module-install js test docs module $(PACKAGE_DIR).tgz
 	mkdir -p $(TEST_MODULE_INSTALL_DIR); cd $(TEST_MODULE_INSTALL_DIR); npm install "$(CURDIR)/$(PACKAGE_DIR).tgz"; node -e "require('assert').ok(require('inote-util').Util);" && cd $(CURDIR) && rm -rf $(TEST_MODULE_INSTALL_DIR) && echo "\n\nIT WORKED!\n\n"
 
 $(NODE_MODULES): $(PACKAGE_JSON)

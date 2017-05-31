@@ -133,6 +133,22 @@ describe 'AsyncUtil',->
     args = [ [ "abc" ], ["x","yz"] ]
     AsyncUtil.fork methods, args, when_done
 
+  it "fork_for_each_async works", (done)=>
+    args = [0...5]
+    ran = args.map ()->false
+    action = (elt, index, list, next)=>
+      elt.should.equal index
+      ran[elt].should.not.be.ok
+      ran[elt] = true
+      next(elt)
+    when_done = (results)=>
+      for i in args
+        results[i][0].should.equal i
+      for elt in ran
+        elt.should.be.ok
+      done()
+    AsyncUtil.fork_for_each_async args, action, when_done
+
   it "throttled fork limits the number of methods running in parallel", (done)=>
     args = [0...5]
     order_done = []
@@ -163,7 +179,7 @@ describe 'AsyncUtil',->
       # at t=500 : end 1, start 4 running for 200
       # at t=600 : end 0
       # at t=700 : end 4
-      for step, i in [ 2, 1, 0, 3, 4 ]
+      for step, i in [ 2, 1, 0 ]
         order_done[i].should.equal step
       for i in args
         results[i][0].should.equal i
