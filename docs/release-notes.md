@@ -5,6 +5,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 - [inote-util Release Notes](#inote-util-release-notes)
+	- [Release 1.8.5 (31 May 2017)](#release-185-31-may-2017)
 	- [Release 1.8.4 (28 May 2017)](#release-184-28-may-2017)
 	- [Release 1.8.3 (28 May 2017)](#release-183-28-may-2017)
 	- [Release 1.8.2](#release-182)
@@ -56,6 +57,10 @@ This file summarizes the changes bundled in each release of `inote-util`.
 	- [Release 0.1.1 (30 September 2014)](#release-011-30-september-2014)
 
 <!-- tocstop -->
+
+## Release 1.8.5 (31 May 2017)
+
+  * Added `AsyncUtil.fork_for_each_async` and `AsyncUtil.throttled_fork_for_each_async`.
 
 ## Release 1.8.4 (28 May 2017)
 
