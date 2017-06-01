@@ -416,10 +416,22 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 *[Back to Index](#feature-index)*
 
 ### LogUtil
-* **tlog(...)** - writes to stdout (`console.log`), pre-pending a timestamp (E.g., `[2015-05-17T22:03:58.569Z] Hello World!`)
-* **terr(...)** - writes to stderr (`console.error`), pre-pending a timestamp.  (E.g., `[2015-05-17T22:03:58.569Z] Hello World!`)
-* **tplog(...)** - writes to stdout (`console.log`), pre-pending a timestamp and process ID (E.g., `[2015-05-17T22:03:58.569Z] [p:123] Hello World!`)
-* **tperr(...)** - writes to stderr (`console.error`), pre-pending a timestamp and process ID.  (E.g., `[2015-05-17T22:03:58.569Z] [p:123] Hello World!`)
+* Some notes on configuration:
+  * `require('inote-util').LogUtil` yields a "singleton" object with a default configuration.  
+  * `require('inote-util').LogUtil.init` is a function that invokes the `LogUtil` constructor
+  * `require('inote-util').LogUtil.LogUtil` and `require('inote-util').LogUtil.constructor` provide direct access to the `LogUtil` constructor.
+  * Both **LogUtil.init** and the **LogUtil.LogUtil** constructor accept a single "configuration" object, a map with the following (optional) attributes:
+    * `debug` - when `true` `LogUtil.[t[p]]debug(...)` while write to `LogUtil.[t[p]]log(...)`; otherwise `LogUtil.debug` produces no output.
+    * `prefix` - when a non-`null` string is provided it will be prefixed to every log line (after the timestamp and pid identifiers, where applicable).
+    * `logger` - an object that defines the various underlying logging methods; by default this is `console`.  The `logger` map can be used to override the default behavior by providing any of the following methods:
+      * `log(...)`
+      * `info(...)`
+      * `warn(...)`
+      * `error(...)`
+* **log(...)**, **info(...)**, **warn(...)**, **err(...)**, **error(...)** - writes to stdout/stderr or to the equivalent method in the `logger` object provided to `LogUtil.init`
+* **tlog(...)**, **tinfo(...)**, **twarn(...)**, **terr(...)**, **terror(...)** - prepends a timestamp to each log message (E.g., `[2015-05-17T22:03:58.569Z] Hello World!`)
+* **tplog(...)**, **tpinfo(...)**, **tpwarn(...)**, **tperr(...)**, **tperror(...)** - prepends a timestamp and process ID to each log message (E.g., `[2015-05-17T22:03:58.569Z] [p:123] Hello World!`)
+* **debug(...)**, **tdebug(...)**, **tpdebug(...)** - like `log`/`tlog`,`tplog` but only writes to the log if the `debug` attribute passed to the constructor is `true`.
 
 *[Back to Index](#feature-index)*
 
