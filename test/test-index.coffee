@@ -40,6 +40,12 @@ describe "index",->
 
   it "exports LogUtil", (done)->
     index.LogUtil.should.exist
+    index.LogUtil.init.should.exist
+    index.LogUtil.LogUtil.should.exist
+    done()
+
+  it "exports FileLogger", (done)->
+    index.FileLogger.should.exist
     done()
 
   it "exports AsyncUtil", (done)->

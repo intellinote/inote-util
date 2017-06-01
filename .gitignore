@@ -42,3 +42,5 @@ temp
 Thumbs.db
 tmp
 tramp
+log.err
+log.out
