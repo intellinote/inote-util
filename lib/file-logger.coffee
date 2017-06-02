@@ -41,7 +41,7 @@ class FileLogger
     unless @closed
       @err_stream.write(@_format_log_line(args...))
 
-  warn:()=>
+  warn:(args...)=>
     unless @closed
       @err_stream.write(@_format_log_line(args...))
 
