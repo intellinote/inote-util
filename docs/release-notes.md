@@ -5,6 +5,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 * [inote-util Release Notes](#inote-util-release-notes)
+	* [Release 1.9.1 (2 June 2017)](#release-191-2-june-2017)
 	* [Release 1.9.0 (1 June 2017)](#release-190-1-june-2017)
 	* [Release 1.8.6 (31 May 2017)](#release-186-31-may-2017)
 	* [Release 1.8.5 (31 May 2017)](#release-185-31-may-2017)
@@ -64,6 +65,10 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+
+## Release 1.9.1 (2 June 2017)
+
+  * Fixed a problem that caused `FileLogger.warn` to throw a `ReferenceError`.
 
 ## Release 1.9.0 (1 June 2017)
 
