@@ -5,6 +5,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 * [inote-util Release Notes](#inote-util-release-notes)
+	* [Release 1.9.2 (7 June 2017)](#release-192-7-june-2017)
 	* [Release 1.9.1 (2 June 2017)](#release-191-2-june-2017)
 	* [Release 1.9.0 (1 June 2017)](#release-190-1-june-2017)
 	* [Release 1.8.6 (31 May 2017)](#release-186-31-may-2017)
@@ -65,6 +66,10 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+
+## Release 1.9.2 (7 June 2017)
+
+  * Added no-op `finished` event listeners to the WriteStream used in `FileLogger`. For whatever reason this prevents the stream from closing before it is fully flushed to disk.
 
 ## Release 1.9.1 (2 June 2017)
 
