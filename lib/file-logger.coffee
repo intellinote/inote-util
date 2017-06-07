@@ -16,10 +16,12 @@ class FileLogger
     config.err_file ?= config.out_file ? "log.err"
     config.out_file ?= "log.out"
     @out_stream = fs.createWriteStream(config.out_file,{flags:'a'})
+    @out_stream.on "finish", (()->undefined)
     if config.err_file is config.out_file
       @err_stream = @out_stream
     else
       @err_stream = fs.createWriteStream(config.err_file,{flags:'a'})
+      @err_stream.on "finish", (()->undefined)
     @closed = false
 
   _format_log_line:()->
