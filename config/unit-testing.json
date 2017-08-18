@@ -14,5 +14,11 @@
       "null-value": null
     },
     "source": "config/unit-testing.json"
+  },
+  "s3": {
+    "expires": "84600",
+    "accessKeyId":"xxx",
+    "secretAccessKey": "xxx",
+    "region":"us-east-1"
   }
 }
