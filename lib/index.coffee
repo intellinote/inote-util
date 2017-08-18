@@ -30,6 +30,7 @@ sources = [
   'net-util'
   'object-util'
   'stopwatch'
+  's3-model'
   'string-util'
   'util'
   'work-queue'
