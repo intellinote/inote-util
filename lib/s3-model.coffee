@@ -70,7 +70,7 @@ class S3Model
     data =
       Bucket: folder_name,
       Key: filename,
-      Expires: config.get('s3:expires') or 86400 # Default is one day
+      Expires: 86400 # Default is one day
     @s3.getSignedUrl 'getObject', data, (err, url) ->
       callback err, url
 
