@@ -10,25 +10,21 @@ addresses=[]
 #   one by one until a response is got from the host (this response can even be a 404 or 400).
 #   
 # Example usage:
-#   resolve_ip 'itunes.com', (res) ->
+#   resolve_ip 'itunes.com', (err, res) ->
 #     console.log res
 #     return
 ###
 
 class ResolveIP
-  @resolve_ip = (hostName, cb, timeout=100) ->
+  @resolve_ip = (hostName, callback, timeout=100) ->
     port = 443
-    console.log(hostName)
     dns.resolve hostName, (err, addresses) ->
-      if err
-        console.log 'invalid domain name'
-        throw err
-      console.log(addresses)
-      _resolve_ip addresses.shift(), port, cb, timeout
-      return
-    return
+      if err?
+        callback err,null
+      else
+        _resolve_ip addresses.shift(), port, timeout, callback
 
-  _resolve_ip = (address, port, cb, timeout) ->
+  _resolve_ip = (address, port, timeout, callback) ->
     if address
       http.get({
         hostname: address
@@ -37,14 +33,11 @@ class ResolveIP
         timeout: timeout
       }, (res) ->
         if res and res.statusCode
-          cb res.socket.remoteAddress
-        return
+          callback null,res.socket.remoteAddress
       ).on 'error', (err) ->
         _resolve_ip addresses.shift()
-        return
     else
       console.log 'seems like the domain is down'
       throw new Error('Seems like the domain is down')
-    return
 
 exports.ResolveIP = ResolveIP
