@@ -394,3 +394,28 @@ describe 'ObjectUtil',->
     ObjectUtil.deep_clone(false).should.equal false
     ObjectUtil.deep_clone(17).should.equal 17
     done()
+
+  it "can flatten maps",(done)->
+    src = {
+      "A": {
+        "b1": {
+          "c1": 7,
+          "c2": {
+            "d": "X"
+          }
+        },
+        "b2": 3,
+        "": {
+          "X":"y"
+        }
+      },
+      "A2":"foo"
+    }
+    flat = ObjectUtil.flatten_map src, ":"
+    flat["A:b1:c1"].should.equal 7
+    flat["A:b1:c2:d"].should.equal "X"
+    flat["A:b2"].should.equal 3
+    flat["A::X"].should.equal "y"
+    flat['A2'].should.equal "foo"
+    Object.keys(flat).length.should.equal 5
+    done()

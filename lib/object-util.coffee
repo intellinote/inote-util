@@ -1,5 +1,19 @@
 class ObjectUtil
 
+  # converts `{"foo":{"bar":3}}` to `{"foo.bar":3}`
+  @flatten_map:(map, delim=".")=>
+    @_flatten_map([],{},map,delim)
+
+  @_flatten_map:(ancestory,flat,map,delim=".")=>
+    for n, v of map
+      new_ancestory = ancestory.slice(0)
+      new_ancestory.push n
+      if v? and typeof v is 'object' and not Array.isArray(v)
+        flat = @_flatten_map new_ancestory, flat, v, delim
+      else
+        flat[new_ancestory.join(delim)] = v
+    return flat
+
   # **remove_null** - *`delete` any attribute whose value evaluates to null*
   # Returns a new map or array, with `null` values removed.
   @remove_null:(map)=>
