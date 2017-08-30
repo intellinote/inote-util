@@ -1,10 +1,11 @@
+assert   = require 'assert'
 should   = require 'should'
 fs       = require 'fs'
 path     = require 'path'
-HOMEDIR  = path.join(__dirname,'..')
-LIB_COV  = path.join(HOMEDIR,'lib-cov')
-LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
-NetUtil   = require(path.join(LIB_DIR,'net-util')).NetUtil
+HOME_DIR = path.join(__dirname,'..')
+LIB_COV  = path.join(HOME_DIR,'lib-cov')
+LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
+NetUtil  = require(path.join(LIB_DIR,'net-util')).NetUtil
 
 describe 'NetUtil',->
 
@@ -26,3 +27,17 @@ describe 'NetUtil',->
       in_use.should.equal false
       done()
     port.should.not.be.below 2000
+
+  it "calls-back with an error if the hostname does not resolve", (done)->
+    NetUtil.resolve_hostname 'itunesssssss.com', (err, res)->
+      assert err.code is 'ENOTFOUND'
+      assert not res?
+      done()
+
+  # this is a brittle test - since the host address for itunes can change any time
+  it "ensure that itunes resolves as desired", (done)->
+    ips = ['17.172.224.35', '17.178.96.29', '17.142.160.29']
+    NetUtil.resolve_hostname 'itunes.com', (err,res)->
+      assert not err?
+      assert.equal res in ips, true, 'address mismatch'
+      done()
