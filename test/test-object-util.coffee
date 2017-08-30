@@ -5,8 +5,144 @@ HOMEDIR = path.join(__dirname,'..')
 LIB_COV = path.join(HOMEDIR,'lib-cov')
 LIB_DIR = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 ObjectUtil    = require(path.join(LIB_DIR,'object-util')).ObjectUtil
+assert = require 'assert'
 
 describe 'ObjectUtil',->
+
+  it "can compute deep-equal", (done)->
+    tests = [
+      # A           B           A == B?
+      # comparing identical objects of various types
+      [ undefined     , undefined       , true  ]
+      [ null          , undefined       , true  ]
+      [ undefined     , null            , true  ]
+      [ 1             , 1               , true  ]
+      [ "X"           , "X"             , true  ]
+      [ true          , true            , true  ]
+      [ []            , []              , true  ]
+      [ [null]        , [undefined]     , true  ]
+      [ {}            , {}              , true  ]
+      [ [1]           , [1]             , true  ]
+      [ [1,2]         , [1,2]           , true  ]
+      [ [1,[2,3]]     , [1,[2,3]]       , true  ]
+      [ [1,{},null]   , [1,{},null]     , true  ]
+      [ {x:null}      , {x:null}        , true  ]
+      [ {x:null}      , {x:undefined}   , true  ]
+      [ {x:null}      , {}              , true  ]
+      [ {x:1,y:2}     , {y:2,x:1}       , true  ]
+      [ {x:[]}        , {x:[]}          , true  ]
+      [ {x:[{y:[3]}]} , {x:[{y:[3]}]}   , true  ]
+
+      # comparing non-null with null/undefined
+      [ false          , null           , false ]
+      [ null           , false          , false ]
+      [ 1              , null           , false ]
+      [ null           , 1              , false ]
+      [ "x"            , null           , false ]
+      [ null           , "x"            , false ]
+      [ {}             , null           , false ]
+      [ null           , {}             , false ]
+      [ []             , null           , false ]
+      [ null           , []             , false ]
+      #
+      [ false          , undefined      , false ]
+      [ undefined      , false          , false ]
+      [ 1              , undefined      , false ]
+      [ undefined      , 1              , false ]
+      [ "x"            , undefined      , false ]
+      [ undefined      , "x"            , false ]
+      [ {}             , undefined      , false ]
+      [ undefined      , {}             , false ]
+      [ []             , undefined      , false ]
+      [ undefined      , []             , false ]
+
+      # comparing simple, non-equal objects
+      [ false          , true           , false ]
+      [ true           , false          , false ]
+      [ 1              , true           , false ]
+      [ 1              , 2              , false ]
+      [ "x"            , "y"            , false ]
+      [ ""             , "  "           , false ]
+      [ 1              , "1"            , false ]
+      [ []             , {}             , false ]
+      [ [1]            , []             , false ]
+      [ [null]         , []             , false ]
+      [ {x:null}       , []             , false ]
+      [ {x:[{y:[3]}]}  , {x:[{y:[3,4]}]} , false ]
+      [ [null]         , []              , false ]
+      [ [1,1]          , [1]             , false ] 
+
+    ]
+    for test in tests
+      val_a    = test[0]
+      val_b    = test[1]
+      expected = test[2]
+      found    = ObjectUtil.deep_equal val_a, val_b
+      assert.equal expected, found,  "deep_equal(#{JSON.stringify(val_a)},#{JSON.stringify(val_b)}) yielded '#{found}' expected '#{expected}'."
+    done()
+
+  it "can diff two JSON/map objects - edge cases", (done)->
+    tests = [
+      # OLD-MAP     NEW-MAP     EXPECTED
+      [ undefined , undefined , undefined ]
+      [ null      , undefined , undefined ]
+      [ undefined , null      , undefined ]
+      [ 1         , 1         , undefined ]
+      [ "X"       , "X"       , undefined ]
+      [ true      , true      , undefined ]
+      [ []        , []        , undefined ]
+      [ {}        , {}        , undefined ]
+      [ [{}]      , [{}]        , undefined ]
+      [ [1]       , [1]       , undefined ]
+      [ [1,2]     , [1,2]     , undefined ]
+      [ [1,[2,3]] , [1,[2,3]] , undefined ]
+      [ [1,{}]    , [1,{}]    , undefined ]
+      [ {x:[{y:[3]}]} , {x:[{y:[3]}]}   , undefined  ]
+      [ {x:null}      , {}              , undefined  ]
+      [ [{},[{x:null}]]  , [{},[{}]]    , undefined ]
+
+      [ false     , null      , "d" ]
+      [ null      , false     , "a" ]
+      [ 1         , null      , "d" ]
+      [ null      , 1         , "a" ]
+      [ "x"       , null      , "d" ]
+      [ null      , "x"       , "a" ]
+      [ {}        , null      , "d" ]
+      [ null      , {}        , "a" ]
+      [ []       , null       , "d" ]
+      [ null      , []        , "a" ]
+
+      [ false     , true      , "c" ]
+      [ true      , false     , "c" ]
+      [ 1         , true      , "c" ]
+      [ 1         , 2         , "c" ]
+      [ "x"       , "y"       , "c" ]
+      [ ""        , "  "      , "c" ]
+      [ []        , {}        , "c" ]
+      [ {}        , []        , "c" ]
+      [ []        , [[]]      , "c" ]
+      [ [{}]      , [[]]      , "c" ]
+      [ [{}]      , []        , "c" ]
+      [ 1         , null      , "d" ]
+      [ null      , 1         , "a" ]
+      [ "x"       , null      , "d" ]
+      [ null      , "x"       , "a" ]
+      [ {}        , null      , "d" ]
+      [ null      , {}        , "a" ]
+      [ []        , null       , "d" ]
+      [ null      , []        , "a" ]
+
+    ]
+    for test in tests
+      old_map  = test[0]
+      new_map  = test[1]
+      expected = test[2]
+      found = ObjectUtil.json_diff old_map, new_map
+      if not expected?
+        assert not found?,  JSON.stringify(test) + "; found #{found}"
+      else
+        assert.deepEqual expected, found, JSON.stringify(test) + "; found #{found}"
+    done()
 
   it "remove_null ignores non-array, non-map objects",(done)->
     ObjectUtil.remove_null("foo").should.equal "foo"

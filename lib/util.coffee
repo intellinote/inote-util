@@ -3,7 +3,7 @@ path       = require 'path'
 HOMEDIR    = path.join(__dirname,'..')
 LIB_COV    = path.join(HOMEDIR,'lib-cov')
 LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
-MapUtil    = require(path.join(LIB_DIR,'object-util')).MapUtil
+ObjectUtil = require(path.join(LIB_DIR,'object-util')).ObjectUtil
 StringUtil = require(path.join(LIB_DIR,'string-util')).StringUtil
 uuid       = require 'uuid'
 crypto     = require 'crypto'
@@ -423,6 +423,8 @@ class ArrayUtil
   # and number of times a given entry appears in each array is ignored--only
   # the presence or absence of a value is significant. (For example, `[1,2]` has
   # set equality with `[2,1]` and `[1,2,1]` has set equality with `[2,2,1]`.)
+  #
+  # NOTE: currenly only does a shallow comparison
   @sets_are_equal:(a,b)=>
     unless a? and Array.isArray(a) and b? and Array.isArray(b)
       throw new Error("Expected arrays.")
@@ -437,17 +439,12 @@ class ArrayUtil
 
   # Returns `true` iff the given arrays contain equal (`===`) elements in the
   # exact same order.  (Also see `sets_are_equal`).
+  # Deprecated; use `ObjectUtil.deep_equal` instead
   @arrays_are_equal:(a,b)=>
     unless a? and Array.isArray(a) and b? and Array.isArray(b)
       throw new Error("Expected arrays.")
     else
-      unless a.length is b.length
-        return false
-      else
-        for elt,i in a
-          unless elt is b[i]
-            return false
-        return true
+      return ObjectUtil.deep_equal(a, b)
 
   # Returns a clone of `array` with duplicate values removed
   # When `key` is specified, elements of the array are treated as maps, and the
@@ -1181,11 +1178,11 @@ class Util
   @is_decimal:            NumberUtil.is_float
   @to_decimal:            NumberUtil.to_float
 
-  @remove_null:           MapUtil.remove_null
-  @remove_falsey:         MapUtil.remove_falsey
-  @merge:                 MapUtil.merge
-  @shallow_clone:         MapUtil.shallow_clone
-  @object_array_to_map:   MapUtil.object_array_to_map
+  @remove_null:           ObjectUtil.remove_null
+  @remove_falsey:         ObjectUtil.remove_falsey
+  @merge:                 ObjectUtil.merge
+  @shallow_clone:         ObjectUtil.shallow_clone
+  @object_array_to_map:   ObjectUtil.object_array_to_map
 
   @hex_to_rgb_triplet:    ColorUtil.hex_to_rgb_triplet
   @hex_to_rgb_string:     ColorUtil.hex_to_rgb_string
@@ -1236,7 +1233,7 @@ exports.ComparatorUtil = ComparatorUtil
 exports.DateUtil       = DateUtil
 exports.ErrorUtil      = ErrorUtil
 exports.IdUtil         = IdUtil
-exports.MapUtil        = MapUtil
+exports.MapUtil        = ObjectUtil
 exports.NumberUtil     = NumberUtil
 exports.PasswordUtil   = PasswordUtil
 exports.RandomUtil     = RandomUtil
