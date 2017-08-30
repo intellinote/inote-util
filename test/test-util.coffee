@@ -180,6 +180,56 @@ describe 'Util',->
     (/^[0-9a-f]+$/.test hex).should.be.ok
     done()
 
+  it "random_Alphanumeric returns base-62 values",(done)->
+    for c in [0,1,3,117]
+      str = Util.random_Alphanumeric(c)
+      (/^[0-9a-zA-Z]*$/.test str).should.be.ok
+      str.length.should.equal c
+    long = Util.random_Alphanumeric(300)
+    (/[0-9]/.test(long)).should.equal true
+    (/[a-z]/.test(long)).should.equal true
+    (/[A-Z]/.test(long)).should.equal true
+    done()
+
+  it "random_string returns characters from the specified alphabet",(done)->
+    for c in [0,1,3,117]
+      str = Util.random_string("aeiouyAEIOUY357",c)
+      (/^[aeiouyAEUIOY357]*$/.test str).should.be.ok
+      str.length.should.equal c
+    done()
+
+  it "random_string has smart default parameters",(done)->
+    for c in [0,1,3,117]
+      #
+      count_only = Util.random_string(c)
+      (/^[0-9a-zA-Z]*$/.test count_only).should.be.ok
+      count_only.length.should.equal c
+      #
+      alphabet_only = Util.random_string("aeiou")
+      (/^[aeiou]*$/.test alphabet_only).should.be.ok
+      alphabet_only.length.should.equal 32
+      #
+      rng_only = Util.random_string(Util.seed_rng("xyzzy"))
+      (/^[0-9a-zA-Z]*$/.test rng_only).should.be.ok
+      rng_only.length.should.equal 32
+      #
+      alphabet_and_count = Util.random_string("aeiou",c)
+      (/^[aeiou]*$/.test alphabet_and_count).should.be.ok
+      alphabet_and_count.length.should.equal c
+      #
+      alphabet_and_rng = Util.random_string("aeiou",Util.seed_rng("xyzzy"))
+      (/^[aeiou]*$/.test alphabet_and_rng).should.be.ok
+      alphabet_and_rng.length.should.equal 32
+      #
+      count_and_rng = Util.random_string(c,Util.seed_rng("xyzzy"))
+      (/^[0-9a-zA-Z]*$/.test count_and_rng).should.be.ok
+      count_and_rng.length.should.equal c
+      #
+      alphabet_count_and_rng = Util.random_string("aeiou",c,Util.seed_rng("xyzzy"))
+      (/^[aeiou]*$/.test alphabet_count_and_rng).should.be.ok
+      alphabet_count_and_rng.length.should.equal c
+    done()
+
   it "random_alphanumeric returns base-36 values",(done)->
     for c in [0,1,3,117]
       str = Util.random_alphanumeric(c)

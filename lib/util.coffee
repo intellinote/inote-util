@@ -654,6 +654,28 @@ class RandomUtil
   # **random_alpha** - *generate a string of `count` pseudo-random characters from the set `[a-z]` (lower case).
   @random_alpha:(count=32,rng)=>@_random_alpha(count,'L',rng)
 
+  @random_Alphanumeric:(count=32,rng)=>
+    @random_string "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", count, rng
+
+  @random_string:(alphabet,count,rng)=>
+    if typeof alphabet is 'function' and not count? and not rng?
+      rng = alphabet
+      count = null
+      alphabet = null
+    if typeof count is 'function' and not rng?
+      rng = count
+      count = null
+    if typeof alphabet is 'number' and typeof count isnt 'number'
+      count = alphabet
+      alphabet = null
+    alphabet ?= "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    count ?= 32
+    rng ?= @rng
+    result = ""
+    for i in [0...count]
+      result += alphabet[Math.floor(rng()*alphabet.length)]
+    return result
+
   # lettercase = 'upper', 'lower', 'both' (or 'mixed')
   @_random_alpha:(count=32,lettercase='lower',rng)=>
     rng ?= @rng
@@ -1173,6 +1195,8 @@ class Util
   @random_bytes:          RandomUtil.random_bytes
   @random_hex:            RandomUtil.random_hex
   @random_alphanumeric:   RandomUtil.random_alphanumeric
+  @random_Alphanumeric:   RandomUtil.random_Alphanumeric
+  @random_string:         RandomUtil.random_string
   @random_numeric:        RandomUtil.random_numeric
   @random_alpha:          RandomUtil.random_alpha
   @random_ALPHA:          RandomUtil.random_ALPHA
