@@ -8,7 +8,6 @@ A collection of utility functions and classes for Node.js.
  * [Installing](#installing) - how to install from npm or source.
  * [Licensing](#licensing) - `inote-util` is made available under an MIT License.
  * [How to Contribute](#how-to-contribute) - tips on reporting issues, creating pull-requests for or just generally hacking `inote-util`.
- * [About Intellinote](#about-intellinote) - a little background on [Intellinote](https://www.intellinote.net/), a collaboration platform for teams.
 
 ## Using
 
@@ -765,8 +764,6 @@ Feel free to contribute or comment in whatever channel works for you.
 ---
 
 [![Intellinote](https://app.intellinote.net/auth/img/broadsoft_teamone_color.svg)](https://www.intellinote.net/)
-
-## About <strike>Intellinote</strike> BroadSoft Team-One.
 
 Intellinote is now [BroadSoft Team-One](https://www.team-one.com/).
 ---
