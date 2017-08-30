@@ -38,6 +38,6 @@ class ResolveIP
         _resolve_ip addresses.shift()
     else
       console.log 'seems like the domain is down'
-      throw new Error('Seems like the domain is down')
+      callback new Error "Seems like the domain is down", null
 
 exports.ResolveIP = ResolveIP
