@@ -37,6 +37,7 @@ sources = [
   'zip-util'
   'log-util'
   'file-logger'
+  'dns-round-robin'
 ]
 
 # Now we simply load (`require`) the requisite files and pass along whatever
