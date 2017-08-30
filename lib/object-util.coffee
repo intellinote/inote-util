@@ -1,5 +1,7 @@
 class ObjectUtil
 
+  @deep_equals:(a,b)=>@deep_equal(a,b)
+
   @deep_equal:(a,b)=>
     if not a? and not b?                               # if both null/undefined -> equal
       return true
@@ -62,22 +64,32 @@ class ObjectUtil
         return @__JSON_DIFF_NIL
 
   @__diff_objects:(old_map, new_map)=>
-      delta = @__JSON_DIFF_NIL
-      for name, old_val of old_map
-        new_val = new_map[name]
-        if @is_true_object(old_val) and @is_true_object(new_val)
-          child = @__diff_objects old_val, new_val
-          if child isnt @__JSON_DIFF_NIL
-            delta ?= {}
-            delta[name] = child
-        else
-          child = @__diff_non_objects old_val, new_val
-          if child isnt @__JSON_DIFF_NIL
-            delta ?= {}
-            delta[name] = child
-      return delta
+    delta = null
+    check_fn = (name, val_a, val_b)=>
+      if @is_true_object(val_a) and @is_true_object(val_b)
+        child = @__diff_objects val_a, val_b
+        if child?
+          delta ?= {}
+          delta[name] = child
+      else
+        child = @__diff_non_objects val_a, val_b
+        if child?
+          delta ?= {}
+          delta[name] = child
+    checked = []
+    for name, old_val of old_map # check elements of old_map
+      new_val = new_map[name]
+      check_fn(name, old_val, new_val)
+      checked.push name
+    for name, new_val of new_map # check (any unchecked) elements of new_map
+      unless name in checked
+        old_val = old_map[name]
+        check_fn(name, old_val, new_val)
+    return delta
 
-  @json_diff:(old_map, new_map)=>
+  @json_diff:(old_map, new_map)=>@diff_json(old_map, new_map)
+
+  @diff_json:(old_map, new_map)=>
     if @is_true_object(old_map) and @is_true_object(new_map)
       return @__diff_objects old_map, new_map
     else

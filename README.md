@@ -77,7 +77,7 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
 * **subset_of(a,b) / ArrayUtil.is_subset_of(a,b)** - returns `true` if every element of array a is also an element of b.
 * **strict_subset_of(a,b) / ArrayUtil.is_strict_subset_of(a,b)** - returns `true` if every element of array a appears exacty the same number of times in array b as it does in array a. (E.g., `['a','a','b']` is subset of but not a *strict* subset of `['a','b','c']`, according to this definition).
 * **sets_are_equal(a,b)** - compares arrays as if they were sets.
-* **arrays_are_equal(a,b)** - `true` if and only if array a and array b contain the exact same elements in the exact same order.
+* **arrays_are_equal(a,b)** - `true` if and only if array a and array b contain the exact same elements in the exact same order. DEPRECATED: please use `ObjectUtil.deep_equal`
 * **uniquify(array[,key])** - returns a clone of `array` with duplicate values removed. When the array contains objects (maps) and a `key` is provided, two elements will be considered duplicates if they have the same value for the attribute `key`.
 
 *[Back to Index](#feature-index)*
@@ -451,6 +451,14 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 *[Back to Index](#feature-index)*
 
 ### ObjectUtil
+* **deep_equal(a,b)** - performs a deep comparison of the two specified objects; handles arrays, maps, strings, booleans, numbers, `null` and `undefined`, results are undefined for other object types; considers `null`, `undefined` and missing elements to be equal.
+* **is_true_object(a)** - `true` iff `a` is a non-`null`, non-array object for which `typeof a == 'object'`.
+* **diff_json(a,b)** - recursively compares elements of `a` and `b`, returning a map describing where the objects differ; handles arrays, maps, strings, booleans, numbers, `null` and `undefined`, results are undefined for other object types; considers `null`, `undefined` and missing elements to be equal. Some examples:
+  * `{foo:{bar:1}}`, `{foo:{bar:1}}` yields `undefined` (no difference)
+  * `3`, `3}` yields `undefined` (no difference)
+  * `{foo:{bar:1}}`, `{foo:{bar:2}}` yields `{foo:{bar:'c'}}` (value of `foo.bar` has `c`hanged.
+  * `{foo:{bar:null}}`, `{foo:{bar:2}}` yields `{foo:{bar:'a'}}` (value of `foo.bar` was `a`dded.
+  * `{foo:{bar:1}}`, `{foo:{x:true}}` yields `{foo:{bar:'d',x:'a'}}` (value of `foo.bar` was `d`eleted and value of `foo.x` was `a`dded).
 * **remove_null(map)** - generates a (shallow) *clone* of the map, with `null` entries removed.
 * **remove_falsey(map)** - generates a (shallow) *clone* of the map, with "falsey" entries removed (see `falsey_string`).
 * **merge(maps...)** - given two or more maps `a` and `b`, creates new new map containing the union of elements from each. If `a` and `b` share a key, the value in `b` will overwrite the value in `a`.
@@ -475,6 +483,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **random_alphanumeric([count=32[,rng]])** - returns `count` random digits from the set `[a-z0-9]` (using the given random number generator if provided).
 * **random_alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-z]` (using the given random number generator if provided).
 * **random_numeric([count=32[,rng]])** - returns `count` random digits from the set `[0-9]` (using the given random number generator if provided).
+* **random_Alphanumeric([count=32[,rng]])** - returns `count` random digits from the set `[0-9a-zA-Z]` (using the given random number generator if provided).
 * **random_Alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-zA-Z]` (using the given random number generator if provided).
 * **random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
 * **random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).

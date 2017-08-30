@@ -24,7 +24,6 @@ describe 'ObjectUtil',->
       assert.equal ObjectUtil.is_true_object(test[0]), test[1], JSON.stringify(test)
     done()
 
-
   it "can compute deep-equal", (done)->
     tests = [
       # A           B           A == B?
@@ -94,7 +93,44 @@ describe 'ObjectUtil',->
       val_b    = test[1]
       expected = test[2]
       found    = ObjectUtil.deep_equal val_a, val_b
-      assert.equal expected, found,  "deep_equal(#{JSON.stringify(val_a)},#{JSON.stringify(val_b)}) yielded '#{found}' expected '#{expected}'."
+      assert.equal expected, found, "deep_equal(#{JSON.stringify(val_a)},#{JSON.stringify(val_b)}) yielded '#{found}' expected '#{expected}'."
+      found2   = ObjectUtil.deep_equals val_a, val_b
+      assert.equal expected, found, "deep_equals(#{JSON.stringify(val_a)},#{JSON.stringify(val_b)}) yielded '#{found2}' expected '#{expected}'."
+    done()
+
+  it "can diff two JSON/map objects", (done)->
+    a = {
+      "foo": {
+        "bar": {
+          "xyzzy": [1,2,3,4]
+          "nil": null
+          "cbaab": [1,2,3,4]
+          "z": {}
+        }
+        "foo":"1"
+      }
+    }
+    b = {
+      "foo": {
+        "foo":1
+        "bar": {
+          "xyzzy": [1,2,3,4],
+          "cbaab": [4,3,2,1]
+        }
+        "x": 3,
+      }
+    }
+    d = {
+      foo: {
+        foo: "c"
+        x: "a"
+        bar: {
+          z: "d"
+          cbaab: "c"
+        }
+      }
+    }
+    assert.deepEqual ObjectUtil.json_diff(a,b), d
     done()
 
   it "can diff two JSON/map objects - edge cases", (done)->
@@ -145,7 +181,7 @@ describe 'ObjectUtil',->
       [ null      , "x"       , "a" ]
       [ {}        , null      , "d" ]
       [ null      , {}        , "a" ]
-      [ []        , null       , "d" ]
+      [ []        , null      , "d" ]
       [ null      , []        , "a" ]
 
     ]
