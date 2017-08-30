@@ -12,32 +12,30 @@ addresses=[]
 # Example usage:
 #   resolve_ip 'itunes.com', (err, res) ->
 #     console.log res
-#     return
+# 
 ###
 
-class ResolveIP
+class DNSUtil
   @resolve_ip = (hostName, callback, timeout=100) ->
-    port = 443
     dns.resolve hostName, (err, addresses) ->
       if err?
         callback err,null
       else
-        _resolve_ip addresses.shift(), port, timeout, callback
+        _resolve_ip addresses.shift(), timeout, callback
 
-  _resolve_ip = (address, port, timeout, callback) ->
+  _resolve_ip = (address, timeout, callback) ->
     if address
       http.get({
-        hostname: address
-        port: port
+        hostname: address,
         rejectUnauthorized: false, # this is set to false to avoid ssl errors
         timeout: timeout
       }, (res) ->
         if res and res.statusCode
           callback null,res.socket.remoteAddress
       ).on 'error', (err) ->
-        _resolve_ip addresses.shift()
+        _resolve_ip addresses.shift(), timeout, callback
     else
       console.log 'seems like the domain is down'
       callback new Error "Seems like the domain is down", null
 
-exports.ResolveIP = ResolveIP
+exports.DNSUtil = DNSUtil
