@@ -9,6 +9,22 @@ assert = require 'assert'
 
 describe 'ObjectUtil',->
 
+  it "can identifiy true objects", (done)->
+    tests = [
+      [null, false]
+      [{}, true]
+      [{foo:"bar"}, true]
+      [[], false]
+      [[1], false]
+      ["string", false]
+      [3.14159, false]
+      [console.log, false]
+    ]
+    for test in tests
+      assert.equal ObjectUtil.is_true_object(test[0]), test[1], JSON.stringify(test)
+    done()
+
+
   it "can compute deep-equal", (done)->
     tests = [
       # A           B           A == B?
@@ -70,7 +86,7 @@ describe 'ObjectUtil',->
       [ {x:null}       , []             , false ]
       [ {x:[{y:[3]}]}  , {x:[{y:[3,4]}]} , false ]
       [ [null]         , []              , false ]
-      [ [1,1]          , [1]             , false ] 
+      [ [1,1]          , [1]             , false ]
 
     ]
     for test in tests
