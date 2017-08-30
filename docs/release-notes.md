@@ -5,7 +5,8 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 
-  - [Release 1.9.4 (18 August 2017)](#release-192-7-june-2017)
+  - [Release 1.10.0 (30 August 2017)](#release-1100-30-august-2017)
+  - [Release 1.9.4 (18 August 2017)](#release-194-18-august-2017)
   - [Release 1.9.2 (7 June 2017)](#release-192-7-june-2017)
   - [Release 1.9.1 (2 June 2017)](#release-191-2-june-2017)
   - [Release 1.9.0 (1 June 2017)](#release-190-1-june-2017)
@@ -76,7 +77,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
-## Release 1.10.0 (18 August 2017)
+## Release 1.10.0 (30 August 2017)
 
 - Minor changes to the s3 model. These are technically "breaking" changes since the constructor method signature has changed.
 - Added `RandomUtil.random_Alphanumeric` and `RandomUtil.random_string`.
