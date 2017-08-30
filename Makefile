@@ -198,7 +198,7 @@ $(COFFEE_JS_OBJ): $(NODE_MODULES) $(COFFEE_SRCS) $(COFFEE_TEST_SRCS)
 ################################################################################
 # TEST TARGETS
 
-test: js $(MOCHA_TESTS) $(NODE_MODULES)
+test: $(MOCHA_TESTS) $(NODE_MODULES)
 	$(MOCHA_EXE) $(MOCHA_TEST_ARGS) ${MOCHA_EXTRA_ARGS} $(MOCHA_TESTS)
 
 test-watch: $(MOCHA_TESTS) $(NODE_MODULES)

@@ -18,7 +18,7 @@ describe 'FileUtil',->
           should.not.exist err
           (age2 - age1).should.be.above(499)
           (age2 - age1).should.be.below(600)
-          AsyncUtil.set_timeout 600, ()->
+          AsyncUtil.setTimeout 600, ()->  # using `setTimeout` rather than `set_timeout` here just for test coverage; they are aliases
             FileUtil.file_age path.join(HOMEDIR, "package.json"), (err, age3)->
               should.not.exist err
               (age3 - age2).should.be.above(599)

@@ -54,3 +54,7 @@ describe "index",->
     index.Util.for_each_async.should.exist
     index.Util.procedure.should.exist
     done()
+
+  it "exports S3Model", (done)->
+    index.S3Model.should.exist
+    done()

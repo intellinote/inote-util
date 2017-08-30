@@ -70,6 +70,22 @@ describe 'AsyncUtil',->
         times_run.should.equal initial_times_run
         done()
 
+  it "wait_for is an alias for wait_until and treats negative delay (and null delay) as default delay", (done)=>
+    start_time = Date.now()
+    target = 300
+    times_run = 0
+    predicate = ()=>
+      times_run++
+      return (Date.now() - start_time) >= target
+    AsyncUtil.wait_for predicate, -10, (err,complete)=>
+      initial_times_run = times_run
+      should.not.exist err
+      complete.should.equal true
+      times_run.should.be.above 1
+      AsyncUtil.wait target, ()=>
+        times_run.should.equal initial_times_run
+        done()
+
   it "wait_until passes error to callback when encountered", (done)=>
     start_time = Date.now()
     target = 300

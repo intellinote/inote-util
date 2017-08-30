@@ -3,7 +3,7 @@ path               = require 'path'
 cjson              = require 'comment-json'
 nconf              = require 'nconf'
 CONFIG_DIR         = path.join(process.cwd(),'config')
-# strips comments from JSON before handing off ot nconf
+# strips comments from JSON before handing off to nconf
 JSON_WITH_COMMENTS = {
   parse:(str)->cjson.parse(str, null, true)
   stringify:(args...)->cjson.stringify(args...)
