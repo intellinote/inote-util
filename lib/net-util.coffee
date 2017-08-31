@@ -64,8 +64,11 @@ class NetUtil
     dns.resolve hostname, (err, addresses)=>
       if err?
         callback err,null
-      else
+      # try hitting different ips only if the host name resolves to multiple ips, else return the hostname back
+      else if addresses.length > 1
         @_resolve_hostname hostname, addresses.shift(), timeout, callback
+      else
+        callback(err, hostname)
 
   # (hostname is only passed for the purpose of the text in the error)
   @_resolve_hostname:(hostname, address, timeout, callback)=>
