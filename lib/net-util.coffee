@@ -56,30 +56,43 @@ class NetUtil
   # TODO - when addresses resolves to single IP is there a way to fall back to the default node behavior? this method exists to handle the case when the hostname resolves to multiple ips
   # TODO - when test all IPs in parallel (or at least up to some moderately large limit, say 64) and callback with the first that works; see AsyncUtil.fork_for_each_async for example.
   # TODO - need to support ports other than 443
-  @resolve_hostname:(hostname, timeout, callback)=>
+  @resolve_hostname:(url, timeout, callback)=>
+    parsed_url = URL.parse url
     if typeof timeout is 'function' and not callback?
       callback = timeout
       timeout = null
     timeout ?= DEFAULT_RESOLVE_IP_TIMEOUT
-    dns.resolve hostname, (err, addresses)=>
+    dns.resolve parsed_url.hostname, (err, addresses)=>
       if err?
         callback err,null
+      # try hitting different ips only if the host name resolves to multiple ips, else return the hostname back
+      else if addresses.length > 1
+        @_resolve_hostname parsed_url, addresses.shift(), timeout, addresses, callback
       else
-        @_resolve_hostname hostname, addresses.shift(), timeout, callback
+        callback(err, url)
 
   # (hostname is only passed for the purpose of the text in the error)
-  @_resolve_hostname:(hostname, address, timeout, callback)=>
+  @_resolve_hostname:(parsed_url, address, timeout, addresses, callback)=>
+    if parsed_url.port?
+      port = parsed_url.port
+    else
+      port = 443
     if address?
       https.get({
         hostname: address,
-        rejectUnauthorized: false, # this is set to false to avoid ssl errors TODO - replace with `Host:` header
-        timeout: timeout
+        # set host name in the headers to avoid ssl error.
+        headers:{
+          host: parsed_url.hostname
+        },
+        timeout: timeout,
+        port: port
       }, (res) ->
         if res?.statusCode?
-          callback null, res.socket.remoteAddress
+          url = parsed_url.protocol+'//'+res.socket.remoteAddress+':'+port+parsed_url.path
+          callback null, url
       ).on 'error', (err)=>
-        @_resolve_hostname hostname, addresses.shift(), timeout, callback
+        @_resolve_hostname parsed_url, addresses.shift(), timeout, addresses, callback
     else
-      callback new Error "Unable to find live server for host '#{hostname}'."
+      callback new Error "Unable to find live server for host '#{parsed_url.hostname}'."
 
 exports.NetUtil = NetUtil
