@@ -4,9 +4,9 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
- - [inote-util Release Notes](#inote-util-release-notes)
 
-  - [Release 1.9.4 (18 August 2017)](#release-192-7-june-2017)
+  - [Release 1.10.0 (30 August 2017)](#release-1100-30-august-2017)
+  - [Release 1.9.4 (18 August 2017)](#release-194-18-august-2017)
   - [Release 1.9.2 (7 June 2017)](#release-192-7-june-2017)
   - [Release 1.9.1 (2 June 2017)](#release-191-2-june-2017)
   - [Release 1.9.0 (1 June 2017)](#release-190-1-june-2017)
@@ -77,7 +77,15 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
- ## Release 1.9.4 (18 August 2017)
+## Release 1.10.0 (30 August 2017)
+
+- Minor changes to the s3 model. These are technically "breaking" changes since the constructor method signature has changed.
+- Added `RandomUtil.random_Alphanumeric` and `RandomUtil.random_string`.
+- Added `ObjectUtil.is_true_object`. `ObjectUtil.deep_equal` and `ObjectUtil.diff_json`.
+- Deprecated `ArrayUtil.arrays_are_equal`. Please use `ObjectUtil.deep_equal` instead.
+- (`NetUtil.resolve_hostname` was added but should not yet be considered part of the public API.)
+
+## Release 1.9.4 (18 August 2017)
 
 - Added in the s3 model.
 

@@ -1,5 +1,114 @@
 class ObjectUtil
 
+  @deep_equals:(a,b)=>@deep_equal(a,b)
+
+  @deep_equal:(a,b)=>
+    if not a? and not b?                               # if both null/undefined -> equal
+      return true
+    else if a? isnt b?                                 # if only one is null/undefined -> not equal
+      return false
+    else if Array.isArray(a) isnt Array.isArray(b)     # if only one is an array -> not equal
+      return false
+    else if Array.isArray(a) and Array.isArray(b)      # if both are arrays...
+      unless a.length is b.length                      # ...different length -> not equal
+        return false
+      else                                             # ...else do an element by element comparision
+        for elt, i in a
+          unless @deep_equal(elt, b[i])
+            return false
+        return true
+    else if @is_true_object(a) isnt @is_true_object(b) # if only one is an object (map) -> not equal
+      return false
+    else if @is_true_object(a) and @is_true_object(b)  # if both are objects, compare all each element of _both_ objects
+      checked = []
+      for n, v of a
+        unless @deep_equal v, b[n]
+          return false
+        else
+          checked.push n
+      for n, v of b
+        unless n in checked
+          unless @deep_equal v, a[n]
+            return false
+      return true
+    else
+      return a is b                                    # otherwise just compare with `is`
+
+  @__JSON_DIFF_ADD: "a"
+  @__JSON_DIFF_REM: "d"
+  @__JSON_DIFF_CHG: "c"
+  @__JSON_DIFF_NIL: undefined
+
+  @is_true_object:(obj)->
+    return obj? and (typeof obj is 'object') and (not Array.isArray(obj))
+
+  @__diff_non_objects:(old_val, new_val)=>
+      if old_val? and not new_val?
+        return @__JSON_DIFF_REM
+      else if new_val? and not old_val? # could happen when a null or undefiend value is stored in old_map
+        return @__JSON_DIFF_ADD
+      else if not new_val? and not old_val?
+        return @__JSON_DIFF_NIL
+      else if Array.isArray(old_val) and Array.isArray(new_val)
+        if @deep_equal old_val, new_val
+          return @__JSON_DIFF_NIL
+        else
+          return @__JSON_DIFF_CHG
+      else if Array.isArray(old_val) isnt Array.isArray(new_val)
+        return @__JSON_DIFF_CHG
+      else unless (typeof old_val) is (typeof new_val)
+        return @__JSON_DIFF_CHG
+      else if old_val isnt new_val
+        return @__JSON_DIFF_CHG
+      else
+        return @__JSON_DIFF_NIL
+
+  @__diff_objects:(old_map, new_map)=>
+    delta = null
+    check_fn = (name, val_a, val_b)=>
+      if @is_true_object(val_a) and @is_true_object(val_b)
+        child = @__diff_objects val_a, val_b
+        if child?
+          delta ?= {}
+          delta[name] = child
+      else
+        child = @__diff_non_objects val_a, val_b
+        if child?
+          delta ?= {}
+          delta[name] = child
+    checked = []
+    for name, old_val of old_map # check elements of old_map
+      new_val = new_map[name]
+      check_fn(name, old_val, new_val)
+      checked.push name
+    for name, new_val of new_map # check (any unchecked) elements of new_map
+      unless name in checked
+        old_val = old_map[name]
+        check_fn(name, old_val, new_val)
+    return delta
+
+  @json_diff:(old_map, new_map)=>@diff_json(old_map, new_map)
+
+  @diff_json:(old_map, new_map)=>
+    if @is_true_object(old_map) and @is_true_object(new_map)
+      return @__diff_objects old_map, new_map
+    else
+      return @__diff_non_objects old_map, new_map
+
+  # converts `{"foo":{"bar":3}}` to `{"foo.bar":3}`
+  @flatten_map:(map, delim=".")=>
+    @_flatten_map([],{},map,delim)
+
+  @_flatten_map:(ancestory,flat,map,delim=".")=>
+    for n, v of map
+      new_ancestory = ancestory.slice(0)
+      new_ancestory.push n
+      if v? and typeof v is 'object' and not Array.isArray(v)
+        flat = @_flatten_map new_ancestory, flat, v, delim
+      else
+        flat[new_ancestory.join(delim)] = v
+    return flat
+
   # **remove_null** - *`delete` any attribute whose value evaluates to null*
   # Returns a new map or array, with `null` values removed.
   @remove_null:(map)=>
