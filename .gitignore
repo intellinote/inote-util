@@ -1,7 +1,6 @@
 *.html
 docco
 lib-cov
-*.js
 *.map
 node_modules
 module
