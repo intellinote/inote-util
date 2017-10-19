@@ -5,20 +5,20 @@ DEFAULT_DEFAULT_FOLDER = 'default-folder'
 # See http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html
 class S3Model
 
-  # `config` may be:
-  #  - `default_folder` - S3 folder name used when otherwise `null`
-  #  - `credentials` - AWS credentials object, generally containing:
-  #      - `access_key_id`
-  #      - `secret_access_key`
-  #      - `region`
-  # alternatively, `config` may be an AWS credentials object
-  # (directly containing `access_key_id`, `secret_access_key`, `region`).
+  # `config` should be set in the project that is calling this library. It should look like the following:
+  # "s3": {
+  #  "expires": "84600",
+  #  "accessKeyId": "",
+  #  "secretAccessKey": "",
+  #  "region": "us-east-1",
+  #  "defaultFolder": "teamone-files-new"
+  # },
   constructor:(config)->
     config ?= {}
     @default_folder = config.default_folder ? "default-folder"
     if config.credentials?
       AWS.config.credentials = config.credentials
-    else if config.access_key_id?
+    else if config.accessKeyId?
       AWS.config.credentials = config
     unless AWS.config.credentials?
       console.warn "WARNING: S3Model created but no AWS credentials have been set. You may want to pass `{access_key_id:, secret_access_key:, region: }` to the S3Model constructor."
