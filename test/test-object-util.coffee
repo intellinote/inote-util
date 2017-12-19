@@ -1,3 +1,5 @@
+require 'coffee-errors'
+#------------------------------------------------------------------------------#
 should  = require 'should'
 fs      = require 'fs'
 path    = require 'path'

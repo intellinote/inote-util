@@ -1,3 +1,5 @@
+require 'coffee-errors'
+#------------------------------------------------------------------------------#
 #coffeelint:disable=cyclomatic_complexity
 should  = require 'should'
 fs      = require 'fs'

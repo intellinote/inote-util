@@ -8,7 +8,6 @@
 # COFFEE & NODE ################################################################
 COFFEE_EXE ?= ./node_modules/.bin/coffee
 NODE_EXE ?= node
-COFFEE_SOURCE_MAP ?= $(COFFEE_EXE) -mc --watch
 COFFEE_COMPILE ?= $(COFFEE_EXE) -c
 COFFEE_COMPILE_ARGS ?=
 COFFEE_SRCS ?= $(wildcard lib/*.coffee *.coffee)
@@ -38,12 +37,6 @@ MOCHA_TEST_PATTERN ?=
 MOCHA_TIMEOUT ?=-t 2000
 MOCHA_TEST_ARGS  ?= -R list --compilers coffee:coffee-script/register $(MOCHA_TIMEOUT) $(MOCHA_TEST_PATTERN)
 MOCHA_EXTRA_ARGS ?=
-
-# DEBUG ################################################################
-pre-debug: 
-	$(COFFEE_SOURCE_MAP) $(COFFEE_SRCS) $(COFFEE_TEST_SRCS) $(COFFEE_SPEC_SRCS) 
-debug-nm: 
-	./node_modules/coffee-script/bin/coffee -mc node_modules/inote-util
 
 # COVERAGE #####################################################################
 LIB ?= lib
