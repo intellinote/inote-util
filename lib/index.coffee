@@ -13,9 +13,9 @@
 
 fs        = require 'fs'
 path      = require 'path'
-HOMEDIR   = path.join __dirname, '..'
-LIB_COV   = path.join HOMEDIR, 'lib-cov'
-LIB       = path.join HOMEDIR, 'lib'
+HOME_DIR  = path.join __dirname, '..'
+LIB_COV   = path.join HOME_DIR, 'lib-cov'
+LIB       = path.join HOME_DIR, 'lib'
 LIB_DIR   = if fs.existsSync(LIB_COV) then LIB_COV else LIB
 
 # ## Export Objects to the External Namespace
@@ -29,6 +29,7 @@ sources = [
   'io-util'
   'net-util'
   'object-util'
+  'l10n-util'
   'stopwatch'
   's3-model'
   'string-util'
@@ -46,6 +47,8 @@ for file in sources
   exported = require path.join(LIB_DIR,file)
   for k,v of exported
     exports[k] = v
+
+# here we map so functions that were moved to their old locations also (for backward compatiblity)
 
 for fn in ["read_stdin_sync","load_json_file_sync","load_json_stdin_sync"]
   exports.Util[fn] = exports.FileUtil[fn]

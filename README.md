@@ -55,6 +55,7 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
 [FileUtil](#fileutil) |
 [FileUtil MIME](#fileutil---mime-and-file-extension-related) |
 [IOUtil](#ioutil) |
+[L10nUtil](#l10nutil) |
 [LogUtil](#logutil) |
 [NetUtil](#netutil) |
 [NumberUtil](#numberutil) |
@@ -413,6 +414,16 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **download_to_data_uri(url,callback)** - convert the contents of a URL to a data-uri. (`callback(err,uri)`).
 
 *[Back to Index](#feature-index)*
+
+### L10nUtil
+* **identify_locales(req)** - identify a list of `[ lang, REGION ]` pairs based on the given request object.
+* **expand_locales(locales)** - given a list of`[ lang, REGION ]` pairs, adds `[ lang, null ]` to this list if otherwise missing.
+* **identify_and_expand_locales(req)** - `expand_locales(identify_locales(req))``
+* **match_locale(accepted, available, default_value)** - given a list of accepted `[ lang, REGION ]` pairs and a map of `lang-region: non-null`, returns an acceptable key (or the `default_value`) when no matching locale is found.
+* **load_l10n_files(dir, [options], callback)** - loads a set of localization files (JSON + comments) from the specified directory, returning a map of `'name-without-extension': loaded-content`. When present `options` are options passed to `FileUtil.ls`, notably `recurse` and `pattern` (defaulting to `false` and `/^.+.json$/`, respectively). Note that a specific `lang-REGION`'s attributes will inherit default values from those in `lang` (when set), such that if `en.json` has the key `foo` but `en-US.json` does not, the returned `en-us` object _will_ contain the key `foo`. Callback signature is `(err, map_of_localiation_data)`
+* **localize(localization_data, key, [args...])** - returns the localized value for the `sprintf` template `localization_data[key]`, passing in the optional `args` arguments when provided. Returns `null` if no matching template is found.
+  - note that a localization entry _may_ be a map from which one specific template will be selected according to the value of the first argument (see unit tests for details).
+* **make_localizer(localization_data)** - returns the function of the form `fn(key, [args...])` which is equivalent to `localize(localization_data, key, [args...])`.
 
 ### LogUtil
 * Some notes on configuration:

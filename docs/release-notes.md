@@ -77,6 +77,19 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+
+## Release 1.13.0 (19 December 2017)
+
+ * Added `L10nUtil`.
+
+## Release 1.11.0
+
+ * Not captured.
+
+## Release 1.12.0
+
+ * Not captured.
+
 ## Release 1.10.0 (30 August 2017)
 
 - Minor changes to the s3 model. These are technically "breaking" changes since the constructor method signature has changed.
