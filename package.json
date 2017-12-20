@@ -1,6 +1,6 @@
 {
   "name": "inote-util",
-  "version": "1.13.2",
+  "version": "1.13.3",
   "description": "A collection of utility functions and classes.",
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
     "nconf"            : "^0",
     "priorityqueuejs"  : "^1",
     "remove"           : "^0",
-    "request"          : "^2",
+    "request"          : "^2.83",
     "seedrandom"       : "^2",
     "semver"           : "^5",
     "shelljs"          : "^0",
