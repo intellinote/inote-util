@@ -609,3 +609,31 @@ describe 'ObjectUtil',->
     flat['A2'].should.equal "foo"
     Object.keys(flat).length.should.equal 5
     done()
+
+  it "get_json_path() can walk JSON structures",(done)->
+    json = {
+      "A": {
+        "b1": {
+          "c1": 7,
+          "c2": {
+            "d": "X"
+          }
+        },
+        "b2": 3,
+        "": {
+          "X":"y"
+        }
+      },
+      "A2":"foo"
+    }
+    ObjectUtil.get_json_path(json, ["A","b1","c1"]).should.equal 7
+    ObjectUtil.get_json_path(json, ["A","b1","c2","d"]).should.equal "X"
+    ObjectUtil.get_json_path(json, ["A","b2"]).should.equal 3
+    ObjectUtil.get_json_path(json, ["A","", "X"]).should.equal "y"
+    ObjectUtil.get_json_path(json, ["A2"]).should.equal "foo"
+    ObjectUtil.get_json_path(json, "A","b1","c1").should.equal 7
+    ObjectUtil.get_json_path(json, "A","b1","c2","d").should.equal "X"
+    ObjectUtil.get_json_path(json, "A","b2").should.equal 3
+    ObjectUtil.get_json_path(json, "A","", "X").should.equal "y"
+    ObjectUtil.get_json_path(json, "A2").should.equal "foo"
+    done()

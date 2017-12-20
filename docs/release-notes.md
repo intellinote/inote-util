@@ -81,6 +81,11 @@ This file summarizes the changes bundled in each release of `inote-util`.
 ## Release 1.13.0 (19 December 2017)
 
  * Added `L10nUtil`.
+ * Added `ObjectUtil.get_json_path`.
+ * Added `FileUtil.load_json`/`FileUtil.load_json_file`
+ * Added `FileUtil.load_json_file_sync(file,options)`.
+ * Added `FileUtil.load_json_stdin_sync(end_byte,buffer_size,options)`.
+ * Support `options.allow_comments` (defaults to true) and `options.strip_comments` (defaults to true) in `FileUtil.load_json*`
 
 ## Release 1.11.0
 

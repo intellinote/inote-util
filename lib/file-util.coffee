@@ -9,6 +9,7 @@ mkdirp     = require 'mkdirp'
 remove     = require 'remove'
 DEBUG      = (/(^|,)file-?util($|,)/i.test process?.env?.NODE_DEBUG)
 mmmagic    = require('mmmagic')
+CJSON      = require("comment-json")
 magic      = new mmmagic.Magic(mmmagic.MAGIC_MIME_TYPE)
 
 class FileUtil
@@ -228,20 +229,66 @@ class FileUtil
           break
       return all_buf
 
-  @load_json_file_sync:(file,ignore_errors=false)->
+  @load_json:(file, options, callback)=>
+    @load_json_file file, options, callback
+
+  @load_json_file:(file, options, callback)->
+    if typeof options is 'function' and not callback?
+      callback = options
+      options = null
+    if typeof options is 'boolean'
+      options = { ignore_errors: options }
+    options ?= {}
+    fs.readFile file, (err, data)->
+      if err?
+        if options.ignore_errors
+          callback null, null
+        else
+          callback err, null
+      else
+        try
+          str = data.toString()
+          if options.allow_comments is false
+            parsed = JSON.parse str
+          else
+            parsed = CJSON.parse str, null, (options.strip_comments isnt false)
+          callback null, parsed
+        catch err
+          if options.ignore_errors
+            callback null, null
+          else
+            callback err, null
+
+  @load_json_file_sync:(file,options)->
+    if typeof options is 'boolean'
+      options = { ignore_errors: options }
+    options ?= {}
     try
-      return JSON.parse(fs.readFileSync(file).toString())
+      str = fs.readFileSync(file).toString()
+      if options.allow_comments is false
+        parsed = JSON.parse str
+      else
+        parsed = CJSON.parse str, null, (options.strip_comments isnt false)
+      return parsed
     catch err
-      if ignore_errors
+      if options.ignore_errors
         return null
       else
         throw err
 
-  @load_json_stdin_sync:(end_byte="\x04",buffer_size=512,ignore_errors=false)=>
+  @load_json_stdin_sync:(end_byte="\x04",buffer_size=512,options)=>
+    if typeof options is 'boolean'
+      options = { ignore_errors: options }
+    options ?= {}
     try
-      return JSON.parse(@read_stdin_sync(end_byte,buffer_size))
+      str = @read_stdin_sync(end_byte,buffer_size).toString()
+      if options.allow_comments is false
+        parsed = JSON.parse str
+      else
+        parsed = CJSON.parse str, null, (options.strip_comments isnt false)
+      return parsed
     catch err
-      if ignore_errors
+      if options.ignore_errors
         return null
       else
         throw err

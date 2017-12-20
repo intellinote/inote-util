@@ -4,7 +4,6 @@ HOME_DIR   = path.join(__dirname,'..')
 LIB_COV    = path.join(HOME_DIR,'lib-cov')
 LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
 #------------------------------------------------------------------------------#
-CJSON      = require("comment-json")
 sprintf    = require("sprintf-js").sprintf
 #------------------------------------------------------------------------------#
 Util       = require(path.join(LIB_DIR,'util')).Util
@@ -96,18 +95,12 @@ class L10nUtil
         # console.log "KEY:", key
         full_filename = path.resolve(dir, filename)
         # console.log "FULL:", full_filename
-        fs.readFile full_filename, (err, contents)->
+        FileUtil.load_json full_filename, {allow_comments:true, strip_comments:true}, (err, json)=>
           if err?
-            LogUtil.tperr "Encountered error reading #{full_filename}. The error will be ignored:", err
-            next()
-          else
-            try
-              parsed = CJSON.parse(contents.toString(), null, true)
-            catch err
-              LogUtil.tperr "Encountered error parsing #{full_filename}. The error will be ignored:", err
-            if parsed?
-              available_locales[key] = parsed
-              next()
+            LogUtil.tperr "Encountered error loading #{full_filename}. The error will be ignored:", err
+          else if json?
+            available_locales[key] = json
+          next()
       AsyncUtil.for_each_async filelist, action, ()=>
         for name, value of available_locales
           parsed = @parse_locale(name)

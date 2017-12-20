@@ -377,8 +377,9 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **rm(files...)** - remove one or more files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
 * **rmdir(dirs...)** - recursively remove one or more directories or files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
 * **read_stdin_sync([end_byte="\x04"\[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
-* **load_json_file_sync(file\[,ignore_errors=false])** - synchronously read and parse a JSON file. When `ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.
-* **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
+* **load_json_file(file\[, options], callback)** (also just `load_json`)- asynchronously read and parse a JSON file. When `options.ignore_errors` is true, calls-back with `null, null` rather than `err, null`.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
+* **load_json_file_sync(file\[,options])** - synchronously read and parse a JSON file. When `options.ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
+* **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,options]]])** - synchronously read and parse JSON object from stdin. When `options.ignore_errors` is true, returns `null` rather than throwing an exception.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
 
@@ -462,6 +463,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 *[Back to Index](#feature-index)*
 
 ### ObjectUtil
+* **get_json_path(json,path...)** - fetches that attribute stored at the specified path
 * **deep_equal(a,b)** - performs a deep comparison of the two specified objects; handles arrays, maps, strings, booleans, numbers, `null` and `undefined`, results are undefined for other object types; considers `null`, `undefined` and missing elements to be equal.
 * **is_true_object(a)** - `true` iff `a` is a non-`null`, non-array object for which `typeof a == 'object'`.
 * **diff_json(a,b)** - recursively compares elements of `a` and `b`, returning a map describing where the objects differ; handles arrays, maps, strings, booleans, numbers, `null` and `undefined`, results are undefined for other object types; considers `null`, `undefined` and missing elements to be equal. Some examples:
