@@ -11,5 +11,3 @@ git push --all --follow-tags
 ## Push to npm
 
 `npm publish`
-
-Note: you need access to the intellinote npm group.
