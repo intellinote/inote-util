@@ -33,6 +33,7 @@
     "coffee-script"    : "^1",
     "coffeelint"       : "^2",
     "docco"            : "^0",
+    "dustjs-linkedin"  : "^2",
     "htmlparser"       : "^1",
     "marked-toc"       : "^0",
     "marked"           : "^0.3.7",
