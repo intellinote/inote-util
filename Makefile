@@ -124,85 +124,96 @@ help:
 ################################################################################
 # CLEAN UP TARGETS
 
-clean: clean-coverage clean-docco clean-docs clean-js clean-module clean-test-module-install clean-node-modules
+clean: _clean_msg clean-coverage clean-docco clean-docs clean-js clean-module clean-test-module-install clean-node-modules
+_clean_msg:
+	@echo "\x1b[1m==== REMOVING GENERATED FILES ====\x1b[0m"
 
 clean-test-module-install:
-	rm -rf $(TEST_MODULE_INSTALL_DIR)
+	@rm -rf $(TEST_MODULE_INSTALL_DIR)
 
 clean-module:
-	rm -rf $(MODULE_DIR)
-	rm -rf $(PACKAGE_DIR)
-	rm -rf $(PACKAGE_DIR).tgz
+	@rm -rf $(MODULE_DIR)
+	@rm -rf $(PACKAGE_DIR)
+	@rm -rf $(PACKAGE_DIR).tgz
 
 clean-node-modules:
-	$(NPM_EXE) $(NPM_ARGS) prune
+	@echo "\x1b[1mPruning node_modules\x1b[0m"
+	@($(NPM_EXE) $(NPM_ARGS) prune)
 
 really-clean: clean really-clean-node-modules
 
 really-clean-node-modules: # deletes rather that simply pruning node_modules
-	rm -rf $(NODE_MODULES)
+	@echo "\x1b[1mDeleting node_modules\x1b[0m"
+	@rm -rf $(NODE_MODULES)
 
 clean-js:
-	rm -f $(COFFEE_JS) $(COFFEE_TEST_JS)
+	@echo "\x1b[1mDeleting *.js\x1b[0m"
+	@rm -f $(COFFEE_JS) $(COFFEE_TEST_JS)
 
 clean-coverage:
-	rm -rf $(COVERAGE_TMP_DIR)
-	rm -rf $(LIB_COV)
-	rm -f $(COVERAGE_REPORT)
+	@rm -rf $(COVERAGE_TMP_DIR)
+	@rm -rf $(LIB_COV)
+	@rm -f $(COVERAGE_REPORT)
 
 clean-docs: clean-markdown clean-docco
 
 clean-docco:
-	rm -rf docs/docco
+	@rm -rf docs/docco
 
 clean-markdown:
-	rm -rf $(MARKDOWN_HTML)
+	@rm -rf $(MARKDOWN_HTML)
 
 ################################################################################
 # NPM TARGETS
 
-module: clean-module js test docs #coverage
-	mkdir -p $(MODULE_DIR)
-	cp -r lib $(MODULE_DIR)
-	cp -r data $(MODULE_DIR)
-	cp $(PACKAGE_JSON) $(MODULE_DIR)
-	cp LICENSE.txt $(MODULE_DIR)
-	cp README.md $(MODULE_DIR)
-	mv module $(PACKAGE_DIR)
-	tar -czf $(PACKAGE_DIR).tgz $(PACKAGE_DIR)
+module: clean-module js test
+	@echo "\x1b[1m==== BUILDING NPM MODULE ====\x1b[0m"
+	@mkdir -p $(MODULE_DIR)
+	@cp -r lib $(MODULE_DIR)
+	@cp -r data $(MODULE_DIR)
+	@cp $(PACKAGE_JSON) $(MODULE_DIR)
+	@cp LICENSE.txt $(MODULE_DIR)
+	@cp README.md $(MODULE_DIR)
+	@mv module $(PACKAGE_DIR)
+	@tar -czf $(PACKAGE_DIR).tgz $(PACKAGE_DIR)
 
 test-module-install: clean-test-module-install js test docs module $(PACKAGE_DIR).tgz
-	mkdir -p $(TEST_MODULE_INSTALL_DIR); cd $(TEST_MODULE_INSTALL_DIR); npm install "$(CURDIR)/$(PACKAGE_DIR).tgz"; node -e "require('assert').ok(require('inote-util').Util);" && cd $(CURDIR) && rm -rf $(TEST_MODULE_INSTALL_DIR) && echo "\n\nIT WORKED!\n\n"
+	@echo "\x1b[1m==== TESTING DEPLOYMENT OF NPM MODULE ====\x1b[0m"
+	@(mkdir -p $(TEST_MODULE_INSTALL_DIR); cd $(TEST_MODULE_INSTALL_DIR); npm install "$(CURDIR)/$(PACKAGE_DIR).tgz"; node -e "require('assert').ok(require('inote-util').Util);" && cd $(CURDIR) && rm -rf $(TEST_MODULE_INSTALL_DIR) && echo "\n\nIT WORKED!\n\n")
 
 $(NODE_MODULES): $(PACKAGE_JSON)
-	$(NPM_EXE) $(NPM_ARGS) prune
-	$(NPM_EXE) $(NPM_ARGS) install
-	touch $(NODE_MODULES) # touch the module dir so it looks younger than `package.json`
+	@($(NPM_EXE) $(NPM_ARGS) prune)
+	@($(NPM_EXE) $(NPM_ARGS) install)
+	@touch $(NODE_MODULES) # touch the module dir so it looks younger than `package.json`
 
 npm: $(NODE_MODULES) # an alias
+
 install: $(NODE_MODULES) # an alias
 
 ################################################################################
 # COFFEE TARGETS
 
 coffee: $(NODE_MODULES)
-	rm -rf $(LIB_COV)
+	@rm -rf $(LIB_COV)
 
-js: coffee $(COFFEE_JS) $(COFFEE_TEST_JS)
+js: _js_msg coffee $(COFFEE_JS) $(COFFEE_TEST_JS)
+_js_msg:
+	@echo "\x1b[1m==== BUILDING JS FILES ====\x1b[0m"
 
 .SUFFIXES: .js .coffee
 .coffee.js:
-	$(COFFEE_COMPILE) $(COFFEE_COMPILE_ARGS) $<
+	@($(COFFEE_COMPILE) $(COFFEE_COMPILE_ARGS) $<)
 $(COFFEE_JS_OBJ): $(NODE_MODULES) $(COFFEE_SRCS) $(COFFEE_TEST_SRCS)
 
 ################################################################################
 # TEST TARGETS
 
 test: $(MOCHA_TESTS) $(NODE_MODULES)
-	$(MOCHA_EXE) $(MOCHA_TEST_ARGS) ${MOCHA_EXTRA_ARGS} $(MOCHA_TESTS)
+	@echo "\x1b[1m==== RUNNING UNIT TESTS ====\x1b[0m"
+	($(MOCHA_EXE) $(MOCHA_TEST_ARGS) ${MOCHA_EXTRA_ARGS} $(MOCHA_TESTS))
 
 test-watch: $(MOCHA_TESTS) $(NODE_MODULES)
-	$(MOCHA_EXE) --watch $(MOCHA_TEST_ARGS) ${MOCHA_EXTRA_ARGS} $(MOCHA_TESTS)
+	@($(MOCHA_EXE) --watch $(MOCHA_TEST_ARGS) ${MOCHA_EXTRA_ARGS} $(MOCHA_TESTS))
 
 define COVERAGE_SUMMARY
 stew = new (require("stew-select")).Stew()
@@ -222,16 +233,20 @@ stew.select_first html, "#stats", (err,node)->
 endef
 export COVERAGE_SUMMARY
 coverage: $(COFFEE_SRCS) $(COFFEE_TEST_SRCS) $(MOCHA_TESTS) $(NODE_MODULES)
-	rm -rf $(COVERAGE_TMP_DIR)
-	rm -rf $(LIB_COV)
-	mkdir -p $(COVERAGE_TMP_DIR)
-	cp -r $(LIB)/* $(COVERAGE_TMP_DIR)/.
+	@echo "\x1b[1m==== RUNNING TEST COVERAGE REPORT ====\x1b[0m"
+	@rm -rf $(COVERAGE_TMP_DIR)
+	@rm -rf $(LIB_COV)
+	@mkdir -p $(COVERAGE_TMP_DIR)
+	@cp -r $(LIB)/* $(COVERAGE_TMP_DIR)/.
+	@echo "\x1b[1mAnnotating Source Code\x1b[0m"
 	$(COVERAGE_EXE) $(COVERAGE_ARGS) $(COVERAGE_TMP_DIR) $(LIB_COV)
-	mkdir -p `dirname $(COVERAGE_REPORT)`
+	@mkdir -p `dirname $(COVERAGE_REPORT)`
+	@echo "\x1b[1mRunning Unit Tests\x1b[0m"
 	$(MOCHA_EXE) $(MOCHA_COV_ARGS) $(MOCHA_TESTS) > $(COVERAGE_REPORT)
-	rm -rf $(COVERAGE_TMP_DIR)
-	rm -rf $(LIB_COV)
-	$(COFFEE_EXE) -e "$$COVERAGE_SUMMARY"
+	@echo "\x1b[1mComputing Summary\x1b[0m"
+	@rm -rf $(COVERAGE_TMP_DIR)
+	@rm -rf $(LIB_COV)
+	@$(COFFEE_EXE) -e "$$COVERAGE_SUMMARY"
 	@echo "Detailed coverage report generated at \x1b[1m$(COVERAGE_REPORT)\x1b[0m."
 	@echo "USE \x1b[1mopen $(COVERAGE_REPORT)\x1b[0m TO OPEN (ON OSX)"
 
@@ -242,20 +257,20 @@ docs: markdown docco
 
 .SUFFIXES: .md-toc .md
 .md.md-toc:
-	cp "$<" "$@"
-	$(MARKDOWN_TOC) "$@"
+	@cp "$<" "$@"
+	@($(MARKDOWN_TOC) "$@")
 $(MARKDOWN_TOCCED_OBJ): $(MARKDOWN_SRCS)
 
 # (echo $(MARKDOWN_PREFIX) > $@) && ($(MARKDOWN_PROCESSOR) $(MARKDOWN_PROCESSOR_ARGS) $< | sed "s/<!-- toc -->/<div id=TofC>/"  | sed "s/<!-- toc stop -->/<\/div>/" >> $@) && (echo $(MARKDOWN_SUFFIX) >> $@)
 .SUFFIXES: .html .md-toc
 .md-toc.html:
-	(echo $(MARKDOWN_PREFIX) > $@) && (cat "$<" | $(MARKDOWN_PROCESSOR) | sed "s/<!-- toc -->/<div id=TofC>/"  | sed "s/<!-- toc stop -->/<div style=\"font-size: 0.9em; text-align: right\"><a href=\".\" >[up]<\/a> <a href=\"javascript:back(-1)\">[back]<\/a><\/div><\/div>/" >> $@) && (echo $(MARKDOWN_SUFFIX) >> $@)
+	@((echo $(MARKDOWN_PREFIX) > $@) && (cat "$<" | $(MARKDOWN_PROCESSOR) | sed "s/<!-- toc -->/<div id=TofC>/"  | sed "s/<!-- toc stop -->/<div style=\"font-size: 0.9em; text-align: right\"><a href=\".\" >[up]<\/a> <a href=\"javascript:back(-1)\">[back]<\/a><\/div><\/div>/" >> $@) && (echo $(MARKDOWN_SUFFIX) >> $@))
 $(MARKDOWN_HTML_OBJ): $(MARKDOWN_TOCCED_OBJ)
 
 .SUFFIXES: .litcoffee-toc .litcoffee
 .litcoffee.litcoffee-toc:
-	cp "$<" "$@"
-	$(MARKDOWN_TOC) "$@"
+	@cp "$<" "$@"
+	@($(MARKDOWN_TOC) "$@")
 $(LITCOFFEE_TOCCED_OBJ): $(LITCOFFEE_SRCS)
 
 .SUFFIXES: .html .litcoffee-toc
@@ -270,13 +285,14 @@ markdown: $(MARKDOWN_HTML) $(LITCOFFEE_HTML) $(NODE_MODULES)
 html: markdown
 
 docco: $(COFFEE_SRCS) $(NODE_MODULES)
-	rm -rf docs/docco
-	mkdir -p docs
-	mv docs docs-temporarily-renamed-so-docco-doesnt-clobber-it
-	$(DOCCO_EXE) $(COFFEE_SRCS)
-	mv docs docs-temporarily-renamed-so-docco-doesnt-clobber-it/docco
-	mv docs-temporarily-renamed-so-docco-doesnt-clobber-it docs
+	@echo "\x1b[1m==== GENERATING ANNOTATED SOURCE CODE ====\x1b[0m"
+	@rm -rf docs/docco
+	@mkdir -p docs
+	@mv docs docs-temporarily-renamed-so-docco-doesnt-clobber-it
+	@($(DOCCO_EXE) $(COFFEE_SRCS))
+	@mv docs docs-temporarily-renamed-so-docco-doesnt-clobber-it/docco
+	@mv docs-temporarily-renamed-so-docco-doesnt-clobber-it docs
 
 .SUFFIXES: .coffee
 .coffee:
-	$(COFFEE_EXE) $< >  $@
+	@($(COFFEE_EXE) $< >  $@)
