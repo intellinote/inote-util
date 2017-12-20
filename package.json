@@ -19,7 +19,7 @@
     "nconf"            : "^0",
     "priorityqueuejs"  : "^1",
     "remove"           : "^0",
-    "request"          : "^2",
+    "request"          : "^2.83",
     "seedrandom"       : "^2",
     "semver"           : "^5",
     "shelljs"          : "^0",
