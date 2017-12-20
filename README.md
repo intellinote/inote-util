@@ -55,6 +55,7 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
 [FileUtil](#fileutil) |
 [FileUtil MIME](#fileutil---mime-and-file-extension-related) |
 [IOUtil](#ioutil) |
+[L10nUtil](#l10nutil) |
 [LogUtil](#logutil) |
 [NetUtil](#netutil) |
 [NumberUtil](#numberutil) |
@@ -376,8 +377,9 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 * **rm(files...)** - remove one or more files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
 * **rmdir(dirs...)** - recursively remove one or more directories or files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
 * **read_stdin_sync([end_byte="\x04"\[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
-* **load_json_file_sync(file\[,ignore_errors=false])** - synchronously read and parse a JSON file. When `ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.
-* **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,ignore_errors=false]]])** - synchronously read and parse JSON object from stdin. When `ignore_errors` is true, returns `null` rather than throwing an exception.
+* **load_json_file(file\[, options], callback)** (also just `load_json`)- asynchronously read and parse a JSON file. When `options.ignore_errors` is true, calls-back with `null, null` rather than `err, null`.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
+* **load_json_file_sync(file\[,options])** - synchronously read and parse a JSON file. When `options.ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
+* **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,options]]])** - synchronously read and parse JSON object from stdin. When `options.ignore_errors` is true, returns `null` rather than throwing an exception.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
 
@@ -413,6 +415,16 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **download_to_data_uri(url,callback)** - convert the contents of a URL to a data-uri. (`callback(err,uri)`).
 
 *[Back to Index](#feature-index)*
+
+### L10nUtil
+* **identify_locales(req)** - identify a list of `[ lang, REGION ]` pairs based on the given request object.
+* **expand_locales(locales)** - given a list of`[ lang, REGION ]` pairs, adds `[ lang, null ]` to this list if otherwise missing.
+* **identify_and_expand_locales(req)** - `expand_locales(identify_locales(req))``
+* **match_locale(accepted, available, default_value)** - given a list of accepted `[ lang, REGION ]` pairs and a map of `lang-region: non-null`, returns an acceptable key (or the `default_value`) when no matching locale is found.
+* **load_l10n_files(dir, [options], callback)** - loads a set of localization files (JSON + comments) from the specified directory, returning a map of `'name-without-extension': loaded-content`. When present `options` are options passed to `FileUtil.ls`, notably `recurse` and `pattern` (defaulting to `false` and `/^.+.json$/`, respectively). Note that a specific `lang-REGION`'s attributes will inherit default values from those in `lang` (when set), such that if `en.json` has the key `foo` but `en-US.json` does not, the returned `en-us` object _will_ contain the key `foo`. Callback signature is `(err, map_of_localiation_data)`
+* **localize(localization_data, key, [args...])** - returns the localized value for the `sprintf` template `localization_data[key]`, passing in the optional `args` arguments when provided. Returns `null` if no matching template is found.
+  - note that a localization entry _may_ be a map from which one specific template will be selected according to the value of the first argument (see unit tests for details).
+* **make_localizer(localization_data)** - returns the function of the form `fn(key, [args...])` which is equivalent to `localize(localization_data, key, [args...])`.
 
 ### LogUtil
 * Some notes on configuration:
@@ -451,6 +463,8 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 *[Back to Index](#feature-index)*
 
 ### ObjectUtil
+* **get_json_path(json,path...)** - fetches that attribute stored at the specified path
+* **get_funky_json_path(json,path...)** - fetches that attribute stored at the specified path, handlig the `@name` and `name.$` attributes that some XML-to-JSON parsers produce.
 * **deep_equal(a,b)** - performs a deep comparison of the two specified objects; handles arrays, maps, strings, booleans, numbers, `null` and `undefined`, results are undefined for other object types; considers `null`, `undefined` and missing elements to be equal.
 * **is_true_object(a)** - `true` iff `a` is a non-`null`, non-array object for which `typeof a == 'object'`.
 * **diff_json(a,b)** - recursively compares elements of `a` and `b`, returning a map describing where the objects differ; handles arrays, maps, strings, booleans, numbers, `null` and `undefined`, results are undefined for other object types; considers `null`, `undefined` and missing elements to be equal. Some examples:
@@ -568,7 +582,9 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 
 ### WebUtil
 * **remote_ip(req,name,default_value)** - attempts to discover the proper "client IP" for the given request using various approaches.
-* **param(req)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js
+* **param(req, name, default_value)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js.  `name` can also be an array of names to check.
+* **map_to_qs(map)** (also **map_to_query_string(map)**) - convert the given map to a string of the form `name1=value1&name2=value2&etc.` for which names and values are properly URL-encoded.  When a key maps to an array the key is appended multiple times (`key=value1&key=value2&etc.`).
+* **append_qs(url,map)** / **append_qs(url,qs_fragment)** / **append_qs(url,name,value)** (also **append_query_string()**)
 
 *[Back to Index](#feature-index)*
 

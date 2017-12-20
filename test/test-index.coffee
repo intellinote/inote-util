@@ -1,3 +1,5 @@
+require 'coffee-errors'
+#------------------------------------------------------------------------------#
 should    = require 'should'
 fs        = require 'fs'
 path      = require 'path'
@@ -57,4 +59,8 @@ describe "index",->
 
   it "exports S3Model", (done)->
     index.S3Model.should.exist
+    done()
+
+  it "exports L10nUtil", (done)->
+    index.L10nUtil.should.exist
     done()

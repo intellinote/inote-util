@@ -1,0 +1,5 @@
+{
+  "foo":"foo from fr.json",
+  "bar":"bar from fr.json", /* This is a comment */
+  "another":"another from fr.json"
+}

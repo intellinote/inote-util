@@ -1,3 +1,5 @@
+require 'coffee-errors'
+#------------------------------------------------------------------------------#
 fs        = require 'fs'
 path      = require 'path'
 HOME_DIR  = path.join(__dirname,'..')

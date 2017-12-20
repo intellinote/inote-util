@@ -1,13 +1,17 @@
+require 'coffee-errors'
+#------------------------------------------------------------------------------#
 #coffeelint:disable=cyclomatic_complexity
-should  = require 'should'
 fs      = require 'fs'
 path    = require 'path'
 HOMEDIR = path.join(__dirname,'..')
 LIB_COV = path.join(HOMEDIR,'lib-cov')
 LIB_DIR = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 Util    = require(path.join(LIB_DIR,'index')).Util
+WebUtil    = require(path.join(LIB_DIR,'index')).WebUtil
 Stream  = require 'stream'
 zipstream = require 'zipstream'
+assert    = require 'assert'
+should  = require 'should'
 
 describe 'Util',->
 
@@ -322,7 +326,7 @@ describe 'Util',->
     zip.addFile (stream),{name:"random.txt"}, ()->
       zip.finalize (count)->
         process.nextTick = old_nextTick
-        console.log (count/(loops*size))
+        #console.log (count/(loops*size))
         (count/(loops*size)).should.not.be.below 0.6
         done()
 
@@ -340,7 +344,7 @@ describe 'Util',->
     zip.addFile (stream),{name:"random.txt"}, ()->
       zip.finalize (count)->
         process.nextTick = old_nextTick
-        console.log (count/(loops*size))
+        #console.log (count/(loops*size))
         (count/(loops*size)).should.not.be.below 0.65
         done()
 
@@ -358,7 +362,7 @@ describe 'Util',->
     zip.addFile (stream),{name:"random.txt"}, ()->
       zip.finalize (count)->
         process.nextTick = old_nextTick
-        console.log (count/(loops*size))
+        #console.log (count/(loops*size))
         (count/(loops*size)).should.not.be.below 0.65
         done()
 
@@ -376,7 +380,7 @@ describe 'Util',->
     zip.addFile (stream),{name:"random.txt"}, ()->
       zip.finalize (count)->
         process.nextTick = old_nextTick
-        console.log (count/(loops*size))
+        #console.log (count/(loops*size))
         (count/(loops*size)).should.not.be.below 0.65
         done()
 
@@ -414,7 +418,7 @@ describe 'Util',->
     done()
 
   it "slow_equals takes a similar amount of time whether buffers are equal or not equal",(done)->
-    @timeout(6000)
+    @timeout(12000)
     reps = 300
     prefix_length = 32768
     length = 16384
@@ -457,9 +461,6 @@ describe 'Util',->
       slow = slow_equal / slow_not_equal
     else
       slow = slow_not_equal / slow_equal
-    # console.log slow, std
-    # slow version should be closer to 1 than the standard
-    # console.log Math.abs(1-slow),Math.abs(1-std)
     Math.abs(1-slow).should.be.below Math.abs(1-std)
     done()
 
@@ -1275,3 +1276,20 @@ describe 'Util',->
       steps_executed[2].should.be.ok
       steps_executed[3].should.be.ok
       done()
+
+  it "WebUtil can apppend query string values", (done)->
+    foo = "https://example.com/no-qs"
+    bar = "https://example.com/with-qs?has-qs=true"
+    assert.equal WebUtil.append_query_string(foo, "x=y&y=z"), "https://example.com/no-qs?x=y&y=z"
+    assert.equal WebUtil.append_query_string(bar, "x=y&y=z"), "https://example.com/with-qs?has-qs=true&x=y&y=z"
+    assert.equal WebUtil.append_query_string(foo, null), "https://example.com/no-qs"
+    assert.equal WebUtil.append_query_string(bar, null), "https://example.com/with-qs?has-qs=true"
+    assert.equal WebUtil.append_query_string(foo, {x:'y',y:'z'}), "https://example.com/no-qs?x=y&y=z"
+    assert.equal WebUtil.append_query_string(bar, {x:'y',y:'z'}), "https://example.com/with-qs?has-qs=true&x=y&y=z"
+    assert.equal WebUtil.append_query_string(foo, { }), "https://example.com/no-qs?"
+    assert.equal WebUtil.append_query_string(bar, { }), "https://example.com/with-qs?has-qs=true&"
+    assert.equal WebUtil.append_query_string(foo, "x", "y"), "https://example.com/no-qs?x=y"
+    assert.equal WebUtil.append_query_string(bar, "x", "y"), "https://example.com/with-qs?has-qs=true&x=y"
+    assert.equal WebUtil.append_query_string(foo, "x", ["a","b","c"]), "https://example.com/no-qs?x=a&x=b&x=c"
+    assert.equal WebUtil.append_query_string(bar, "x", ["a","b","c"]), "https://example.com/with-qs?has-qs=true&x=a&x=b&x=c"
+    done()

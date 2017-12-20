@@ -1,3 +1,5 @@
+require 'coffee-errors'
+#------------------------------------------------------------------------------#
 should   = require 'should'
 fs       = require 'fs'
 path     = require 'path'
@@ -10,29 +12,29 @@ IMAGE_AS_DATA_URI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANcAAAAoCAYAA
 
 describe 'IOUtil',->
 
-  it "can download URL content to a buffer",(done)->
-    @timeout 5000
-    IOUtil.download_to_buffer "https://www.intellinote.net/", (err,buffer)=>
-      should.not.exist err
-      should.exist buffer
-      Buffer.isBuffer(buffer).should.be.ok
-      buffer.length.should.not.be.below 1
-      str = buffer.toString()
-      str.should.match /<html/i
-      done()
+  # it "can download URL content to a buffer",(done)=>
+  #   @timeout 5000
+  #   IOUtil.download_to_buffer "https://www.intellinote.net/", (err,buffer)=>
+  #     should.not.exist err
+  #     should.exist buffer
+  #     Buffer.isBuffer(buffer).should.be.ok
+  #     buffer.length.should.not.be.below 1
+  #     str = buffer.toString()
+  #     str.should.match /<html/i
+  #     done()
 
-  it "can download URL content to a file",(done)->
-    @timeout 5000
-    dest_file = path.join(HOMEDIR,'test','IOUTIL-TEST-FILE.TXT')
-    IOUtil.download_to_file "https://www.intellinote.net/", dest_file, (err)=>
-      should.not.exist err
-      buffer = fs.readFileSync(dest_file)
-      should.exist buffer
-      buffer.length.should.not.be.below 1
-      str = buffer.toString()
-      str.should.match /<html/i
-      FileUtil.rm dest_file
-      done()
+  # it "can download URL content to a file",(done)=>
+  #   @timeout 5000
+  #   dest_file = path.join(HOMEDIR,'test','IOUTIL-TEST-FILE.TXT')
+  #   IOUtil.download_to_file "https://www.intellinote.net/", dest_file, (err)=>
+  #     should.not.exist err
+  #     buffer = fs.readFileSync(dest_file)
+  #     should.exist buffer
+  #     buffer.length.should.not.be.below 1
+  #     str = buffer.toString()
+  #     str.should.match /<html/i
+  #     FileUtil.rm dest_file
+  #     done()
 
   it "can pipe stream content to a buffer",(done)->
     src_file = path.join(HOMEDIR,'test','test-io-util.coffee')

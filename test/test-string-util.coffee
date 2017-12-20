@@ -1,3 +1,5 @@
+require 'coffee-errors'
+#------------------------------------------------------------------------------#
 #coffeelint:disable=cyclomatic_complexity
 should  = require 'should'
 fs      = require 'fs'
@@ -185,7 +187,7 @@ describe 'StringUtil',->
       StringUtil.truncate(text,width,marker).should.equal expected
       StringUtil.truncate(text,width,marker).length.should.not.be.above width
     done()
-
+#
   it "lpad pads strings from the left",(done)->
     tests = [
       [ '',     3, null, '   ' ]
