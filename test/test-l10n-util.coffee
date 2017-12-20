@@ -1,16 +1,16 @@
 require 'coffee-errors'
 #------------------------------------------------------------------------------#
-fs              = require 'fs'
-path            = require 'path'
-HOME_DIR        = path.join(__dirname, '..')
-LIB_COV         = path.join(HOME_DIR, 'lib-cov')
-LIB_DIR         = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR, 'lib')
-DATA_DIR        = path.join(HOME_DIR, 'test', 'data', 'test-l10n')
+fs       = require 'fs'
+path     = require 'path'
+HOME_DIR = path.join(__dirname, '..')
+LIB_COV  = path.join(HOME_DIR, 'lib-cov')
+LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR, 'lib')
+DATA_DIR = path.join(HOME_DIR, 'test', 'data', 'test-l10n')
 #------------------------------------------------------------------------------#
-assert          = require 'assert'
+assert   = require 'assert'
 #------------------------------------------------------------------------------#
-L10nUtil        = require(path.join(LIB_DIR, 'l10n-util')).L10nUtil
-DustUtil        = require(path.join(LIB_DIR,'dust-util')).DustUtil.DustUtil
+L10nUtil = require(path.join(LIB_DIR, 'l10n-util')).L10nUtil
+DustUtil = require(path.join(LIB_DIR,'dust-util')).DustUtil.DustUtil
 #------------------------------------------------------------------------------#
 
 describe 'L10nUtil', ()->
@@ -351,22 +351,3 @@ describe 'L10nUtil', ()->
               assert.ok not err?, err
               assert.equal output, "First: 1; Second: 10; Third: three."
             done()
-        # # IN CONTEXT (STRING)
-        # template = '{@l10n key="the-key" args=the_args/}'
-        # context = {
-        #   the_args: "1,2,three"
-        #   l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
-        # }
-        # du.render_template template, context, (err, output)->
-        #   assert.ok not err?, err
-        #   assert.equal output, "First: 1; Second: 10; Third: three."
-        #   # IN CONTEXT (ARRAY
-        #   template = '{@l10n key="the-key" args=the_args/}'
-        #   context = {
-        #     the_args: [1,2,"three"]
-        #     l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
-        #   }
-        #   du.render_template template, context, (err, output)->
-        #     assert.ok not err?, err
-        #     assert.equal output, "First: 1; Second: 10; Third: three."
-        #     done()

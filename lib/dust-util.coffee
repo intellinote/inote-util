@@ -1,11 +1,3 @@
-#------------------------------------------------------------------------------#
-# fs         = require 'fs'
-# path       = require 'path'
-# HOME_DIR   = path.join(__dirname,'..')
-# LIB_COV    = path.join(HOME_DIR,'lib-cov')
-# LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
-#------------------------------------------------------------------------------#
-
 # This class contains some basic utilties for working with
 # [dust.js](https://akdubya.github.io/dustjs/).
 #
@@ -116,4 +108,5 @@ class DustUtil
     return @empty_template
 
 exports.DustUtil = new DustUtil()
-exports.DustUtil.DustUtil = DustUtil
+exports.DustUtil.constructor = exports.DustUtil.DustUtil = DustUtil
+exports.DustUtil.init = (dust)->return new DustUtil(dust)

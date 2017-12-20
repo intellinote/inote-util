@@ -202,4 +202,5 @@ class L10nUtil
       return @localize(localization_data, key, args...)
 
 exports.L10nUtil = new L10nUtil()
-exports.L10nUtil.L10nUtil = L10nUtil
+exports.L10nUtil.constructor = exports.L10nUtil.L10nUtil = L10nUtil
+exports.L10nUtil.init = (config)->return new L10nUtil(config)
