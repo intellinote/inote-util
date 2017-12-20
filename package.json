@@ -35,7 +35,7 @@
     "docco"            : "^0",
     "htmlparser"       : "^1",
     "marked-toc"       : "^0",
-    "marked"           : "^0",
+    "marked"           : "^0.3.4",
     "mocha"            : "^2",
     "should"           : "^13",
     "stew-select"      : "^0",
