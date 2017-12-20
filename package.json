@@ -1,6 +1,6 @@
 {
   "name": "inote-util",
-  "version": "1.13.3",
+  "version": "1.13.4",
   "description": "A collection of utility functions and classes.",
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
     "docco"            : "^0",
     "htmlparser"       : "^1",
     "marked-toc"       : "^0",
-    "marked"           : "^0.3.4",
+    "marked"           : "^0.3.7",
     "mocha"            : "^2",
     "should"           : "^13",
     "stew-select"      : "^0",
