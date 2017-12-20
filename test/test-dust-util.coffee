@@ -1,15 +1,15 @@
 require 'coffee-errors'
 #------------------------------------------------------------------------------#
-fs              = require 'fs'
-path            = require 'path'
-HOME_DIR        = path.join(__dirname, '..')
-LIB_COV         = path.join(HOME_DIR, 'lib-cov')
-LIB_DIR         = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR, 'lib')
+fs         = require 'fs'
+path       = require 'path'
+HOME_DIR   = path.join(__dirname, '..')
+LIB_COV    = path.join(HOME_DIR, 'lib-cov')
+LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR, 'lib')
 #------------------------------------------------------------------------------#
-assert          = require 'assert'
+assert     = require 'assert'
 #------------------------------------------------------------------------------#
-DustUtil        = require(path.join(LIB_DIR, 'dust-util')).DustUtil
-StringUtil            = require(path.join(LIB_DIR, 'string-util')).StringUtil
+DustUtil   = require(path.join(LIB_DIR, 'dust-util')).DustUtil.DustUtil
+StringUtil = require(path.join(LIB_DIR, 'string-util')).StringUtil
 #------------------------------------------------------------------------------#
 
 describe 'DustUtil', ()->

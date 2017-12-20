@@ -10,6 +10,7 @@ DATA_DIR        = path.join(HOME_DIR, 'test', 'data', 'test-l10n')
 assert          = require 'assert'
 #------------------------------------------------------------------------------#
 L10nUtil        = require(path.join(LIB_DIR, 'l10n-util')).L10nUtil
+DustUtil        = require(path.join(LIB_DIR,'dust-util')).DustUtil.DustUtil
 #------------------------------------------------------------------------------#
 
 describe 'L10nUtil', ()->
@@ -219,3 +220,153 @@ describe 'L10nUtil', ()->
     assert.equal L10nUtil.localize(templates, "foo", false), "Well, actually..."
     assert.equal L10nUtil.localize(templates, "foo", "false"), "Well, actually..."
     done()
+
+  describe "{@l10n} tag", ()->
+
+    it "renders a localized string based on the provided key", (done)->
+      du = new DustUtil()
+      L10nUtil.add_dust_helpers(du)
+      template = '{@l10n key="the-key"/}'
+      context = {
+        l10n: L10nUtil.make_localizer {"the-key":"The string mapped to the key."}
+      }
+      du.render_template template, context, (err, output)->
+        assert.ok not err?, err
+        assert.equal output, "The string mapped to the key."
+        done()
+
+    it "can read the key from the tag body", (done)->
+      du = new DustUtil()
+      L10nUtil.add_dust_helpers(du)
+      template = '{@l10n}the-key{/l10n}'
+      context = {
+        l10n: L10nUtil.make_localizer {"the-key":"The string mapped to the key."}
+      }
+      du.render_template template, context, (err, output)->
+        assert.ok not err?, err
+        assert.equal output, "The string mapped to the key."
+        done()
+
+    it "renders the :else block if the key is not matched", (done)->
+      du = new DustUtil()
+      L10nUtil.add_dust_helpers(du)
+      template = '{@l10n}not-the-key{:else}Not matched :({/l10n}'
+      context = {
+        l10n: L10nUtil.make_localizer {"the-key":"The string mapped to the key."}
+      }
+      du.render_template template, context, (err, output)->
+        assert.ok not err?, err
+        assert.equal output, "Not matched :("
+        template = '{@l10n key="not-the-key"}{:else}Not matched :({/l10n}'
+        du.render_template template, context, (err, output)->
+          assert.ok not err?, err
+          assert.equal output, "Not matched :("
+          template = '{@l10n}{:else}Not matched :({/l10n}'
+          du.render_template template, context, (err, output)->
+            assert.ok not err?, err
+            assert.equal output, "Not matched :("
+            template = '{@l10n/}'
+            du.render_template template, context, (err, output)->
+              assert.ok not err?, err
+              assert.equal output, ""
+              done()
+
+    it "passes parameters as arguments to sprintf (single 'args' param case)", (done)->
+      du = new DustUtil()
+      L10nUtil.add_dust_helpers(du)
+      # IN TEMPLATE
+      template = '{@l10n key="the-key" args="1,2,three"/}'
+      context = {
+        l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+      }
+      du.render_template template, context, (err, output)->
+        assert.ok not err?, err
+        assert.equal output, "First: 1; Second: 10; Third: three."
+        # IN CONTEXT (STRING)
+        template = '{@l10n key="the-key" args=the_args/}'
+        context = {
+          the_args: "1,2,three"
+          l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+        }
+        du.render_template template, context, (err, output)->
+          assert.ok not err?, err
+          assert.equal output, "First: 1; Second: 10; Third: three."
+          # IN CONTEXT (AS DUST STRING)
+          template = '{@l10n key="the-key" args="{the_args}"/}'
+          context = {
+            the_args: "1,2,three"
+            l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+          }
+          du.render_template template, context, (err, output)->
+            assert.ok not err?, err
+            assert.equal output, "First: 1; Second: 10; Third: three."
+            # IN CONTEXT (ARRAY)
+            template = '{@l10n key="the-key" args=the_args/}'
+            context = {
+              the_args: [1,2,"three"]
+              l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+            }
+            du.render_template template, context, (err, output)->
+              assert.ok not err?, err
+              assert.equal output, "First: 1; Second: 10; Third: three."
+              done()
+
+    it "passes parameters as arguments to sprintf (multiple 'argN' params case)", (done)->
+      du = new DustUtil()
+      L10nUtil.add_dust_helpers(du)
+      # IN TEMPLATE
+      template = '{@l10n key="the-key" arg0="1" arg1="2" arg2="three"/}'
+      context = {
+        l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+      }
+      du.render_template template, context, (err, output)->
+        assert.ok not err?, err
+        assert.equal output, "First: 1; Second: 10; Third: three."
+        # IN TEMPLATE - out of order; numbers skipped
+        template = '{@l10n key="the-key" arg4="E" arg0="A" arg2="C"/}'
+        context = {
+          l10n: L10nUtil.make_localizer {"the-key":"[%s,%s,%s,%s,%s,%s]"}
+        }
+        du.render_template template, context, (err, output)->
+          assert.ok not err?, err
+          assert.equal output, "[A,undefined,C,undefined,E,undefined]"
+          # AS CONTEXT VARS
+          template = '{@l10n key="the-key" arg0=zero arg1="2" arg2=three/}'
+          context = {
+            zero: 1
+            three: "three"
+            l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+          }
+          du.render_template template, context, (err, output)->
+            assert.ok not err?, err
+            assert.equal output, "First: 1; Second: 10; Third: three."
+            # AS DUST STRINGS
+            template = '{@l10n key="the-key" arg0="{zero}" arg1="2" arg2="{three}"/}'
+            context = {
+              zero: 1
+              three: "three"
+              l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+            }
+            du.render_template template, context, (err, output)->
+              assert.ok not err?, err
+              assert.equal output, "First: 1; Second: 10; Third: three."
+            done()
+        # # IN CONTEXT (STRING)
+        # template = '{@l10n key="the-key" args=the_args/}'
+        # context = {
+        #   the_args: "1,2,three"
+        #   l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+        # }
+        # du.render_template template, context, (err, output)->
+        #   assert.ok not err?, err
+        #   assert.equal output, "First: 1; Second: 10; Third: three."
+        #   # IN CONTEXT (ARRAY
+        #   template = '{@l10n key="the-key" args=the_args/}'
+        #   context = {
+        #     the_args: [1,2,"three"]
+        #     l10n: L10nUtil.make_localizer {"the-key":"First: %d; Second: %b; Third: %s."}
+        #   }
+        #   du.render_template template, context, (err, output)->
+        #     assert.ok not err?, err
+        #     assert.equal output, "First: 1; Second: 10; Third: three."
+        #     done()

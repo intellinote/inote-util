@@ -104,5 +104,16 @@ class DustUtil
         if val?
           return val
       return default_value
+    # if bodies.block?
+    # return chunk.capture bodies.block, context, (body_data, chunk) ->
 
-exports.DustUtil = DustUtil
+  maybe_capture_block:(chunk, block, context, callback)->
+    callback @eval_dust_string(block ? "", chunk, context), chunk
+
+  ensure_empty_template:()=>
+    unless @empty_template?
+      @empty_template = @compile_template("")
+    return @empty_template
+
+exports.DustUtil = new DustUtil()
+exports.DustUtil.DustUtil = DustUtil
