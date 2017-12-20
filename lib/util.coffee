@@ -376,7 +376,10 @@ class ArrayUtil
   # **paginate_list** - *extract a sub-array based on offset and limit*
   #
   # Given a list (array), returns the sublist defined by `offset` and `limit`.
-  @paginate_list:(list,offset=0,limit=20)=>list[offset...(offset+limit)]
+  @paginate_list:(list,offset=0,limit=20)=>
+    offset ?= 0
+    limit ?= 20
+    list[offset...(offset+limit)]
 
   # **subset_of** - *check whether on array contains another arrays as if they are sets *
   #
@@ -491,6 +494,7 @@ class NumberUtil
   # The input value must be a decimal string in standard (non-scientific)
   # notation.)
   @round_decimal:(value,digits=0)=>
+    digits ?= 0
     unless value?
       return null
     else
@@ -617,6 +621,8 @@ class RandomUtil
   # Note that `count` specifies the number of *bytes* to be generated. The encoded
   # string may be more or less than `count` *characters*.
   @random_bytes:(count=32,enc='hex')=>
+    count ?= 32
+    enc ?= 'hex'
     if typeof count is 'string'
       if typeof enc is 'number'
         [count,enc] = [enc,count]
@@ -634,24 +640,37 @@ class RandomUtil
   @rng:Math.random
 
   # **random_hex** - *generate a string of `count` pseudo-random characters from the set ``[0-9a-f]``.
-  @random_hex:(count=32,rng)=>@_random_digits(count,16,rng)
+  @random_hex:(count=32,rng)=>
+    count ?= 32
+    @_random_digits(count,16,rng)
 
   # **random_alphanumeric** - *generate a string of `count` pseudo-random characters from the set `[a-z0-9]`.
-  @random_alphanumeric:(count=32,rng)=>@_random_digits(count,36,rng)
+  @random_alphanumeric:(count=32,rng)=>
+    count ?= 32
+    @_random_digits(count,36,rng)
 
   # **random_numeric** - *generate a string of `count` pseudo-random characters from the set `[0-9]`.*
-  @random_numeric:(count=32,rng)=>@_random_digits(count,10,rng)
+  @random_numeric:(count=32,rng)=>
+    count ?= 32
+    @_random_digits(count,10,rng)
 
   # **random_Alpha** - *generate a string of `count` pseudo-random characters from the set `[a-zA-Z]` (mixed case).
-  @random_Alpha:(count=32,rng)=>@_random_alpha(count,'M',rng)
+  @random_Alpha:(count=32,rng)=>
+    count ?= 32
+    @_random_alpha(count,'M',rng)
 
   # **random_ALPHA** - *generate a string of `count` pseudo-random characters from the set `[A-Z]` (upper case).
-  @random_ALPHA:(count=32,rng)=>@_random_alpha(count,'U',rng)
+  @random_ALPHA:(count=32,rng)=>
+    count ?= 32
+    @_random_alpha(count,'U',rng)
 
   # **random_alpha** - *generate a string of `count` pseudo-random characters from the set `[a-z]` (lower case).
-  @random_alpha:(count=32,rng)=>@_random_alpha(count,'L',rng)
+  @random_alpha:(count=32,rng)=>
+    count ?= 32
+    @_random_alpha(count,'L',rng)
 
   @random_Alphanumeric:(count=32,rng)=>
+    count ?= 32    
     @random_string "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", count, rng
 
   @random_string:(alphabet,count,rng)=>
@@ -675,6 +694,8 @@ class RandomUtil
 
   # lettercase = 'upper', 'lower', 'both' (or 'mixed')
   @_random_alpha:(count=32,lettercase='lower',rng)=>
+    count ?= 32
+    lettercase ?= 'lower'
     rng ?= @rng
     str = ""
     include_upper = /^(u|b|m)/i.test lettercase
@@ -867,7 +888,9 @@ class ComparatorUtil
   #
   # Also see `compare`.
   #
-  @field_comparator:(field,locale_compare=false)=>@path_comparator([field],locale_compare)
+  @field_comparator:(field,locale_compare=false)=>
+    locale_compare = false
+    @path_comparator([field],locale_compare)
 
   # **path_operator** - *compares objects based on (optionally nested) attributes*
   #
@@ -894,6 +917,7 @@ class ComparatorUtil
   # Also see `compare`.
   #
   @path_comparator:(path,locale_compare=false)=>
+    locale_compare = false
     (a,b)=>
       fn = null
       if locale_compare
@@ -1041,6 +1065,7 @@ class ErrorUtil
   #         # ...continue processing...
   #
   @handle_error:(err,callback,throw_when_no_callback=true)=>
+    throw_when_no_callback ?= true
     if err?
       if callback?
         callback(err)
@@ -1084,6 +1109,7 @@ class IdUtil
     return v.replace(/-/g,'').toLowerCase()
 
   @normalize_uuid:(v,generate=false)=>
+    generate ?= false
     @uuid v, generate
 
   @make_uuid:(v)=>
@@ -1103,6 +1129,7 @@ class IdUtil
   # If `generate` is `true` and `v` is `null`, a new (normalized) UUID value
   # is generated and returned.
   @pad_uuid:(v,generate=false)=>
+    generate ?= false
     v = @uuid(v,generate)
     if v?
       return (v.substring(0,8)+"-"+v.substring(8,12)+"-"+v.substring(12,16)+"-"+v.substring(16,20)+"-"+v.substring(20))
@@ -1119,6 +1146,7 @@ class Base64
   # When a string value is provided, the optional `output_encoding` attribute
   # specifies the encoding to use when converting characters to bytes.
   @encode:(buf,output_encoding='utf8')=>
+    output_encoding ?= 'utf8'
     if not buf?
       return null
     else
@@ -1132,6 +1160,7 @@ class Base64
   # The optional `output_encoding` attribute specifies the encoding to use
   # when converting bytes to characters.
   @decode:(buf,output_encoding='utf8')=>
+    output_encoding ?= 'utf8'
     if not buf?
       return null
     else

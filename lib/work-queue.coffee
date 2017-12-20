@@ -14,6 +14,7 @@ DEFAULT_MAX_WORKERS = 1
 class WorkQueue extends EventEmitter
 
   constructor:(options)->
+    super()
     options ?= {}
     @default_priority = options.priority    ? DEFAULT_PRIORITY
     @work_interval    = options.interval    ? DEFAULT_INTERVAL

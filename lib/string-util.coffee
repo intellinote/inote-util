@@ -42,7 +42,7 @@ class StringUtil
     if not text? or not text.length? or text.length <= width
       return text
     else
-      marker ?= ''
+      marker ?= '…'
       max_shorten = 10 # maximum number of characters to step back while looking for a word boundary
       break_chars = /\.|\!|\?|\,|\:|\-|\s|\0|\)|\(|\[|\]|\{|\}|\\|\/|\\|\<|\>|\"|\'/ # characters recognized as word boundaries
       short_width = max_width = width-(marker.length)
@@ -169,6 +169,8 @@ class StringUtil
   # by prepending the specified `pad_elt` to (a copy of) the
   # given `value`.
   @lpad_array:(value=[],width=8,pad_elt=null)=>
+    value ?= []
+    width ?= 8
     while value.length < width
       value = [pad_elt].concat value
     return value
@@ -181,6 +183,9 @@ class StringUtil
   #
   # `pad_char` *should* be exactly one character wide.
   @lpad_string:(value="",width=8,pad_char=" ")=>
+    value ?= ""
+    width ?= 8
+    pad_char ?= " "
     if "#{pad_char}".length is 0
       throw new Error("pad must not be empty")
     value = "#{value}"
@@ -208,6 +213,8 @@ class StringUtil
   # by appending the specified `pad_elt` to (a copy of) the
   # given `value`.
   @rpad_array:(value=[],width=8,pad_elt=null)=>
+    value ?= []
+    width ?= 8
     while value.length < width
       value.push pad_elt
     return value
@@ -220,6 +227,9 @@ class StringUtil
   #
   # `pad_char` *should* be exactly one character wide.
   @rpad_string:(value="",width=8,pad_char=" ")=>
+    value ?= ""
+    width ?= 8
+    pad_char ?= " "
     if "#{pad_char}".length is 0
       throw new Error("pad must not be empty")
     else

@@ -45,7 +45,7 @@ COVERAGE_REPORT ?= docs/coverage.html
 COVERAGE_TMP_DIR ?=  ./cov-tmp
 COVERAGE_EXE ?= ./node_modules/.bin/coffeeCoverage
 COVERAGE_ARGS ?= -e migration --initfile $(LIB_COV)/coffee-coverage-init.js
-MOCHA_COV_ARGS  ?= --require $(LIB_COV)/coffee-coverage-init.js --globals "_\$$jscoverage" --compilers coffee:coffee-script/register -R html-cov -t 20000
+MOCHA_COV_ARGS  ?= --require $(LIB_COV)/coffee-coverage-init.js --globals "_\$$jscoverage" --compilers coffee:coffee-script/register -R html-cov -t 30000
 
 # MARKDOWN #####################################################################
 MARKDOWN_TOC ?= ./node_modules/.bin/toc
@@ -204,6 +204,23 @@ test: $(MOCHA_TESTS) $(NODE_MODULES)
 test-watch: $(MOCHA_TESTS) $(NODE_MODULES)
 	$(MOCHA_EXE) --watch $(MOCHA_TEST_ARGS) ${MOCHA_EXTRA_ARGS} $(MOCHA_TESTS)
 
+define COVERAGE_SUMMARY
+stew = new (require("stew-select")).Stew()
+html = require("fs").readFileSync("$(COVERAGE_REPORT)").toString()
+pad = require("./lib/string-util").StringUtil.lpad
+stew.select_first html, "#stats", (err,node)->
+  inner = stew.dom_util.inner_html(node)
+  stew.select inner, "div", (err,nodes)->
+    nodes = nodes.map (x)->stew.dom_util.to_text(x)
+    console.log ""
+    console.log "\x1b[1mTEST COVERAGE SUMMARY\x1b[0m"
+    console.log "\x1b[1m  Coverage: \x1b[0m",pad(nodes[0],5)
+    console.log "\x1b[1m      SLOC: \x1b[0m",pad(nodes[1],5)
+    console.log "\x1b[1m      Hits: \x1b[0m",pad(nodes[2],5)
+    console.log "\x1b[1m    Misses: \x1b[0m",pad(nodes[3],5)
+    console.log ""
+endef
+export COVERAGE_SUMMARY
 coverage: $(COFFEE_SRCS) $(COFFEE_TEST_SRCS) $(MOCHA_TESTS) $(NODE_MODULES)
 	rm -rf $(COVERAGE_TMP_DIR)
 	rm -rf $(LIB_COV)
@@ -214,6 +231,9 @@ coverage: $(COFFEE_SRCS) $(COFFEE_TEST_SRCS) $(MOCHA_TESTS) $(NODE_MODULES)
 	$(MOCHA_EXE) $(MOCHA_COV_ARGS) $(MOCHA_TESTS) > $(COVERAGE_REPORT)
 	rm -rf $(COVERAGE_TMP_DIR)
 	rm -rf $(LIB_COV)
+	$(COFFEE_EXE) -e "$$COVERAGE_SUMMARY"
+	@echo "Detailed coverage report generated at \x1b[1m$(COVERAGE_REPORT)\x1b[0m."
+	@echo "USE \x1b[1mopen $(COVERAGE_REPORT)\x1b[0m TO OPEN (ON OSX)"
 
 ################################################################################
 # MARKDOWN & OTHER DOC TARGETS
