@@ -5,6 +5,9 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 
+  - [Release 1.13.0 (19 December 2017)](#release-1130-19-december-2017)
+  - [Release 1.12.0](#release-1120)
+  - [Release 1.11.0](#release-1110)
   - [Release 1.10.0 (30 August 2017)](#release-1100-30-august-2017)
   - [Release 1.9.4 (18 August 2017)](#release-194-18-august-2017)
   - [Release 1.9.2 (7 June 2017)](#release-192-7-june-2017)
@@ -19,25 +22,10 @@ This file summarizes the changes bundled in each release of `inote-util`.
   - [Release 1.7.2 (13 July 2016)](#release-172-13-july-2016)
   - [Release 1.7.1 (8 June 2016)](#release-171-8-june-2016)
   - [Release 1.7.0 (25 May 2016)](#release-170-25-may-2016)
-
-    - [Enhancements](#enhancements)
-    - [Changes](#changes)
-
   - [Release 1.6.3 (23 May 2016)](#release-163-23-may-2016)
-
-    - [Enhancements](#enhancements-1)
-    - [Changes](#changes-1)
-
   - [Release 1.6.2 (20 May 2016)](#release-162-20-may-2016)
-
-    - [Enhancements](#enhancements-2)
-
   - [Release 1.6.1 (20 May 2016)](#release-161-20-may-2016)
-
-    - [Enhancements](#enhancements-3)
-
   - [Release 1.6 (19 May 2016)](#release-16-19-may-2016)
-
   - [Release 1.5.2 (17 May 2016)](#release-152-17-may-2016)
   - [Release 1.5.1 (16 May 2016)](#release-151-16-may-2016)
   - [Release 1.5.0 (16 May 2016)](#release-150-16-may-2016)
@@ -81,11 +69,13 @@ This file summarizes the changes bundled in each release of `inote-util`.
 ## Release 1.13.0 (19 December 2017)
 
  * Added `L10nUtil`.
- * Added `ObjectUtil.get_json_path`.
+ * Added `ObjectUtil.get_json_path` and `ObjectUtil.get_funky_json_path`
  * Added `FileUtil.load_json`/`FileUtil.load_json_file`
  * Added `FileUtil.load_json_file_sync(file,options)`.
  * Added `FileUtil.load_json_stdin_sync(end_byte,buffer_size,options)`.
  * Support `options.allow_comments` (defaults to true) and `options.strip_comments` (defaults to true) in `FileUtil.load_json*`
+ * Added support for an array of names in  `WebUtil.param(req, name, default_value)`.
+ * Added `WebUtil.map_to_qs` and `WebUtil.append_qs`.
 
 ## Release 1.11.0
 

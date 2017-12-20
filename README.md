@@ -464,6 +464,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 
 ### ObjectUtil
 * **get_json_path(json,path...)** - fetches that attribute stored at the specified path
+* **get_funky_json_path(json,path...)** - fetches that attribute stored at the specified path, handlig the `@name` and `name.$` attributes that some XML-to-JSON parsers produce.
 * **deep_equal(a,b)** - performs a deep comparison of the two specified objects; handles arrays, maps, strings, booleans, numbers, `null` and `undefined`, results are undefined for other object types; considers `null`, `undefined` and missing elements to be equal.
 * **is_true_object(a)** - `true` iff `a` is a non-`null`, non-array object for which `typeof a == 'object'`.
 * **diff_json(a,b)** - recursively compares elements of `a` and `b`, returning a map describing where the objects differ; handles arrays, maps, strings, booleans, numbers, `null` and `undefined`, results are undefined for other object types; considers `null`, `undefined` and missing elements to be equal. Some examples:
@@ -581,7 +582,9 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 
 ### WebUtil
 * **remote_ip(req,name,default_value)** - attempts to discover the proper "client IP" for the given request using various approaches.
-* **param(req)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js
+* **param(req, name, default_value)** - replaces the now deprecated `req.param(name,default_value)` found in Express.js.  `name` can also be an array of names to check.
+* **map_to_qs(map)** (also **map_to_query_string(map)**) - convert the given map to a string of the form `name1=value1&name2=value2&etc.` for which names and values are properly URL-encoded.  When a key maps to an array the key is appended multiple times (`key=value1&key=value2&etc.`).
+* **append_qs(url,map)** / **append_qs(url,qs_fragment)** / **append_qs(url,name,value)** (also **append_query_string()**)
 
 *[Back to Index](#feature-index)*
 

@@ -670,7 +670,7 @@ class RandomUtil
     @_random_alpha(count,'L',rng)
 
   @random_Alphanumeric:(count=32,rng)=>
-    count ?= 32    
+    count ?= 32
     @random_string "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", count, rng
 
   @random_string:(alphabet,count,rng)=>
@@ -967,6 +967,7 @@ class ComparatorUtil
 ################################################################################
 
 class WebUtil
+
   # Identifies the "client IP" for the given request in various circumstances
   @remote_ip:(req)=>
     req?.get?('x-forwarded-for') ?
@@ -976,8 +977,49 @@ class WebUtil
     req?.connection?.socket?.remoteAddress
 
   # replaces the now deprecated `req.param` found in Express.js
-  @param:(req,name,default_value)=>
-    return (req?.params?[name] ? (req?.body?[name] ? (req?.query?[name] ? default_value)))
+  @param:(req, name, default_value)=>
+    unless req? and name?
+      return default_value
+    else
+      unless Array.isArray(name)
+        name = [name]
+      for n in name
+        val = req.params?[n] ? req.body?[n] ? req.query?[n]
+        if val?
+          return val
+      return default_value
+
+  @map_to_query_string:(map)->
+    return @map_to_qs(map)
+
+  @map_to_qs:(map)->
+    parts = []
+    for name, value of (map ? {})
+      unless Array.isArray(value)
+        value = [value]
+      parts = parts.concat value.map((v)->"#{encodeURIComponent(name)}=#{encodeURIComponent(v)}")
+    return parts.join("&")
+
+  @append_query_string:(url, name, value)=>
+    return @append_qs url, name, value
+
+  @append_qs:(url,name,value)=>
+    if name?
+      if /\?/.test url
+        url += "&"
+      else
+        url += "?"
+      if typeof name is 'string' and value?
+        unless Array.isArray(value)
+          value = [value]
+        url += value.map((v)->"#{encodeURIComponent(name)}=#{encodeURIComponent(v)}").join("&")
+      else if typeof name is 'string' and not value?
+        url += name
+      else if typeof name is 'object' and not value?
+        url += @map_to_qs(name)
+      else
+        throw new Error("Not sure what to do with the parameters #{name} and #{value}.")
+    return url
 
 class IOUtil
 

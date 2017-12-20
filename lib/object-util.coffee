@@ -275,6 +275,18 @@ class ObjectUtil
         return null
     return json
 
+  # like `get_json_path` except `@name` and `name.$` are supported
+  @get_funky_json_path:(json, path...)->
+    if typeof path is 'string'
+      path = [path]
+    if path.length is 1 and Array.isArray(path[0])
+      path = path[0]
+    for name in path
+      json = json[name] ? json["@#{name}"]
+      unless json?
+        return null
+    return json?.$ ? json
+
 ################################################################################
 
 exports.ObjectUtil = exports.MapUtil = ObjectUtil
