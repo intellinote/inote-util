@@ -7,6 +7,7 @@ LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib
 sprintf    = require("sprintf-js").sprintf
 #------------------------------------------------------------------------------#
 Util       = require(path.join(LIB_DIR,'util')).Util
+LogUtil    = require(path.join(LIB_DIR,'log-util')).LogUtil
 FileUtil   = require(path.join(LIB_DIR,'file-util')).FileUtil
 AsyncUtil  = require(path.join(LIB_DIR,'async-util')).AsyncUtil
 ObjectUtil = require(path.join(LIB_DIR,'object-util')).ObjectUtil
