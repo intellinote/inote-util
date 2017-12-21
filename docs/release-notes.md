@@ -70,7 +70,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 ## Release 1.14.0 (21 December 2017)
 
  * Added `DustUtil`.
- * Added `{@l10n}` dustjs helper tag to `L10nUtil`.
+ * Added `{@l10n}` [dustjs](https://akdubya.github.io/dustjs/) helper tag to `L10nUtil`.
 
 ## Release 1.13.0 (19 December 2017)
 
