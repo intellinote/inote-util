@@ -36,7 +36,7 @@
     "dustjs-linkedin"  : "^2",
     "htmlparser"       : "^1",
     "marked-toc"       : "^0",
-    "marked"           : "^0.3.7",
+    "8fold-marked"     : "^0",
     "mocha"            : "^2",
     "should"           : "^13",
     "stew-select"      : "^0",
