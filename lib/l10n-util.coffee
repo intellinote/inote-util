@@ -10,12 +10,67 @@ Util       = require(path.join(LIB_DIR,'util')).Util
 FileUtil   = require(path.join(LIB_DIR,'file-util')).FileUtil
 AsyncUtil  = require(path.join(LIB_DIR,'async-util')).AsyncUtil
 ObjectUtil = require(path.join(LIB_DIR,'object-util')).ObjectUtil
+DustUtil   = require(path.join(LIB_DIR,'dust-util')).DustUtil.DustUtil
 #------------------------------------------------------------------------------#
 
 class L10nUtil
 
-  constructor:()->
+  constructor:(config)->
+    config ?= {}
     @locale_re = /^([a-z]+)(-([a-z]+))??$/i
+    if config.dust? or config.dust_util?
+      @dust_util = config.dust_util ? new DustUtil(config.dust)
+
+  set_dust_util:(dust_util)=>
+    @dust_util = dust_util
+
+  add_dust_helpers:(dust)=>
+    if dust instanceof DustUtil
+      @dust_util ?= dust
+      dust = dust.dust
+    if dust? and not @dust_util?
+      @dust_util = new DustUtil(dust)
+    if not dust?
+      @dust_util ?= new DustUtil()
+      dust = @dust_util.ensure_dust()
+    dust.helpers ?= {}
+    dust.helpers.l10n = @l10n_dust_helper
+
+  l10n_dust_helper:(chunk, context, bodies, params)=>
+    @dust_util ?= new DustUtil()
+    localize_fn = @dust_util.ctx_get(context, ['localizer', 'localize', 'localization', 'l10n'])
+    if typeof localize_fn is 'object'
+      localize_fn = @make_localizer(localize_fn)
+    unless localize_fn? and typeof localize_fn is 'function'
+      LogUtil.tperr "ERROR: l10n helper called but localization is missing or invalid. Will render :else block."
+      localize_fn = ()->null
+    key = params.key ? @dust_util.eval_dust_string (bodies.block ? ""), chunk, context
+    key = key?.trim?() ? ""
+    sprintf_args = []
+    if params.args? and Array.isArray(params.args)
+      sprintf_args = params.args
+    else if params.args?
+      sprintf_args = (@dust_util.eval_dust_string(params.args, chunk, context)).split(',')
+    else
+      non_arg_params = null
+      for pn, pv of params
+        pv = @dust_util.eval_dust_string(pv, chunk, context)
+        match = pn.match(/^arg([0-9]+)$/)
+        if match? and match[1]?
+          sprintf_args[Util.to_int(match[1])] = pv
+        else unless pn is 'key'
+          non_arg_params ?= {}
+          non_arg_params[pn] = pv
+      if sprintf_args.length is 0 and non_arg_params?
+        sprintf_args = non_arg_params
+    result = localize_fn key, sprintf_args
+    if result?
+      return chunk.write(result)
+    else if bodies.else?
+      return chunk.render(bodies.else, context)
+    else
+      return chunk.write("")
+
 
   identify_and_expand_locales:(req)=>
     return @expand_locales(@identify_locales(req))
@@ -147,3 +202,5 @@ class L10nUtil
       return @localize(localization_data, key, args...)
 
 exports.L10nUtil = new L10nUtil()
+exports.L10nUtil.constructor = exports.L10nUtil.L10nUtil = L10nUtil
+exports.L10nUtil.init = (config)->return new L10nUtil(config)

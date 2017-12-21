@@ -25,19 +25,20 @@ LIB_DIR   = if fs.existsSync(LIB_COV) then LIB_COV else LIB
 sources = [
   'async-util'
   'config'
+  'dust-util'
+  'file-logger'
   'file-util'
   'io-util'
+  'l10n-util'
+  'log-util'
   'net-util'
   'object-util'
-  'l10n-util'
-  'stopwatch'
   's3-model'
+  'stopwatch'
   'string-util'
   'util'
   'work-queue'
   'zip-util'
-  'log-util'
-  'file-logger'
 ]
 
 # Now we simply load (`require`) the requisite files and pass along whatever

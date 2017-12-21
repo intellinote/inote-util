@@ -4,7 +4,9 @@ HOMEDIR    = path.join(__dirname,'..')
 LIB_COV    = path.join(HOMEDIR,'lib-cov')
 LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 DATA       = path.join HOMEDIR, "data"
-Util       = require(path.join(LIB_DIR,'util')).Util
+StringUtil = require(path.join(LIB_DIR,'string-util')).StringUtil
+AsyncUtil  = require(path.join(LIB_DIR,'async-util')).AsyncUtil
+ObjectUtil = require(path.join(LIB_DIR,'object-util')).ObjectUtil
 mkdirp     = require 'mkdirp'
 remove     = require 'remove'
 DEBUG      = (/(^|,)file-?util($|,)/i.test process?.env?.NODE_DEBUG)
@@ -72,7 +74,7 @@ class FileUtil
       callback = options
       options = null
     options ?= {}
-    recurse = Util.truthy_string(options.recurse ? false)
+    recurse = StringUtil.truthy_string(options.recurse ? false)
     pattern = options.pattern
     types   = options.types ? options.type
     fs.readdir dir, (err,files)=>
@@ -90,7 +92,7 @@ class FileUtil
               next()
             else
               next()
-        Util.for_each_async files, action, ()=>
+        AsyncUtil.for_each_async files, action, ()=>
           # recurse if needed
           unless recurse
             callback null, found
@@ -111,7 +113,7 @@ class FileUtil
                         next()
                   else
                     next()
-            Util.for_each_async files, action, ()=>
+            AsyncUtil.for_each_async files, action, ()=>
               callback null, found
 
   # Replaces invalid characters from and truncates very long filenames.
@@ -142,12 +144,12 @@ class FileUtil
       return "#{basename}#{ext}"
     else
       i = 1
-      while fs.existsSync(path.join(dir,"#{basename}-#{Util.lpad(i,minpadwidth,'0')}#{ext}"))
+      while fs.existsSync(path.join(dir,"#{basename}-#{StringUtil.lpad(i,minpadwidth,'0')}#{ext}"))
         if i > max_attempts
           throw new Error("Unable to obtain a unique filename for \"#{basename}#{ext}\" in \"#{dir}\" after #{max_attempts} attempts.")
         else
           i += 1
-      return "#{basename}-#{Util.lpad(i,minpadwidth,'0')}#{ext}"
+      return "#{basename}-#{StringUtil.lpad(i,minpadwidth,'0')}#{ext}"
 
   # Attempts to recursively create the specified directory, ignoring errors.
   # Set `NODE_DEBUG=inote-util` to view errors.
@@ -158,7 +160,7 @@ class FileUtil
         mkdirp.sync(dir)
         return true
       catch e
-        if DEBUG
+        if DEBUG # TODO replace with LogUtil
           console.error "FileUtil.mkdir",e
         return false
     else
@@ -176,7 +178,7 @@ class FileUtil
           fs.unlinkSync(file)
         catch e
           result = false
-          if DEBUG
+          if DEBUG # TODO replace with LogUtil
             console.error "FileUtil.rm",e
     return result
 
@@ -192,7 +194,7 @@ class FileUtil
           remove.removeSync(dir)
         catch e
           result = false
-          if DEBUG
+          if DEBUG # TODO replace with LogUtil
             console.error "FileUtil.rmdir",e
     return result
 
@@ -391,7 +393,7 @@ class FileUtil
 
   @get_extension:(filename)=>
     if filename?
-      ext = Util.blank_to_null(path.extname(filename)) ? filename
+      ext = StringUtil.blank_to_null(path.extname(filename)) ? filename
       if /^\./.test ext
         ext = ext.substring(1,ext.length)
       return ext
@@ -537,7 +539,7 @@ class FileUtil
       pair = {}
       pair[mappings[0]] = mappings[1]
       mappings = [pair]
-    @_mime_to_ext_map = Util.merge(@get_mime_to_ext_map(),mappings...)
+    @_mime_to_ext_map = ObjectUtil.merge(@get_mime_to_ext_map(),mappings...)
   @add_to_mime_to_extension_map:(mappings...)=>@add_mime_to_ext_map(mappings...)
 
   # add to the currently active extension-to-mime mapping
@@ -547,7 +549,7 @@ class FileUtil
       pair = {}
       pair[mappings[0]] = mappings[1]
       mappings = [pair]
-    @_ext_to_mime_map = Util.merge(@get_ext_to_mime_map(),mappings...)
+    @_ext_to_mime_map = ObjectUtil.merge(@get_ext_to_mime_map(),mappings...)
   @add_to_extension_to_mime_map:(mappings...)=>@add_ext_to_mime_map(mappings...)
 
   # Lazily load the `ext-to-mime.json` file into the `_EXT_TO_MIME_MAP` map.

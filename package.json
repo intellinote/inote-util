@@ -1,6 +1,6 @@
 {
   "name": "inote-util",
-  "version": "1.13.4",
+  "version": "1.14.0",
   "description": "A collection of utility functions and classes.",
   "repository": {
     "type": "git",
@@ -33,9 +33,10 @@
     "coffee-script"    : "^1",
     "coffeelint"       : "^2",
     "docco"            : "^0",
+    "dustjs-linkedin"  : "^2",
     "htmlparser"       : "^1",
     "marked-toc"       : "^0",
-    "marked"           : "^0.3.7",
+    "8fold-marked"     : "^0",
     "mocha"            : "^2",
     "should"           : "^13",
     "stew-select"      : "^0",

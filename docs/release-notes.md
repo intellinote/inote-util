@@ -5,6 +5,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- toc -->
 
 
+  - [Release 1.14.0 (21 December 2017)](#release-1130-21-december-2017)
   - [Release 1.13.0 (19 December 2017)](#release-1130-19-december-2017)
   - [Release 1.12.0](#release-1120)
   - [Release 1.11.0](#release-1110)
@@ -65,6 +66,11 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+
+## Release 1.14.0 (21 December 2017)
+
+ * Added `DustUtil`.
+ * Added `{@l10n}` [dustjs](https://akdubya.github.io/dustjs/) helper tag to `L10nUtil`.
 
 ## Release 1.13.0 (19 December 2017)
 
