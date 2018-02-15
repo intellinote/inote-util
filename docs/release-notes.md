@@ -67,6 +67,11 @@ This file summarizes the changes bundled in each release of `inote-util`.
 <!-- tocstop -->
 
 
+## Release 1.14.1 (15 February 2018)
+
+ * Ensure `AsyncUtil.wait` and related methods return the ID that can be used to cancel the timer.
+
+
 ## Release 1.14.0 (21 December 2017)
 
  * Added `DustUtil`.
