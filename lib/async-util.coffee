@@ -8,7 +8,7 @@ DEBUG      = (/(^|,)async-?util($|,)/i.test process?.env?.NODE_DEBUG)
 
 class AsyncUtil
 
-  @wait_until:(predicate,delay,callback)=>
+  @wait_until:(predicate,delay,args...,callback)=>
     if typeof delay is 'function' and not callback?
       callback = delay
       delay = null
@@ -29,32 +29,58 @@ class AsyncUtil
           @cancel_interval(interval_id)
           callback?(err,wait_over)
           callback = null
-    interval_id = @interval(delay, action)
+    interval_id = @interval(delay, args..., action)
+    return interval_id
 
-  @wait_for:(predicate,delay,callback)=>@wait_until(predicate,delay,callback)
-
+  @wait_for:(predicate,delay,callback)=>return @wait_until(predicate,delay,callback)
 
   # Wait `delay` milliseconds then invoke `cb`.
   # Much like `setTimeout`, but with a more sensible argument sequence for CoffeeScript
-  @wait:(delay,cb)=>process.nextTick(()=>setTimeout(cb,delay))
-  @set_timeout:(delay,cb)=>@wait(delay,cb)
-  @setTimeout:(delay,cb)=>@wait(delay,cb)
+  @wait:(delay,args...,cb)->
+    fn = (args...)->
+      process.nextTick ()->
+        cb(args...)
+    return setTimeout(fn, delay, args...)
+  @set_timeout:(delay,args...,cb)=>
+    return @wait(delay,args...,cb)
+  @setTimeout:(delay,args...,cb)=>
+    return @wait(delay,args...,cb)
 
   # Alias for `window.clearTimeout`
-  @cancel_wait:(id)=>clearTimeout(id)
-  @clearTimeout:(id)=>@cancel_wait(id)
-  @clear_timeout:(id)=>@cancel_wait(id)
+  @cancel_wait:(id)->
+    clearTimeout(id)
+  @cancelWait:(id)=>
+    @cancel_wait(id)
+  @cancelTimeout:(id)=>
+    @cancel_wait(id)
+  @cancel_timeout:(id)=>
+    @cancel_wait(id)
+  @clearTimeout:(id)=>
+    @cancel_wait(id)
+  @clear_timeout:(id)=>
+    @cancel_wait(id)
+  @clearWait:(id)=>
+    @cancel_wait(id)
+  @clear_wait:(id)=>
+    @cancel_wait(id)
 
   # Like `setInterval`, but with a more sensible argument sequence for CoffeeScript
-  @interval:(delay,cb)=>setInterval(cb,delay)
-  @set_interval:(delay,cb)=>interval(cb,delay)
-  @setInterval:(delay,cb)=>@interval(delay,cb)
+  @interval:(delay,args...,cb)->
+    return setInterval(cb,delay,args...)
+  @set_interval:(delay,args...,cb)=>
+    return @interval(delay,args...,cb)
+  @setInterval:(delay,args...,cb)=>
+    return @interval(delay,args...,cb)
 
   # Alias for `window.clearInterval`
-  @cancel_interval:(id)=>clearInterval(id)
-  @cancelInterval:(id)=>@cancel_interval(id)
-  @clear_interval:(id)=>@cancel_interval(id)
-  @clearInterval:(id)=>@cancel_interval(id)
+  @cancel_interval:(id)->
+    clearInterval(id)
+  @cancelInterval:(id)=>
+    @cancel_interval(id)
+  @clear_interval:(id)=>
+    @cancel_interval(id)
+  @clearInterval:(id)=>
+    @cancel_interval(id)
 
   # **for_async** - *executes an asynchronous `for` loop.*
   #

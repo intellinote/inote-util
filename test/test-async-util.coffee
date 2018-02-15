@@ -1,6 +1,7 @@
 require 'coffee-errors'
 #------------------------------------------------------------------------------#
 should   = require 'should'
+assert   = require 'assert'
 fs       = require 'fs'
 path     = require 'path'
 HOMEDIR  = path.join(__dirname,'..')
@@ -10,6 +11,106 @@ AsyncUtil = require(path.join(LIB_DIR,'async-util')).AsyncUtil
 Sequencer = require(path.join(LIB_DIR,'async-util')).Sequencer
 
 describe 'AsyncUtil',->
+
+  it "wait is like setTimeout but with a more coffee-friendly API", (done)=>
+    DELAY = 20
+    start_time = Date.now()
+    fn = (arg1, arg2)->
+      stop_time = Date.now()
+      assert.ok stop_time-start_time >= DELAY
+      assert.equal arg1, "arg-one"
+      assert.equal arg2, 2
+      done()
+    AsyncUtil.wait DELAY, "arg-one", 2, fn
+
+  it "wait returns a timer-id that can be used to cancel the timer", (done)=>
+    DELAY = 20
+    fn1_called = false
+    fn1 = ()->
+      fn1_called = true
+      assert.fail "Expected this function to be cancelled."
+    fn2 = ()->
+      assert.ok not fn1_called, "Expected fn1 to be cancelled but it was called instead."
+      done()
+    id1 = AsyncUtil.wait DELAY, fn1
+    id2 = AsyncUtil.wait DELAY*1.5, fn2
+    assert.ok id1?
+    assert.ok id2?
+    AsyncUtil.cancel_wait id1
+
+  it "set_timeout returns a timer-id that can be used to cancel the timer", (done)=>
+    DELAY = 20
+    fn1_called = false
+    fn1 = ()->
+      fn1_called = true
+      assert.fail "Expected this function to be cancelled."
+    fn2 = ()->
+      assert.ok not fn1_called, "Expected fn1 to be cancelled but it was called instead."
+      done()
+    id1 = AsyncUtil.set_timeout DELAY, fn1
+    id2 = AsyncUtil.set_timeout DELAY*1.5, fn2
+    assert.ok id1?
+    assert.ok id2?
+    AsyncUtil.cancel_wait id1
+
+  it "interval is like setInterval but with a more coffee-friendly API", (done)=>
+    DELAY = 15
+    call_count = 0
+    start_time = Date.now()
+    id = null
+    fn = (arg1, arg2)->
+      call_count += 1
+      if call_count is 2
+        stop_time = Date.now()
+        AsyncUtil.cancel_interval id
+        assert.ok stop_time-start_time >= DELAY*2
+        assert.ok stop_time-start_time <= DELAY*3
+        assert.equal arg1, "arg-one"
+        assert.equal arg2, 2
+        done()
+      else
+        assert.ok call_count < 2
+    id = AsyncUtil.interval DELAY, "arg-one", 2, fn
+
+  it "set_interval is like setInterval but with a more coffee-friendly API", (done)=>
+    DELAY = 15
+    call_count = 0
+    start_time = Date.now()
+    id = null
+    fn = (arg1, arg2)->
+      call_count += 1
+      if call_count is 2
+        stop_time = Date.now()
+        AsyncUtil.cancel_interval id
+        assert.ok stop_time-start_time >= DELAY*2
+        assert.ok stop_time-start_time <= DELAY*3
+        assert.equal arg1, "arg-one"
+        assert.equal arg2, 2
+        done()
+      else
+        assert.ok call_count < 2
+    id = AsyncUtil.set_interval DELAY, "arg-one", 2, fn
+
+
+  it "setInterval is like setInterval but with a more coffee-friendly API", (done)=>
+    DELAY = 15
+    call_count = 0
+    start_time = Date.now()
+    id = null
+    fn = (arg1, arg2)->
+      call_count += 1
+      if call_count is 2
+        stop_time = Date.now()
+        AsyncUtil.cancelInterval id
+        assert.ok stop_time-start_time >= DELAY*2
+        assert.ok stop_time-start_time <= DELAY*3
+        assert.equal arg1, "arg-one"
+        assert.equal arg2, 2
+        done()
+      else
+        assert.ok call_count < 2
+    id = AsyncUtil.setInterval DELAY, "arg-one", 2, fn
+
 
   it "for_each_async can execute an async for-each loop", (done)=>
     numbers = [1..100]
@@ -58,12 +159,12 @@ describe 'AsyncUtil',->
 
   it "wait_until can wait for a condition to be true", (done)=>
     start_time = Date.now()
-    target = 300
+    target = 20
     times_run = 0
     predicate = ()=>
       times_run++
       return (Date.now() - start_time) >= target
-    AsyncUtil.wait_until predicate, 10, (err,complete)=>
+    AsyncUtil.wait_until predicate, 5, (err,complete)=>
       initial_times_run = times_run
       should.not.exist err
       complete.should.equal true
@@ -74,7 +175,7 @@ describe 'AsyncUtil',->
 
   it "wait_for is an alias for wait_until and treats negative delay (and null delay) as default delay", (done)=>
     start_time = Date.now()
-    target = 300
+    target = 200
     times_run = 0
     predicate = ()=>
       times_run++
