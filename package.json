@@ -1,6 +1,6 @@
 {
   "name": "inote-util",
-  "version": "1.14.1",
+  "version": "1.14.2",
   "description": "A collection of utility functions and classes.",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
     "url": "https://github.com/intellinote/inote-util/issues"
   },
   "license": "MIT",
-  "author": "BroadSoft <https://www.team-one.com/>",
+  "author": "Team-One/BroadSoft/Cisco <https://www.team-one.com/>",
   "dependencies": {
     "aws-sdk"          : "^2",
     "comment-json"     : "^1",
