@@ -1,21 +1,34 @@
-fs                                          = require 'fs'
-path                                        = require 'path'
-HOME_DIR                                    = path.join(__dirname,'..')
-LIB_COV                                     = path.join(HOME_DIR,'lib-cov')
-LIB_DIR                                     = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
-Util                                        = require(path.join(LIB_DIR,'util')).Util
-AsyncUtil                                   = require(path.join(LIB_DIR,'async-util')).AsyncUtil
-cluster                                     = require 'cluster'
-dns                                         = require 'dns'
-http                                        = require 'http'
-https                                       = require 'https'
-net                                         = require 'net'
-shelljs                                     = require 'shelljs'
-URL                                         = require 'url'
-DEFAULT_RESOLVE_HOSTNAME_TIMEOUT            = 333
-DEFAULT_RESOLVE_HOSTNAME_MAX_PARALLEL_TESTS = 16
+fs                                           = require 'fs'
+path                                         = require 'path'
+HOME_DIR                                     = path.join(__dirname,'..')
+LIB_COV                                      = path.join(HOME_DIR,'lib-cov')
+LIB_DIR                                      = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
+#------------------------------------------------------------------------------#
+Util                                         = require(path.join(LIB_DIR,'util')).Util
+AsyncUtil                                    = require(path.join(LIB_DIR,'async-util')).AsyncUtil
+RandomUtil                                   = require(path.join(LIB_DIR,'util')).RandomUtil
+#------------------------------------------------------------------------------#
+cluster                                      = require 'cluster'
+dns                                          = require 'dns'
+http                                         = require 'http'
+https                                        = require 'https'
+net                                          = require 'net'
+shelljs                                      = require 'shelljs'
+URL                                          = require 'url'
+#------------------------------------------------------------------------------#
+DEFAULT_RESOLVE_HOSTNAME_TIMEOUT             = 333
+DEFAULT_RESOLVE_HOSTNAME_MAX_PARALLEL_TESTS  = 4
+DEFAULT_RESOLVE_HOSTNAME_CACHE_TTL           = 60*1000
+DEFAULT_RESOLVE_HOSTNAME_USE_CACHE           = true
+DEFAULT_RESOLVE_HOSTNAME_REJECT_UNAUTHORIZED = true
+DEFAULT_RESOLVE_HOSTNAME_SHUFFLE             = true
+DEFAULT_RESOLVE_HOSTNAME_PROTOCOL            = "https:"
+DEFAULT_RESOLVE_HOSTNAME_PATH                = "/"
+#------------------------------------------------------------------------------#
 
 class NetUtil
+
+  @_dns_resolve_cache: { }
 
   @normalize_url:(url)=>
     return URL.parse(url)?.href ? url
@@ -59,6 +72,49 @@ class NetUtil
       server.close()
     server.listen port
 
+  # sets defaults for `resolve_hostname`
+  @set_resolve_hostname_options:(options)=>
+    @resolve_hostname_options = options
+
+  # gets defaults for `resolve_hostname`
+  @get_resolve_hostname_options:()=>
+    return @resolve_hostname_options
+
+  # when `host` is provided, removes that one entry from the cache,
+  # otherwise removes all entries from the cache
+  @clear_resolve_hostname_cache:(host)=>
+    if host?
+      if @_dns_resolve_cache[host]?
+        delete @_dns_resolve_cache[host]
+    else
+      @_dns_resolve_cache = { }
+
+  # private method that wraps optional caching around `dns.resolve`
+  @_resolve_hostname_to_ips:(host, options, callback)=>
+    # swap options and callback if options is not provided
+    if typeof options is 'function' and not callback?
+      callback = options
+      options = null
+    #
+    options ?= {}
+    now = Date.now()
+    if options.use_cache and @_dns_resolve_cache[host]?.expires_at > now # if caching is enabled and a valid entry is found
+      callback null, @_dns_resolve_cache[host].ips
+    else
+      if @_dns_resolve_cache[host]?.expires_at <= now # if already expired, delete the cached value
+        delete @_dns_resolve_cache[host]
+      dns.resolve host, (err, ip_addresses)=>
+        if err?
+          callback err
+        else
+          if ip_addresses? and options.cache_ttl? and options.cache_ttl > 0 # if caching
+            @_dns_resolve_cache[host] = {
+              expires_at: now + options.cache_ttl
+              ips: ip_addresses
+            }
+          callback err, ip_addresses
+
+
   # Identifies a "live" IP address for the given domain name, respecting
   # [round-robin DNS](https://en.wikipedia.org/wiki/Round-robin_DNS) entries when found.
   #
@@ -84,27 +140,33 @@ class NetUtil
   #     * `path` - path for the request used to test each server; defaults to `/`
   #     * `timeout` - request timeout (in milliseconds), defaults to `DEFAULT_RESOLVE_HOSTNAME_TIMEOUT`
   #     * `max_parallel_tests` - number of IP addresses to check simultaneously; defaults to `DEFAULT_RESOLVE_HOSTNAME_MAX_PARALLEL_TESTS`
+  #     * `cache_ttl` - time (in milliseconds) that resolved list of DNS entries may be cached
+  #     * `use_cache` - when `false`, the any cached DNS lookups will be ignored
   #     * `reject_unauthorized` - when `false`, problems validating the server's SSL certificate will be ignored; defalts to `true`.
+  #     * `shuffle` - when `true` the list of IP addresses will be shuffled each time (defaults to `true`)
   # * `callback` - callback method with the signature `(err, ip_addresses)`
-  #
   @resolve_hostname:(host, options, callback)=>
     # swap options and callback if options is not provided
     if typeof options is 'function' and not callback?
       callback = options
       options = null
-    # parse options (or set defaults)
     options ?= {}
-    protocol = options.protocol ? "https:"
-    protocol = protocol.toLowerCase()
-    unless /:$/.test protocol
-      protocol = protocol + ":"
-    port = Util.to_int(options.port) ? if protocol is 'http:' then 80 else 443
-    path = options.path ? "/"
-    timeout = Util.to_int(options.timeout) ? DEFAULT_RESOLVE_HOSTNAME_TIMEOUT
-    max_parallel_tests = Util.to_int(options.max_parallel_tests) ? DEFAULT_RESOLVE_HOSTNAME_MAX_PARALLEL_TESTS
-    reject_unauthorized = Util.truthy_string(options.reject_unauthorized ? options.rejectUnauthorized ? true)
-    # Cconvert hostname to one or more IPs, and try to find one that works:
-    dns.resolve host, (err, ip_addresses)->
+    # parse options (or set defaults)
+    opts = {}
+    opts.protocol = options.protocol ? @resolve_hostname_options?.protocol ? DEFAULT_RESOLVE_HOSTNAME_PROTOCOL
+    opts.protocol = opts.protocol.toLowerCase()
+    unless /:$/.test opts.protocol
+      opts.protocol = opts.protocol + ":"
+    opts.port           = Util.to_int(options.port) ?  Util.to_int(@resolve_hostname_options?.port) ? (if opts.protocol is 'http:' then 80 else 443)
+    opts.path                = options.path                                   ? @resolve_hostname_options?.path                            ? DEFAULT_RESOLVE_HOSTNAME_PATH
+    opts.timeout             = Util.to_int(options.timeout)                   ? Util.to_int(@resolve_hostname_options?.timeout)            ? DEFAULT_RESOLVE_HOSTNAME_TIMEOUT
+    opts.max_parallel_tests  = Util.to_int(options.max_parallel_tests)        ? Util.to_int(@resolve_hostname_options?.max_parallel_tests) ? DEFAULT_RESOLVE_HOSTNAME_MAX_PARALLEL_TESTS
+    opts.cache_ttl           = Util.to_int(options.cache_ttl)                 ? Util.to_int(@resolve_hostname_options?.cache_ttl)          ? DEFAULT_RESOLVE_HOSTNAME_CACHE_TTL
+    opts.use_cache           = Util.truthy_string(options.use_cache           ? @resolve_hostname_options?.use_cache                       ? DEFAULT_RESOLVE_HOSTNAME_USE_CACHE)
+    opts.reject_unauthorized = Util.truthy_string(options.reject_unauthorized ? options.rejectUnauthorized ? @resolve_hostname_options?.reject_unauthorized ? @resolve_hostname_options?.rejectUnauthorized ? DEFAULT_RESOLVE_HOSTNAME_REJECT_UNAUTHORIZED)
+    opts.shuffle             = Util.truthy_string(options.shuffle ? @resolve_hostname_options?.shuffle ? DEFAULT_RESOLVE_HOSTNAME_SHUFFLE)
+    # Convert hostname to one or more IPs, and try to find one that works:
+    @_resolve_hostname_to_ips host, opts, (err, ip_addresses)->
       if err?
         callback err
       else
@@ -114,17 +176,17 @@ class NetUtil
           if called_back                                                        #   If we've already returned an IP for this host, skip this test.
             next()
           else                                                                  #   Otherwise attempt a GET request to see if the IP address is live.
-            client = if protocol is 'http:' then http else https
+            client = if opts.protocol is 'http:' then http else https
             client.get({
-              protocol: protocol
+              protocol: opts.protocol
               host: ip_address
-              port: port
-              path: path
+              port: opts.port
+              path: opts.path
               headers: {
                 Host: host
               }
-              timeout: timeout
-              rejectUnauthorized: reject_unauthorized
+              timeout: opts.timeout
+              rejectUnauthorized: opts.reject_unauthorized
             }, (res) ->
               if res?.statusCode? and res?.socket?.remoteAddress?               #   If it worked...
                 if not called_back                                              #   ...and we haven't called back yet...
@@ -132,7 +194,9 @@ class NetUtil
                   called_back = true                                            #   ...note that we've called back, and we're done.
             ).on 'error', next                                                  #   Otherwise just keep going.
         # Use that method to test the ip_addresses returned by `dns.resolve`.
-        AsyncUtil.throttled_fork_for_each_async max_parallel_tests, ip_addresses, test_ip_action, ()->
+        if ip_addresses? and Array.isArray(ip_addresses) and opts.shuffle
+          ip_addresses = RandomUtil.shuffle([].concat(ip_addresses))
+        AsyncUtil.throttled_fork_for_each_async opts.max_parallel_tests, ip_addresses, test_ip_action, ()->
           if not called_back                                                    # If we get to "when_done" and still haven't called back yet, none of the IPs worked.
             callback new Error "Unable to find live server for host '#{host}'."
 

@@ -759,6 +759,16 @@ class RandomUtil
       str = str.substring(0,count)
     return str
 
+  # performs an IN PLACE shuffle of the given array
+  @shuffle:(list)->
+    if list? and Array.isArray(list) and list.length > 1
+      for i in [(list.length-1)..0]
+        j = Math.floor(Math.random() * (i + 1))
+        x = list[i]
+        list[i] = list[j]
+        list[j] = x
+    return list
+
 ################################################################################
 
 class PasswordUtil
@@ -1273,6 +1283,7 @@ class Util
   @seed_rng:              RandomUtil.seed_rng
   @set_rng:               RandomUtil.set_rng
   @random_digits:         RandomUtil._random_digits
+  @shuffle:               RandomUtil.shuffle
 
   @validate_hashed_password:PasswordUtil.validate_hashed_password
   @hash_password:PasswordUtil.hash_password
@@ -1294,6 +1305,10 @@ class Util
   @pad_uuid:IdUtil.pad_uuid
   @b64e:Base64.encode
   @b64d:Base64.decode
+
+################################################################################
+
+ArrayUtil.shuffle      = RandomUtil.shuffle
 
 ################################################################################
 

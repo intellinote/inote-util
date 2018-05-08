@@ -4,7 +4,8 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
-
+  - [Release 1.15.0 (7 May 2018)](#release-1150-7-may-2018)
+  - [Release 1.14.2 (15 February 2018)](#release-1142-15-february-2018)
   - [Release 1.14.0 (21 December 2017)](#release-1130-21-december-2017)
   - [Release 1.13.0 (19 December 2017)](#release-1130-19-december-2017)
   - [Release 1.12.0](#release-1120)
@@ -66,6 +67,22 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+## Release 1.15.0 (7 May 2018)
+ * **RandomUtil**
+   * Add `RandomUtil.shuffle` (aliased as `ArrayUtil.shuffle`) to perform an in-place shuffle of an array.
+ * **NetUtil**
+   * Add optional cache to `NetUtil.resolve_hostname` and `NetUtil.clear_resolve_hostname_cache` to flush it.
+   * Add `NetUtil.set_resolve_hostname_options`
+   * Now using the following configuration options for `NetUtil.resolve_hostname`:
+      * `protocol` - protocol for the request used to test each server; one of `http:` or `https:`; defaults to `https:`
+      * `port` - port for the request used to test each server; when `protocol` is `http:`, defaults to `80`; otherwise defaults to `443`
+      * `path` - path for the request used to test each server; defaults to `/`
+      * `timeout` - request timeout (in milliseconds), defaults to `333`
+      * `max_parallel_tests` - number of IP addresses to check simultaneously; defaults to `4`
+      * `cache_ttl` - time (in milliseconds) that a resolved list of DNS entries may be cached; defaults to `60000`; non-positive integer values will disable this feature
+      * `use_cache` - when truthy, any cached DNS lookups will be ignored (hence a fresh lookup will be performed); defaults to `true`
+      * `reject_unauthorized` - when `false`, problems validating the server's SSL certificate will be ignored; defaults to `true`.
+      * `shuffle`
 
 ## Release 1.14.2 (15 February 2018)
 
