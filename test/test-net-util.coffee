@@ -42,4 +42,12 @@ describe 'NetUtil',->
     NetUtil.resolve_hostname 'itunes.com', (err,res)->
       assert not err?
       assert.equal res in ips, true, 'address mismatch'
+      assert.ok NetUtil._dns_resolve_cache?["itunes.com"]?.expires_at?
+      assert.ok NetUtil._dns_resolve_cache?["itunes.com"]?.ips?
+      NetUtil.clear_resolve_hostname_cache("not.itunes.com")
+      assert.ok NetUtil._dns_resolve_cache?["itunes.com"]?.expires_at?
+      assert.ok NetUtil._dns_resolve_cache?["itunes.com"]?.ips?
+      NetUtil.clear_resolve_hostname_cache()
+      assert.ok not NetUtil._dns_resolve_cache?["itunes.com"]?.expires_at?
+      assert.ok not NetUtil._dns_resolve_cache?["itunes.com"]?.ips?
       done()
