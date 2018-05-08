@@ -6,6 +6,7 @@ LIB_DIR                                      = if fs.existsSync(LIB_COV) then LI
 #------------------------------------------------------------------------------#
 Util                                         = require(path.join(LIB_DIR,'util')).Util
 AsyncUtil                                    = require(path.join(LIB_DIR,'async-util')).AsyncUtil
+RandomUtil                                   = require(path.join(LIB_DIR,'util')).RandomUtil
 #------------------------------------------------------------------------------#
 cluster                                      = require 'cluster'
 dns                                          = require 'dns'
@@ -20,6 +21,7 @@ DEFAULT_RESOLVE_HOSTNAME_MAX_PARALLEL_TESTS  = 4
 DEFAULT_RESOLVE_HOSTNAME_CACHE_TTL           = 60*1000
 DEFAULT_RESOLVE_HOSTNAME_USE_CACHE           = true
 DEFAULT_RESOLVE_HOSTNAME_REJECT_UNAUTHORIZED = true
+DEFAULT_RESOLVE_HOSTNAME_SHUFFLE             = true
 DEFAULT_RESOLVE_HOSTNAME_PROTOCOL            = "https:"
 DEFAULT_RESOLVE_HOSTNAME_PATH                = "/"
 #------------------------------------------------------------------------------#
@@ -141,6 +143,7 @@ class NetUtil
   #     * `cache_ttl` - time (in milliseconds) that resolved list of DNS entries may be cached
   #     * `use_cache` - when `false`, the any cached DNS lookups will be ignored
   #     * `reject_unauthorized` - when `false`, problems validating the server's SSL certificate will be ignored; defalts to `true`.
+  #     * `shuffle` - when `true` the list of IP addresses will be shuffled each time (defaults to `true`)
   # * `callback` - callback method with the signature `(err, ip_addresses)`
   @resolve_hostname:(host, options, callback)=>
     # swap options and callback if options is not provided
@@ -161,6 +164,7 @@ class NetUtil
     opts.cache_ttl           = Util.to_int(options.cache_ttl)                 ? Util.to_int(@resolve_hostname_options?.cache_ttl)          ? DEFAULT_RESOLVE_HOSTNAME_CACHE_TTL
     opts.use_cache           = Util.truthy_string(options.use_cache           ? @resolve_hostname_options?.use_cache                       ? DEFAULT_RESOLVE_HOSTNAME_USE_CACHE)
     opts.reject_unauthorized = Util.truthy_string(options.reject_unauthorized ? options.rejectUnauthorized ? @resolve_hostname_options?.reject_unauthorized ? @resolve_hostname_options?.rejectUnauthorized ? DEFAULT_RESOLVE_HOSTNAME_REJECT_UNAUTHORIZED)
+    opts.shuffle             = Util.truthy_string(options.shuffle ? @resolve_hostname_options?.shuffle ? DEFAULT_RESOLVE_HOSTNAME_SHUFFLE)
     # Convert hostname to one or more IPs, and try to find one that works:
     @_resolve_hostname_to_ips host, opts, (err, ip_addresses)->
       if err?
@@ -190,6 +194,8 @@ class NetUtil
                   called_back = true                                            #   ...note that we've called back, and we're done.
             ).on 'error', next                                                  #   Otherwise just keep going.
         # Use that method to test the ip_addresses returned by `dns.resolve`.
+        if ip_addresses? and Array.isArray(ip_addresses) and opts.shuffle
+          ip_addresses = RandomUtil.shuffle([].concat(ip_addresses))
         AsyncUtil.throttled_fork_for_each_async opts.max_parallel_tests, ip_addresses, test_ip_action, ()->
           if not called_back                                                    # If we get to "when_done" and still haven't called back yet, none of the IPs worked.
             callback new Error "Unable to find live server for host '#{host}'."

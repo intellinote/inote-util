@@ -501,6 +501,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **random_Alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-zA-Z]` (using the given random number generator if provided).
 * **random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
 * **random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).
+* **shuffle(list)** - performs an in-place shuffle of the given list
 
 *[Back to Index](#feature-index)*
 
@@ -557,6 +558,7 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 * **falsey_string(str)** - `true` if the given string is `f`, `false`, `no`, `off`, `0`, etc.
 * **lpad(value,width,pad)** - adds `pad` characters to the beginning of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.lpad`, which is an identical method.)
 * **rpad(value,width,pad)** - adds `pad` characters to the end of `value` until `value` is `width` characters long. (Also accepts arrays, see `ArrayUtil.rpad`, which is an identical method.)
+* **shuffle(list)** - performs an in-place shuffle of the given list
 
 *[Back to Index](#feature-index)*
 

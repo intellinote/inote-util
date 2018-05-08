@@ -1,17 +1,19 @@
 require 'coffee-errors'
 #------------------------------------------------------------------------------#
 #coffeelint:disable=cyclomatic_complexity
-fs      = require 'fs'
-path    = require 'path'
-HOMEDIR = path.join(__dirname,'..')
-LIB_COV = path.join(HOMEDIR,'lib-cov')
-LIB_DIR = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
-Util    = require(path.join(LIB_DIR,'index')).Util
+fs         = require 'fs'
+path       = require 'path'
+HOMEDIR    = path.join(__dirname,'..')
+LIB_COV    = path.join(HOMEDIR,'lib-cov')
+LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
+Util       = require(path.join(LIB_DIR,'index')).Util
 WebUtil    = require(path.join(LIB_DIR,'index')).WebUtil
-Stream  = require 'stream'
-zipstream = require 'zipstream'
-assert    = require 'assert'
-should  = require 'should'
+RandomUtil = require(path.join(LIB_DIR,'index')).RandomUtil
+ArrayUtil  = require(path.join(LIB_DIR,'index')).ArrayUtil
+Stream     = require 'stream'
+zipstream  = require 'zipstream'
+assert     = require 'assert'
+should     = require 'should'
 
 describe 'Util',->
 
@@ -152,6 +154,56 @@ describe 'Util',->
     should.not.exist result.abc
     should.not.exist result.xyz
     result.bar.should.equal 'xyzzy'
+    done()
+
+  it "ArrayUtil.shuffle can perform an in-place shuffle of an array",(done)->
+    tests = [
+      null,
+      "foo"
+      { a:1 }
+      [ ]
+      [ 1 ]
+      [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+      [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]
+      [ 1...52 ]
+      [ 1...1000 ]
+    ]
+    for test in tests
+      if Array.isArray(test)
+        shuffled = ArrayUtil.shuffle([].concat(test))
+      else
+        shuffled = ArrayUtil.shuffle(test)
+      if test? and Array.isArray(test)
+        if test?.length > 1
+          assert.notDeepEqual test, shuffled # this test may actually fail once in a while since the original array is a valid shuffling
+        assert.deepEqual test.sort(), shuffled.sort()
+      else
+        assert.equal test, shuffled
+    done()
+
+  it "RandomUtil.shuffle can perform an in-place shuffle of an array",(done)->
+    tests = [
+      null,
+      "foo"
+      { a:1 }
+      [ ]
+      [ 1 ]
+      [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+      [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]
+      [ 1...52 ]
+      [ 1...1000 ]
+    ]
+    for test in tests
+      if Array.isArray(test)
+        shuffled = RandomUtil.shuffle([].concat(test))
+      else
+        shuffled = RandomUtil.shuffle(test)
+      if test? and Array.isArray(test)
+        if test?.length > 1
+          assert.notDeepEqual test, shuffled # this test may actually fail once in a while since the original array is a valid shuffling
+        assert.deepEqual test.sort(), shuffled.sort()
+      else
+        assert.equal test, shuffled
     done()
 
   it "random_bytes returns random bytes in the specified encoding",(done)->
