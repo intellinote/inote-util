@@ -4,7 +4,8 @@ HOME_DIR                                     = path.join(__dirname,'..')
 LIB_COV                                      = path.join(HOME_DIR,'lib-cov')
 LIB_DIR                                      = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
 #------------------------------------------------------------------------------#
-Util                                         = require(path.join(LIB_DIR,'util')).Util
+NumberUtil                                   = require(path.join(LIB_DIR,'util')).NumberUtil
+StringUtil                                   = require(path.join(LIB_DIR,'util')).StringUtil
 AsyncUtil                                    = require(path.join(LIB_DIR,'async-util')).AsyncUtil
 RandomUtil                                   = require(path.join(LIB_DIR,'util')).RandomUtil
 #------------------------------------------------------------------------------#
@@ -50,7 +51,7 @@ class NetUtil
     port = null
     try
       output = shelljs.exec command, {silent:true}
-      port = Util.to_int(output?.output?.trim())
+      port = NumberUtil.to_int(output?.output?.trim())
     catch err
       console.error "ERROR in NetUtil.get_unused_port: ", err
     unless port?
@@ -103,7 +104,7 @@ class NetUtil
     else
       if @_dns_resolve_cache[host]?.expires_at <= now # if already expired, delete the cached value
         delete @_dns_resolve_cache[host]
-      dns.resolve host, (err, ip_addresses)=>
+      @_dns_resolve_with_timeout host, null, (err, ip_addresses)=>
         if err?
           callback err
         else
@@ -113,6 +114,25 @@ class NetUtil
               ips: ip_addresses
             }
           callback err, ip_addresses
+
+  @_dns_resolve_with_timeout:(host, timeout, callback)->
+    if typeof timeout is 'function' and not callback?
+      callback = timeout
+      timeout = undefined
+    called_back = false
+    timer_id = null
+    if timeout? and timeout > 0
+      timer_id = AsyncUtil.wait timeout, ()->
+        if not called_back
+          called_back = true
+          callback new Error("Timeout of #{timeout} milliseconds exceeded in dns.resolve(\"#{host}\").")
+        timer_id = null
+    dns.resolve host, (err, ip_addresses)->
+      if not called_back
+        called_back = true
+        if timer_id?
+          AsyncUtil.cancel_wait(timer_id)
+        callback err, ip_addresses
 
 
   # Identifies a "live" IP address for the given domain name, respecting
@@ -144,7 +164,7 @@ class NetUtil
   #     * `use_cache` - when `false`, the any cached DNS lookups will be ignored
   #     * `reject_unauthorized` - when `false`, problems validating the server's SSL certificate will be ignored; defalts to `true`.
   #     * `shuffle` - when `true` the list of IP addresses will be shuffled each time (defaults to `true`)
-  # * `callback` - callback method with the signature `(err, ip_addresses)`
+  # * `callback` - callback method with the signature `(err, ip_address)`
   @resolve_hostname:(host, options, callback)=>
     # swap options and callback if options is not provided
     if typeof options is 'function' and not callback?
@@ -157,19 +177,21 @@ class NetUtil
     opts.protocol = opts.protocol.toLowerCase()
     unless /:$/.test opts.protocol
       opts.protocol = opts.protocol + ":"
-    opts.port           = Util.to_int(options.port) ?  Util.to_int(@resolve_hostname_options?.port) ? (if opts.protocol is 'http:' then 80 else 443)
+    opts.port                = NumberUtil.to_int(options.port) ?  NumberUtil.to_int(@resolve_hostname_options?.port) ? (if opts.protocol is 'http:' then 80 else 443)
     opts.path                = options.path                                   ? @resolve_hostname_options?.path                            ? DEFAULT_RESOLVE_HOSTNAME_PATH
-    opts.timeout             = Util.to_int(options.timeout)                   ? Util.to_int(@resolve_hostname_options?.timeout)            ? DEFAULT_RESOLVE_HOSTNAME_TIMEOUT
-    opts.max_parallel_tests  = Util.to_int(options.max_parallel_tests)        ? Util.to_int(@resolve_hostname_options?.max_parallel_tests) ? DEFAULT_RESOLVE_HOSTNAME_MAX_PARALLEL_TESTS
-    opts.cache_ttl           = Util.to_int(options.cache_ttl)                 ? Util.to_int(@resolve_hostname_options?.cache_ttl)          ? DEFAULT_RESOLVE_HOSTNAME_CACHE_TTL
-    opts.use_cache           = Util.truthy_string(options.use_cache           ? @resolve_hostname_options?.use_cache                       ? DEFAULT_RESOLVE_HOSTNAME_USE_CACHE)
-    opts.reject_unauthorized = Util.truthy_string(options.reject_unauthorized ? options.rejectUnauthorized ? @resolve_hostname_options?.reject_unauthorized ? @resolve_hostname_options?.rejectUnauthorized ? DEFAULT_RESOLVE_HOSTNAME_REJECT_UNAUTHORIZED)
-    opts.shuffle             = Util.truthy_string(options.shuffle ? @resolve_hostname_options?.shuffle ? DEFAULT_RESOLVE_HOSTNAME_SHUFFLE)
+    opts.timeout             = NumberUtil.to_int(options.timeout)                   ? NumberUtil.to_int(@resolve_hostname_options?.timeout)            ? DEFAULT_RESOLVE_HOSTNAME_TIMEOUT
+    opts.max_parallel_tests  = NumberUtil.to_int(options.max_parallel_tests)        ? NumberUtil.to_int(@resolve_hostname_options?.max_parallel_tests) ? DEFAULT_RESOLVE_HOSTNAME_MAX_PARALLEL_TESTS
+    opts.cache_ttl           = NumberUtil.to_int(options.cache_ttl)                 ? NumberUtil.to_int(@resolve_hostname_options?.cache_ttl)          ? DEFAULT_RESOLVE_HOSTNAME_CACHE_TTL
+    opts.use_cache           = StringUtil.truthy_string(options.use_cache           ? @resolve_hostname_options?.use_cache                       ? DEFAULT_RESOLVE_HOSTNAME_USE_CACHE)
+    opts.reject_unauthorized = StringUtil.truthy_string(options.reject_unauthorized ? options.rejectUnauthorized ? @resolve_hostname_options?.reject_unauthorized ? @resolve_hostname_options?.rejectUnauthorized ? DEFAULT_RESOLVE_HOSTNAME_REJECT_UNAUTHORIZED)
+    opts.shuffle             = StringUtil.truthy_string(options.shuffle ? @resolve_hostname_options?.shuffle ? DEFAULT_RESOLVE_HOSTNAME_SHUFFLE)
     # Convert hostname to one or more IPs, and try to find one that works:
     @_resolve_hostname_to_ips host, opts, (err, ip_addresses)->
-      if err?
-        callback err
-      else
+      if err? or (not Array.isArray(ip_addresses)) or (ip_addresses?.length < 1) # it there was an error or no ip_addresses found, callback(err)
+        callback err ? new Error("Unable to find live server for host '#{host}'. No IP addresses found.")
+      else if ip_addresses.length is 1                                          # if only one IP address was found, just return it
+        callback null, ip_addresses[0]
+      else                                                                      # otherwise we must have two or more
         called_back = false
         # Define a method that tests a single IP address.
         test_ip_action = (ip_address, index, list, next)->
@@ -192,12 +214,14 @@ class NetUtil
                 if not called_back                                              #   ...and we haven't called back yet...
                   callback null, res.socket.remoteAddress                       #   ...callback with the discovered IP address...
                   called_back = true                                            #   ...note that we've called back, and we're done.
-            ).on 'error', next                                                  #   Otherwise just keep going.
+              else                                                              #   Otherwise just keep going.
+                next()
+            ).on 'error', next                                                  #   Also keep going in case of error
         # Use that method to test the ip_addresses returned by `dns.resolve`.
         if ip_addresses? and Array.isArray(ip_addresses) and opts.shuffle
           ip_addresses = RandomUtil.shuffle([].concat(ip_addresses))
         AsyncUtil.throttled_fork_for_each_async opts.max_parallel_tests, ip_addresses, test_ip_action, ()->
           if not called_back                                                    # If we get to "when_done" and still haven't called back yet, none of the IPs worked.
-            callback new Error "Unable to find live server for host '#{host}'."
+            callback new Error("Unable to find live server for host '#{host}'.")
 
 exports.NetUtil = NetUtil

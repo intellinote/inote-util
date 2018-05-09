@@ -30,17 +30,17 @@ describe 'NetUtil',->
       done()
     port.should.not.be.below 2000
 
-  it "calls-back with an error if the hostname does not resolve", (done)->
+  it "resolve_hostname calls-back with an error if the hostname does not resolve", (done)->
     NetUtil.resolve_hostname 'itunesssssss.com', (err, res)->
-      assert err.code is 'ENOTFOUND'
+      assert err?.code is 'ENOTFOUND'
       assert not res?
       done()
 
   # this is a brittle test - since the host address for itunes can change any time
-  it "ensure that itunes resolves as desired", (done)->
+  it "resolve_hostname returns a working IP address in the round-robin DNS case.", (done)->
     ips = ['17.172.224.35', '17.178.96.29', '17.142.160.29']
     NetUtil.resolve_hostname 'itunes.com', (err,res)->
-      assert not err?
+      assert.ok not err?, err
       assert.equal res in ips, true, 'address mismatch'
       assert.ok NetUtil._dns_resolve_cache?["itunes.com"]?.expires_at?
       assert.ok NetUtil._dns_resolve_cache?["itunes.com"]?.ips?
@@ -50,4 +50,10 @@ describe 'NetUtil',->
       NetUtil.clear_resolve_hostname_cache()
       assert.ok not NetUtil._dns_resolve_cache?["itunes.com"]?.expires_at?
       assert.ok not NetUtil._dns_resolve_cache?["itunes.com"]?.ips?
+      done()
+
+  it "resolve_hostname returns an IP address in the single-entry DNS case.", (done)->
+    NetUtil.resolve_hostname 'www.team-one.com', (err,res)->
+      assert.ok not err?, err
+      assert.equal res, "52.6.110.31"
       done()
