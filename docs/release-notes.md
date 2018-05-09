@@ -4,6 +4,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+  - [Release 1.15.1 (9 May 2018)](#release-1151-9-may-2018)
   - [Release 1.15.0 (7 May 2018)](#release-1150-7-may-2018)
   - [Release 1.14.2 (15 February 2018)](#release-1142-15-february-2018)
   - [Release 1.14.0 (21 December 2017)](#release-1130-21-december-2017)
@@ -67,7 +68,12 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+## Release 1.15.1 (9 May 2018)
+
+ * Some minor performance enhancements to `NetUtil.resolve_hostname`.
+
 ## Release 1.15.0 (7 May 2018)
+
  * **RandomUtil**
    * Add `RandomUtil.shuffle` (aliased as `ArrayUtil.shuffle`) to perform an in-place shuffle of an array.
  * **NetUtil**
