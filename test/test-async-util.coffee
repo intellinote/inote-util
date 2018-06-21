@@ -12,6 +12,40 @@ Sequencer = require(path.join(LIB_DIR,'async-util')).Sequencer
 
 describe 'AsyncUtil',->
 
+  it "invoke_with_timeout will execute the given method", (done)=>
+    cb = (timed_out, err, msg)->
+      assert.ok not timed_out?, timed_out
+      assert.ok not err?, err
+      assert.equal msg, "OK"
+      done()
+    method = (arg1, arg2, callback)->
+      AsyncUtil.wait 100, ()->
+        assert.equal arg1, "one"
+        assert.equal arg2, 2
+        callback(undefined,"OK")
+    AsyncUtil.invoke_with_timeout method, ["one", 2], cb
+
+  it "invoke_with_timeout will call-back if the given method takes too long to complete", (done)=>
+    cb = (timed_out, err, msg)->
+      assert.ok timed_out?
+      done()
+    method = (arg1, arg2, callback)->
+      AsyncUtil.wait 100, ()->
+        assert.equal arg1, "one"
+        assert.equal arg2, 2
+        callback(undefined,"OK")
+    AsyncUtil.invoke_with_timeout method, ["one", 2], 50, cb
+
+  it "invoke_with_timeout will call-back if the given method throws an error", (done)=>
+    cb = (error_found, err, msg)->
+      assert.ok error_found?
+      done()
+    method = (arg1, arg2, callback)->
+      assert.equal arg1, "one"
+      assert.equal arg2, 2
+      throw new Error("dummy error")
+    AsyncUtil.invoke_with_timeout method, ["one", 2], cb
+
   it "wait is like setTimeout but with a more coffee-friendly API", (done)=>
     DELAY = 20
     start_time = Date.now()
@@ -269,7 +303,9 @@ describe 'AsyncUtil',->
     AsyncUtil.fork_for_each_async args, action, when_done
 
   it "throttled fork limits the number of methods running in parallel", (done)=>
-    args = [0...5]
+    NUM_METHODS = 5
+    LIMIT = 3
+    args = [0...NUM_METHODS]
     order_done = []
     running = args.map ()->false
     ran = args.map ()->false
@@ -280,18 +316,16 @@ describe 'AsyncUtil',->
           count++
       return count
     method = (step,next)->
-      num_true(running).should.be.below 4
+      num_true(running).should.be.below LIMIT+1
       running[step] = true
       AsyncUtil.wait ((1+args.length)*100)-(step*100), ()->
-        num_true(running).should.be.below 4
+        num_true(running).should.be.below LIMIT+1
         running[step] = false
         order_done.push step
         ran[step] = true
         next(step)
-
-    args = [0...5]
     methods = args.map ()->method
-    AsyncUtil.throttled_fork 3, methods, args, (results)=>
+    AsyncUtil.throttled_fork LIMIT, methods, args, (results)=>
       # with throttle=3, methods 0,1,2 start at the same time:
       # at t=000 : start 0,1,2 running for 600, 500, 400 respectively
       # at t=400 : end 2, start 3 running for 300
@@ -302,8 +336,120 @@ describe 'AsyncUtil',->
         order_done[i].should.equal step
       for i in args
         results[i][0].should.equal i
-      for elt of running
+      for elt in running
         elt.should.not.be.ok
-      for elt of ran
+      for elt in ran
         elt.should.be.ok
+      done()
+
+  it "throttled fork runs all the methods", (done)=>
+    NUM_METHODS = 7
+    LIMIT = 3
+    args = [0...NUM_METHODS]
+    running = args.map ()->false
+    ran = args.map ()->false
+    num_true = (list)->
+      count = 0
+      for elt in list
+        if elt
+          count++
+      return count
+    method = (step,next)->
+      num_true(running).should.be.below LIMIT+1
+      running[step] = true
+      AsyncUtil.wait 30, ()->
+        num_true(running).should.be.below LIMIT+1
+        running[step] = false
+        ran[step] = true
+        next(step)
+    methods = args.map ()->method
+    AsyncUtil.throttled_fork LIMIT, methods, args, (results)=>
+      for i in args
+        results[i][0].should.equal i
+      for elt in running
+        elt.should.not.be.ok
+      for elt in ran
+        elt.should.be.ok
+      done()
+
+  it "throttled fork keeps going even if an exception is thrown by one of the methods", (done)=>
+    NUM_METHODS = 7
+    LIMIT = 3
+    THROW_FOR_METHODS = [2,5,6]
+    args = [0...NUM_METHODS]
+    running = args.map ()->false
+    ran = args.map ()->false
+    num_true = (list)->
+      count = 0
+      for elt in list
+        if elt
+          count++
+      return count
+    method = (step,next)->
+      num_true(running).should.be.below LIMIT+1
+      running[step] = true
+      if step in THROW_FOR_METHODS
+        num_true(running).should.be.below LIMIT+1
+        running[step] = false
+        ran[step] = true
+        throw new Error("Dummy exception #{step}.")
+      else
+        AsyncUtil.wait 30, ()->
+          num_true(running).should.be.below LIMIT+1
+          running[step] = false
+          ran[step] = true
+          next(step)
+    methods = args.map ()->method
+    AsyncUtil.throttled_fork LIMIT, methods, args, (results , errors)=>
+      for i in args
+        unless i in THROW_FOR_METHODS
+          results[i][0].should.equal i
+        else
+          errors[i].should.be.ok
+      for elt, i in running
+        elt.should.not.be.ok
+      for elt, i in ran
+        elt.should.be.ok
+      done()
+
+
+  it "throttled fork keeps going even if an one of the methods times out", (done)=>
+    NUM_METHODS = 7
+    LIMIT = 3
+    DELAY_FOR = [2,5]
+    timed_out = []
+    args = [0...NUM_METHODS]
+    running = args.map ()->false
+    ran = args.map ()->false
+    num_true = (list)->
+      count = 0
+      for elt in list
+        if elt
+          count++
+      return count
+    method = (step,next)->
+      num_true(running).should.be.below LIMIT+1
+      running[step] = true
+      if step in DELAY_FOR
+        num_true(running).should.be.below LIMIT+1
+        running[step] = false
+        AsyncUtil.wait 2000, ()->
+          ran[step] = true
+      else
+        AsyncUtil.wait 30, ()->
+          num_true(running).should.be.below LIMIT+1
+          running[step] = false
+          ran[step] = true
+          next(step)
+    methods = args.map ()->method
+    AsyncUtil.throttled_fork LIMIT, methods, args, {timeout:60}, (results , errors)=>
+      for i in args
+        unless i in DELAY_FOR
+          results[i][0].should.equal i
+        else
+          errors[i].should.be.ok
+      for elt, i in running
+        elt.should.not.be.ok
+      for elt, i in ran
+        assert.equal elt, (not (i in DELAY_FOR))
       done()

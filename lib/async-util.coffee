@@ -8,6 +8,32 @@ DEBUG      = (/(^|,)async-?util($|,)/i.test process?.env?.NODE_DEBUG)
 
 class AsyncUtil
 
+  @invoke_with_timeout:(method, args, timeout, callback)->
+    if not callback? and typeof timeout is 'function'
+      callback  = timeout
+      timeout = undefined
+    if not timeout? or timeout is true
+      timeout = 1000
+    args ?= []
+    called_back = false
+    timer = AsyncUtil.wait timeout, ()->
+      unless called_back
+        called_back = true
+        callback new Error("Timeout error after #{timeout} milliseconds")
+    wrapped_callback = (callback_args...)->
+      unless called_back
+        called_back = true
+        AsyncUtil.cancel_wait timer
+        callback undefined, callback_args...
+    args = args.concat [wrapped_callback]
+    try
+      method args...
+    catch err
+      unless called_back
+        called_back = true
+        AsyncUtil.cancel_wait timer
+        callback err
+
   @wait_until:(predicate,delay,args...,callback)=>
     if typeof delay is 'function' and not callback?
       callback = delay
@@ -177,11 +203,16 @@ class AsyncUtil
             callback(results)
 
   # Just like `fork` save that at most `max_parallel` methods will run at any one time
-  @throttled_fork: (max_parallel, methods, args_for_methods, callback)->
+  @throttled_fork:(max_parallel, methods, args_for_methods, options, callback)->
+    if (not callback?) and typeof options is 'function'
+      callback = options
+      options = undefined
     if (not callback?) and typeof args_for_methods is 'function'
       callback = args_for_methods
-      args_for_methods = null
+      args_for_methods = undefined
+    timeout = options?.timeout
     results = []
+    errors = []
     currently_running = 0
     next_to_run = 0
     remaining_callbacks = methods.length
@@ -195,14 +226,27 @@ class AsyncUtil
           unless Array.isArray(method_args)
             method_args = [method_args]
           method = methods[index]
-          method method_args..., (callback_args...)->
+          after_method = (err, callback_args...)->
             results[index] = callback_args
+            errors[index] = err
             currently_running--
             remaining_callbacks--
             if remaining_callbacks is 0
-              callback(results)
+              callback(results, errors)
             else
               run_more()
+          try
+            if timeout?
+              AsyncUtil.invoke_with_timeout method, method_args, timeout, (timed_out, callback_args...)->
+                if timed_out?
+                  after_method timed_out
+                else
+                  after_method undefined, callback_args...
+            else
+              method method_args..., (callback_args...)->
+                after_method undefined, callback_args...
+          catch err
+            after_method err
     run_more()
 
 
