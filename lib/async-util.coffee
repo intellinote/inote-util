@@ -108,6 +108,7 @@ class AsyncUtil
   @clearInterval:(id)=>
     @cancel_interval(id)
 
+  # TODO support timeouts in `for_async`
   # **for_async** - *executes an asynchronous `for` loop.*
   #
   # Accepts 5 function-valued parameters:
@@ -123,7 +124,7 @@ class AsyncUtil
   #
   # could be implemented as:
   #
-  #     var i = 0;
+  #     var i;
   #     init = function() { i = 0; }
   #     cond = function() { return i < 10; }
   #     actn = function(next) { console.log(i); next(); }
@@ -142,6 +143,7 @@ class AsyncUtil
     initialize()
     looper()
 
+  # TODO support timeouts in `for_each_async`
   # **for_each_async** - *executes an asynchronous `forEach` loop.*
   #
   # Accepts 3 parameters:
@@ -160,7 +162,7 @@ class AsyncUtil
   #       next()
   #
   @for_each_async:(list,action,whendone)=>
-    i = m = null
+    i = null
     init = ()-> i = 0
     cond = ()-> (i < list.length)
     incr = ()-> i += 1
