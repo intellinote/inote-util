@@ -302,6 +302,36 @@ describe 'AsyncUtil',->
       done()
     AsyncUtil.fork_for_each_async args, action, when_done
 
+  it "throttled_fork_for_each_async works", (done)=>
+    args = [0...10]
+    ran = args.map ()->false
+    running = args.map ()->false
+    num_true = (list)->
+      count = 0
+      for elt in list
+        if elt
+          count++
+      return count
+    action = (elt, index, list, next)=>
+      elt.should.equal index
+      running[elt] = true
+      num_true(running).should.be.below 5
+      ran[elt].should.not.be.ok
+      ran[elt] = true
+      AsyncUtil.wait 200, ()->
+        num_true(running).should.be.below 5
+        running[elt] = false
+        next(elt)
+    when_done = (results)=>
+      for i in args
+        results[i][0].should.equal i
+      for elt in ran
+        elt.should.be.ok
+      for elt in running
+        elt.should.not.be.ok
+      done()
+    AsyncUtil.throttled_fork_for_each_async 4, args, action, when_done
+
   it "throttled fork limits the number of methods running in parallel", (done)=>
     NUM_METHODS = 5
     LIMIT = 3
