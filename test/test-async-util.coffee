@@ -412,7 +412,6 @@ describe 'AsyncUtil',->
         elt.should.be.ok
       done()
 
-
   it "throttled fork keeps going even if an one of the methods times out", (done)=>
     NUM_METHODS = 7
     LIMIT = 3
