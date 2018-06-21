@@ -317,7 +317,7 @@ describe 'AsyncUtil',->
       running[elt] = true
       num_true(running).should.be.below 5
       ran[elt].should.not.be.ok
-      AsyncUtil.wait 200, ()->
+      AsyncUtil.wait 50, ()->
         num_true(running).should.be.below 5
         ran[elt] = true
         running[elt] = false
@@ -353,7 +353,7 @@ describe 'AsyncUtil',->
         running[elt] = false
         throw new Error("Mock error")
       else
-        AsyncUtil.wait 200, ()->
+        AsyncUtil.wait 50, ()->
           num_true(running).should.be.below 5
           ran[elt] = true
           running[elt] = false
@@ -370,6 +370,45 @@ describe 'AsyncUtil',->
         elt.should.not.be.ok
       done()
     AsyncUtil.throttled_fork_for_each_async 4, args, action, when_done
+
+  it "throttled_fork_for_each_async works even when one of the methods times out", (done)=>
+    args = [0...10]
+    ran = args.map ()->false
+    running = args.map ()->false
+    num_true = (list)->
+      count = 0
+      for elt in list
+        if elt
+          count++
+      return count
+    action = (elt, index, list, next)=>
+      elt.should.equal index
+      running[elt] = true
+      num_true(running).should.be.below 5
+      ran[elt].should.not.be.ok
+      if elt%3 is 0
+        num_true(running).should.be.below 5
+        running[elt] = false
+        AsyncUtil.wait 1000, ()->
+          ran[elt] = true
+      else
+        AsyncUtil.wait 50, ()->
+          num_true(running).should.be.below 5
+          ran[elt] = true
+          running[elt] = false
+          next(elt)
+    when_done = (results, errors)=>
+      for i in args
+        if i%3 is 0
+          errors[i].should.be.ok
+        else
+          results[i][0].should.equal i
+      for elt, i in ran
+        elt.should.equal i%3 isnt 0
+      for elt in running
+        elt.should.not.be.ok
+      done()
+    AsyncUtil.throttled_fork_for_each_async 4, args, action, {timeout:100}, when_done
 
   it "throttled fork limits the number of methods running in parallel", (done)=>
     NUM_METHODS = 5

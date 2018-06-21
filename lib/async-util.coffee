@@ -174,12 +174,15 @@ class AsyncUtil
       args.push([ elt, i, list ])
     @fork methods, args, whendone
 
-  @throttled_fork_for_each_async:(max_parallel,list,action,whendone)=>
+  @throttled_fork_for_each_async:(max_parallel,list,action,options,whendone)=>
+    if typeof options is "function" and not whendone?
+      whendone = options
+      options = undefined
     methods = list.map ()->action
     args = []
     for elt,i in list
       args.push [ elt, i, list ]
-    @throttled_fork max_parallel, methods, args, whendone
+    @throttled_fork max_parallel, methods, args, options, whendone
 
   # Run the given array of methods asynchronously, invoking `callback` when done
   # - `methods` - an array of methods
