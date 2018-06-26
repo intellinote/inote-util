@@ -64,3 +64,11 @@ describe "index",->
   it "exports L10nUtil", (done)->
     index.L10nUtil.should.exist
     done()
+
+  it "exports TimeoutError", (done)->
+    index.TimeoutError.should.exist
+    done()
+
+  it "exports ExceptionThrownError", (done)->
+    index.ExceptionThrownError.should.exist
+    done()
