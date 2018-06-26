@@ -66,7 +66,8 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
 [Util](#util) |
 [WebUtil](#webutil) |
 [WorkQueue](#workqueue) |
-[ZipUtil](#ziputil)
+[ZipUtil](#ziputil) |
+[Errors](#errors)
 
 ### ArrayUtil
 * **lpad(value,width,pad)** - adds `pad` elements to the beginning of `value` until `value` is `width` elements long. (Also accepts strings, see `StringUtil.lpad`, which is identical.)
@@ -84,26 +85,33 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
 *[Back to Index](#feature-index)*
 
 ### AsyncUtil
-* **wait_until(predicate\[,interval],callback)** / **wait_for(predicate\[,interval],callback)** - polls `predicate()` every `interval` milliseconds until it returns `true` (or throws an exception). Callback signature is `(err,complete)` where `complete` is `true` if and only if `predicate()` returned `true`. `interval` defaults to `100`.
+* **wait_until(predicate[,interval],callback)** / **wait_for(predicate[,interval],callback)** - polls `predicate()` every `interval` milliseconds until it returns `true` (or throws an exception). Callback signature is `(err,complete)` where `complete` is `true` if and only if `predicate()` returned `true`. `interval` defaults to `100`.
 * **wait(delay,callback)** / **set_timeout(delay,callback)** / **setTimeout(delay,callback)** - just like `setTimeout(callback,delay)` but with a more CoffeeScript-friendly parameter order.
 * **cancel_wait(id)** / **clear_timeout(id)** / **clearTimeout(id)** - alias for `window.clearTimeout(id)`.
 * **interval(delay,callback)** / **set_interval(delay,callback)** / **setInterval(delay,callback)** - just like `setInterval(callback,delay)` but with a more CoffeeScript-friendly parameter order.
 * **cancel_interval(id)** / **cancelInterval(id)** / **clear_interval(id)** / **clearlInterval(id)** - alias for `window.clearInterval(id)`.
-* **for_async(initialize,condition,action,increment,whendone)** - executes an asynchronous `for` loop. Accepts 5 function-valued parameters:
+* **for_async(initialize,condition,action,increment[,options],whendone)** - executes an asynchronous `for` loop. Accepts 5 function-valued parameters:
   * `initialize` - an initialization function (no arguments passed, no return value is expected);
   * `condition` - a predicate that indicates whether we should continue looping (no arguments passed, a boolean value is expected to be returned);
   * `action` - the action to take (a single callback function is passed and should be invoked at the end of the action, no return value is expected);
   * `increment` - called at the end of every `action`, prior to `condition` (no arguments passed, no return value is expected);
+  * `options` - optional options map
+    * `timeout` - max time to wait for an action to complete, in milliseconds
+    * `catch_exceptions` - boolean
   * `whendone` - called at the end of the loop (when `condition` returns `false`), (no arguments passed, no return value is expected).
-  * **for_each_async(list,action,whendone)** - executes an asynchronous `forEach` loop. Accepts 3 parameters:
-    * `list` - the array to iterate over;
-    * `action` - a function with the signature `(value,index,list,next)` indicating the action to take for each element (*must* call `next` for processing to continue);
-    * `whendone` - called at the end of the loop.
-  * **fork(methods, args_for_methods, callback)** - runs the given array of methods "simultaneously" (asynchronously), invoking `callback` when they are *all* complete.
-  * **throttled_fork(max_parallel, methods, args_for_methods, callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
-  * **throttled_fork(max_parallel, methods, args_for_methods, callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
-  * **fork_for_each_async(list, action, whendone)** - like `for_each_async` but running `action` in parallel for each element of the `list`.  The `whendone` callback is provided with a list of "responses", in the same order as the original list.
-  * **throttled_fork_for_each_async(max_parallel,list, action, whendone)** - like `fork_for_each_async` but running at most `max_parallel` methods at any one time.
+* **for_each_async(list,action[,options],whendone)** - executes an asynchronous `forEach` loop. Accepts 3 (or 4) parameters:
+  * `list` - the array to iterate over;
+  * `action` - a function with the signature `(value,index,list,next)` indicating the action to take for each element (*must* call `next` for processing to continue);
+  * `options` - optional options map
+    * `timeout` - max time to wait for an action to complete, in milliseconds
+    * `catch_exceptions` - boolean
+  * `whendone` - called at the end of the loop.
+* **fork(methods,args_for_methods[,options],callback)** - runs the given array of methods "simultaneously" (asynchronously), invoking `callback` when they are *all* complete.
+* **throttled_fork(max_parallel,methods,args_for_methods[,options],callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
+* **fork_for_each_async(list,action[,options],whendone)** - like `for_each_async` but running `action` in parallel for each element of the `list`.  The `whendone` callback is provided with a list of "responses", in the same order as the original list.
+* **throttled_fork_for_each_async(max_parallel,list,action[,options],whendone)** - like `fork_for_each_async` but running at most `max_parallel` methods at any one time.
+* **invoke_with_timeout(method,args[,options],callback)**
+* **maybe_invoke_with_timeout(method,args[,options],callback)**
 * **procedure()** - generates a `Sequencer` object, as described below
 
 #### The Sequencer
@@ -364,22 +372,22 @@ Here is an example of the object returned by the `DateUtil.duration`, with brief
 ### FileUtil
 * **file_age(file,callback)** / **file_age_sync(file)** - obtain the age of a file  (time since last modfied) in milliseconds
 * **file_mtime(file,callback)** / **file_mtime_sync(file)**- obtain the Unix epoch timestamp at which a file was last modified
-* **ls(dir\[,options\],callback)** - list the files in a directory; options:
+* **ls(dir[,options\],callback)** - list the files in a directory; options:
   * `recurse` - when `true`, perform the operation recursively
   * `pattern` - when a non-`null` RegExp, only list files matching the specified pattern
   * `types` - an array or string containing `file` or `directory`
 * **is_dir(filename,callback)**   - test if the specified filename is a directory
 * **is_file(filename,callback)** - test if the specified filename is a plain file (not a directory).
 * **sanitize_filename(filename)** - removes invalid characters from and truncates extremely long filenames; only operates on the last segement of the given path. That is, if `filename` is `/foo/bar/xyz`, only the `xyz` part of the string will be modified.
-* **uniquify_filename(dir,basename[,ext=''[,minpadwidth=3\[,maxpadwidth=5]])** - attempts to generate a unique filename in `dir` based on `basename`.
+* **uniquify_filename(dir,basename[,ext=''[,minpadwidth=3[,maxpadwidth=5]])** - attempts to generate a unique filename in `dir` based on `basename`.
 * **mkdir(dir)** - `mkdir -p dir`
 * **touch(file)** - `touch file`
 * **rm(files...)** - remove one or more files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
 * **rmdir(dirs...)** - recursively remove one or more directories or files, ignoring errors. (Returns `true` if any errors are encountered, `false` otherwise).
-* **read_stdin_sync([end_byte="\x04"\[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
-* **load_json_file(file\[, options], callback)** (also just `load_json`)- asynchronously read and parse a JSON file. When `options.ignore_errors` is true, calls-back with `null, null` rather than `err, null`.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
-* **load_json_file_sync(file\[,options])** - synchronously read and parse a JSON file. When `options.ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
-* **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512\[,options]]])** - synchronously read and parse JSON object from stdin. When `options.ignore_errors` is true, returns `null` rather than throwing an exception.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
+* **read_stdin_sync([end_byte="\x04"[,buffer_size=512]])** - synchronously read all of stdin (up to `end_byte`), returning the resulting buffer
+* **load_json_file(file[, options], callback)** (also just `load_json`)- asynchronously read and parse a JSON file. When `options.ignore_errors` is true, calls-back with `null, null` rather than `err, null`.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
+* **load_json_file_sync(file[,options])** - synchronously read and parse a JSON file. When `options.ignore_errors` is true, returns `null` rather than throwing an exception when the file is not found or does not contain value JSON.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
+* **load_json_stdin_sync([end_byte="\x04"[,buffer_size=512[,options]]])** - synchronously read and parse JSON object from stdin. When `options.ignore_errors` is true, returns `null` rather than throwing an exception.  When `options.allow_comments` is `true` (the default) JS-style comments are allowed. When `options.strip_comments` is `true` (the default) comments do NOT appear in the returned JSON object.
 * **copy_file(src,dest,callback)** - copy a file from `src` to `dest`; works across filesystems.
 * **move_file(src,dest,callback)** - move (rename) a file from `src` to `dest`; works across filesystems.
 
@@ -563,21 +571,21 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 *[Back to Index](#feature-index)*
 
 ### Util
-* **version_satisfies(\[version_string,\]range_string)** - returns `true` if the given `version_string` satisfies the [semver criteria](https://www.npmjs.com/package/semver) specified in `range_string`.  When `version_string` is omitted, the Node version (the value of `process.version`) is used.  E.g., `if(!Util.version_satisifes(">=0.12.3")) { console.error("Expected version 0.12.3 or later."); }`.
+* **version_satisfies([version_string,\]range_string)** - returns `true` if the given `version_string` satisfies the [semver criteria](https://www.npmjs.com/package/semver) specified in `range_string`.  When `version_string` is omitted, the Node version (the value of `process.version`) is used.  E.g., `if(!Util.version_satisifes(">=0.12.3")) { console.error("Expected version 0.12.3 or later."); }`.
 * **slow_equals(a,b)** - constant-time comparison of two buffers for equality.
 * **compare(a,b)** - a minimally-smart comparision function (allows `null`, uses `localeCompare` when available, folds case so that both `A` and `a` appear before `B`, etc.).
-* **field_comparator(field\[,use_locale_compare=false])** - returns a comparator (`function(a,b)`) that compares two maps on the `field` attribute.
-* **path_comparator(path\[,use_locale_compare=false])** - like `field_comparator`, but `path` may be an array of fields that will be interpreted as nested-attributes. (E.g., `["foo","bar"]` compares `a.foo.bar` with `b.foo.bar`.)
+* **field_comparator(field[,use_locale_compare=false])** - returns a comparator (`function(a,b)`) that compares two maps on the `field` attribute.
+* **path_comparator(path[,use_locale_compare=false])** - like `field_comparator`, but `path` may be an array of fields that will be interpreted as nested-attributes. (E.g., `["foo","bar"]` compares `a.foo.bar` with `b.foo.bar`.)
 * **descending_comparator(comparator) / desc_comparator(comparator)** - reverses the order of the given `comparator`.
 * **composite_comparator(list)** - generates a comparator that first compares elements by `list[0]` then (if equal) `list[1]` and so on, until a non-equal comparison is found or we run out of comparators.
-* **handle_error(err[,callback\[,throw_when_no_callback=true]])** - if `err` is not `null`, invokes `callback(err)` or `throw err` as appropriate. Returns `true` if an error was encountered, `false` otherwise. (`function my_callback(err,other,stuff) { if(!handle_error(err,callback)) { /* keep going */ } }`)
-* **uuid(val\[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario. (DEPRECATED)
+* **handle_error(err[,callback[,throw_when_no_callback=true]])** - if `err` is not `null`, invokes `callback(err)` or `throw err` as appropriate. Returns `true` if an error was encountered, `false` otherwise. (`function my_callback(err,other,stuff) { if(!handle_error(err,callback)) { /* keep going */ } }`)
+* **uuid(val[,generate=false])** - normalize `val` to all a lower-case, no-dash version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario. (DEPRECATED)
     * As of v1.8.3, when called with no arguments `uuid()` generates a UUID value, while `uuid(null)` retains the original behavior.
-* **normalize_uuid(val\[,generate=false])** - non-deprecated replacement for `uuid(val,generate)`.
+* **normalize_uuid(val[,generate=false])** - non-deprecated replacement for `uuid(val,generate)`.
 * **make_uuid([val])**, **make_uuid_v1([val])**, **make_uuid_v4([val])** - return a normalized version of the specified UUID, creating a new one if none is proivded.
-* **pad_uuid(val\[,generate=false])** - normalize `val` to all a lower-case, with-dashes version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
-* **b64e(buf\[,encoding='utf8']) / Base64.encode(buf\[,encoding='utf8'])** - Base64 encode the given buffer.
-* **b64d(buf\[,encoding='utf8']) / Base64.decode(buf\[,encoding='utf8'])** - Base64 *decode* the given buffer.
+* **pad_uuid(val[,generate=false])** - normalize `val` to all a lower-case, with-dashes version of a UUID. If `generate` is `true`, generate an new UUID when given a null `val`, otherwise returns `null` in that scenario.
+* **b64e(buf[,encoding='utf8']) / Base64.encode(buf[,encoding='utf8'])** - Base64 encode the given buffer.
+* **b64d(buf[,encoding='utf8']) / Base64.decode(buf[,encoding='utf8'])** - Base64 *decode* the given buffer.
 
 
 *[Back to Index](#feature-index)*
@@ -669,7 +677,7 @@ The WorkQueue is also an `EventEmitter`, with the following events:
 
 #### Methods
 
-* **new WorkQueue(\[options\])** - create a new WorkQueue instance.  Options:
+* **new WorkQueue([options\])** - create a new WorkQueue instance.  Options:
   * `priority` - the default priority for tasks in the queue (when none is specified when the task is added). Defaults to 5.  Larger numbers are executed before smaller numbers.
   * `interval` - the time (in milliseconds) between "polling" the queue for new tasks to execute.  Defaults to `200`.
   * `fuzz` - a floating point value that will be used to "fuzz" the interval between polling runs.  When `fuzz` is a non-zero float, a random value between `-1 × fuzz × interval` and `fuzz × interval` will be added to the interval.  This is used to avoid synchronization when several WorkQueues are launched with the same configuration.  (E.g., when a node app that uses the WorkQueue is launched in a cluster.)  Defaults to `0.1`.
@@ -679,18 +687,26 @@ The WorkQueue is also an `EventEmitter`, with the following events:
 
 * **active_task_count()** - returns the number of tasks from the queue currently being executed.
 
-* **enqueue_task:(method\[,args\]\[,priority\]\[,callback\])** - add a task the the queue.
+* **enqueue_task:(method[,args\][,priority\][,callback\])** - add a task the the queue.
 
-* **start_working(\[options\])** - start queue processing.  The `options` parameter may contain `interval` or `fuzz` attributes, which will override those provided in the construction for the duration of this processing.
+* **start_working([options\])** - start queue processing.  The `options` parameter may contain `interval` or `fuzz` attributes, which will override those provided in the construction for the duration of this processing.
 
 * **stop_working()** - stop queue processing.  Note that if a queue is started but not stopped, a function will be called roughly every `interval` milliseconds via JavaScript's `setInterval` method.
 
 *[Back to Index](#feature-index)*
 
 ### ZipUtil
-* **zip(\[wd\],zipfile,inputs,callback)** - creates (or appends to) `zipfile`, adding the file or array of files in `inputs`.  When `wd` is specified the action will take place relative to that directory.
-* **unzip(\[wd\],zipfile,dest,callback)** - unzips `zipfile` into the specified `dest`.
+* **zip([wd],zipfile,inputs,callback)** - creates (or appends to) `zipfile`, adding the file or array of files in `inputs`.  When `wd` is specified the action will take place relative to that directory.
+* **unzip([wd],zipfile,dest,callback)** - unzips `zipfile` into the specified `dest`.
 * **contents(zipfile,callback)** - obtains a list of files within `zipfile`.
+
+*[Back to Index](#feature-index)*
+
+
+### Errors
+
+  * **TimeoutError**
+  * **ExceptionThrownError**
 
 *[Back to Index](#feature-index)*
 
