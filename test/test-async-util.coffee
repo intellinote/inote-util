@@ -50,7 +50,7 @@ describe 'AsyncUtil',->
       assert.equal arg1, "one"
       assert.equal arg2, 2
       throw new Error("dummy error")
-    AsyncUtil.invoke_with_timeout method, ["one", 2], cb
+    AsyncUtil.invoke_with_timeout method, ["one", 2], {catch_exceptions:true}, cb
 
   it "maybe_invoke_with_timeout will execute the given method (with timeout case)", (done)=>
     cb = (timed_out, err, msg)->
@@ -77,15 +77,17 @@ describe 'AsyncUtil',->
         callback(undefined,"OK")
     AsyncUtil.maybe_invoke_with_timeout method, ["one", 2], 50, cb
 
-  it "maybe_invoke_with_timeout will call-back if the given method throws an error (without timeout case)", (done)=>
-    cb = (error_found, err, msg)->
-      assert.ok error_found?
-      assert.ok error_found instanceof ExceptionThrownError
+  it "maybe_invoke_with_timeout will execute the given method (without timeout case)", (done)=>
+    cb = (timed_out, err, msg)->
+      assert.ok not timed_out?, timed_out
+      assert.ok not err?, err
+      assert.equal msg, "OK"
       done()
     method = (arg1, arg2, callback)->
-      assert.equal arg1, "one"
-      assert.equal arg2, 2
-      throw new Error("dummy error")
+      AsyncUtil.wait 100, ()->
+        assert.equal arg1, "one"
+        assert.equal arg2, 2
+        callback(undefined,"OK")
     AsyncUtil.maybe_invoke_with_timeout method, ["one", 2], undefined, cb
 
   it "maybe_invoke_with_timeout will call-back if the given method throws an error (without timeout case)", (done)=>
@@ -97,7 +99,9 @@ describe 'AsyncUtil',->
       assert.equal arg1, "one"
       assert.equal arg2, 2
       throw new Error("dummy error")
-    AsyncUtil.maybe_invoke_with_timeout method, ["one", 2], false, cb
+    AsyncUtil.maybe_invoke_with_timeout method, ["one", 2], {catch_exceptions:true}, cb
+
+
 
   it "wait is like setTimeout but with a more coffee-friendly API", (done)=>
     DELAY = 20
@@ -198,6 +202,27 @@ describe 'AsyncUtil',->
         assert.ok call_count < 2
     id = AsyncUtil.setInterval DELAY, "arg-one", 2, fn
 
+  it "for_each_async can execute an async for-each loop", (done)=>
+    numbers = [1..100]
+    total = 0
+    count = 0
+    expected_results = []
+    expected_errors = []
+    action = (number, index, list, next)=>
+      count++
+      total += number
+      index.should.equal (number-1)
+      index.should.equal (count-1)
+      list.length.should.equal numbers.length
+      expected_results.push [index, total]
+      expected_errors.push undefined
+      next(index,total)
+    AsyncUtil.for_each_async numbers, action, (results, errors)=>
+      total.should.equal 5050
+      count.should.equal numbers.length
+      assert.deepEqual expected_results, results
+      assert.deepEqual expected_errors, errors
+      done()
 
   it "for_each_async can execute an async for-each loop", (done)=>
     numbers = [1..100]
@@ -355,6 +380,53 @@ describe 'AsyncUtil',->
       done()
     AsyncUtil.fork_for_each_async args, action, when_done
 
+  it "fork_for_each_async works even when one of the methods times out", (done)=>
+    args = [0...5]
+    ran = args.map ()->false
+    action = (elt, index, list, next)=>
+      elt.should.equal index
+      ran[elt].should.not.be.ok
+      if index is 3
+        AsyncUtil.wait 1000, ()->
+          ran[elt] = true
+          next()
+      else
+        ran[elt] = true
+        next(elt)
+    when_done = (results)=>
+      for i in args
+        unless i is 3
+          results[i][0].should.equal i
+      for elt in ran
+        unless elt is 3
+          elt.should.be.ok
+      done()
+    AsyncUtil.fork_for_each_async args, action, {timeout:50}, when_done
+
+  it "fork_for_each_async works even when one of the methods throws an exception", (done)=>
+    args = [0...5]
+    ran = args.map ()->false
+    action = (elt, index, list, next)=>
+      elt.should.equal index
+      ran[elt].should.not.be.ok
+      if index is 3
+        throw new Error("Three")
+      else
+        ran[elt] = true
+        next(elt)
+    when_done = (results, errors)=>
+      for i in args
+        unless i is 3
+          results[i][0].should.equal i
+          assert.ok not errors[i]?
+        else
+          assert.ok errors[i]?
+      for elt in ran
+        unless elt is 3
+          elt.should.be.ok
+      done()
+    AsyncUtil.fork_for_each_async args, action, {catch_exceptions:true}, when_done
+
   it "throttled_fork_for_each_async works", (done)=>
     args = [0...10]
     ran = args.map ()->false
@@ -422,7 +494,7 @@ describe 'AsyncUtil',->
       for elt in running
         elt.should.not.be.ok
       done()
-    AsyncUtil.throttled_fork_for_each_async 4, args, action, when_done
+    AsyncUtil.throttled_fork_for_each_async 4, args, action, {catch_exceptions:true}, when_done
 
   it "throttled_fork_for_each_async works even when one of the methods times out", (done)=>
     args = [0...10]
@@ -561,7 +633,7 @@ describe 'AsyncUtil',->
           ran[step] = true
           next(step)
     methods = args.map ()->method
-    AsyncUtil.throttled_fork LIMIT, methods, args, (results , errors)=>
+    AsyncUtil.throttled_fork LIMIT, methods, args, {timeout:true, catch_exceptions:true}, (results , errors)=>
       for i in args
         unless i in THROW_FOR_METHODS
           results[i][0].should.equal i
