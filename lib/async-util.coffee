@@ -1,25 +1,51 @@
-fs         = require 'fs'
-path       = require 'path'
-HOMEDIR    = path.join(__dirname,'..')
-LIB_COV    = path.join(HOMEDIR,'lib-cov')
-LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
-Util       = require(path.join(LIB_DIR,'util')).Util
-DEBUG      = (/(^|,)async-?util($|,)/i.test process?.env?.NODE_DEBUG)
+fs                   = require 'fs'
+path                 = require 'path'
+HOME_DIR             = path.join(__dirname,'..')
+LIB_COV              = path.join(HOME_DIR,'lib-cov')
+LIB_DIR              = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
+#-------------------------------------------------------------------------------#
+DEBUG                = (/(^|,)async-?util($|,)/i.test process?.env?.NODE_DEBUG)
+#-------------------------------------------------------------------------------#
+Util                 = require(path.join(LIB_DIR,'util')).Util
+ExceptionThrownError = require(path.join(LIB_DIR,'exception-thrown-error')).ExceptionThrownError
+TimeoutError         = require(path.join(LIB_DIR,'timeout-error')).TimeoutError
+#-------------------------------------------------------------------------------#
 
 class AsyncUtil
 
+  # Invokes the specified async method, calling back with an error
+  # if the method takes longer than the specified timeout.
+  #
+  # Parameters:
+  #  * `method` - a function
+  #  * `args` - an array of argumetns to be passed to the function (optional; defaults to `[]`)
+  #  * `timeout` - timeout in milliseconds, or `true`  (optional; defaults to `1000`)
+  #  * `callback` - will be called when the method completes or times out (but not both)
+  #               - signature: `(timeout_or_thrown_error, method_callback_params...)`
+  #
+  # If the first argument passed to `callback` is `undefined` then the function executed normally.
+  # If the first argument is a `TimeoutError` the method timed out before completing.
+  # If the first argument is a `ExceptionThrownError` the call to `method(args...)` threw an exception.
   @invoke_with_timeout:(method, args, timeout, callback)->
     if not callback? and typeof timeout is 'function'
       callback  = timeout
       timeout = undefined
+    if not callback? and typeof args is 'function'
+      callback = args
+      args = undefined
+    if typeof args in ['number','boolean'] and not timeout?
+      timeout = args
+      args = undefined
+    args ?= []
+    if args? and not Array.isArray(args)
+      args = [args]
     if not timeout? or timeout is true
       timeout = 1000
-    args ?= []
     called_back = false
     timer = AsyncUtil.wait timeout, ()->
       unless called_back
         called_back = true
-        callback new Error("Timeout error after #{timeout} milliseconds")
+        callback new TimeoutError(timeout, method)
     wrapped_callback = (callback_args...)->
       unless called_back
         called_back = true
@@ -32,7 +58,33 @@ class AsyncUtil
       unless called_back
         called_back = true
         AsyncUtil.cancel_wait timer
-        callback err
+        callback new ExceptionThrownError(err, method)
+
+  # emulates the signature and structure of `invoke_with_timeout`
+  # but only usess the timeout if `timeout` is `true` or a positive integer
+  @maybe_invoke_with_timeout:(method, args, timeout, callback)->
+    if not callback? and typeof timeout is 'function'
+      callback  = timeout
+      timeout = undefined
+    if not callback? and typeof args is 'function'
+      callback = args
+      args = undefined
+    args ?= []
+    if timeout?
+      @invoke_with_timeout method, args, timeout, callback
+    else
+      called_back = false
+      wrapped_callback = (callback_args...)->
+        unless called_back
+          called_back = true
+          callback undefined, callback_args...
+      args = args.concat [wrapped_callback]
+      try
+        method args...
+      catch err
+        unless called_back
+          called_back = true
+          callback new ExceptionThrownError(err, method)
 
   @wait_until:(predicate,delay,args...,callback)=>
     if typeof delay is 'function' and not callback?
@@ -132,7 +184,11 @@ class AsyncUtil
   #     done = function() { }
   #     for_async(init,cond,actn,incr,done)
   #
-  @for_async:(initialize,condition,action,increment,whendone)=>
+  @for_async:(initialize,condition,action,increment,options,whendone)=>
+    if typeof options is "function" and not whendone?
+      whendone = options
+      options = undefined
+    timeout = options?.timeout
     looper = ()->
       if condition()
         action ()->
@@ -251,7 +307,8 @@ class AsyncUtil
               method method_args..., (callback_args...)->
                 after_method undefined, callback_args...
           catch err
-            after_method err
+            after_method new ExceptionThrownError(err, method)
+
     run_more()
 
 

@@ -1,14 +1,18 @@
 require 'coffee-errors'
 #------------------------------------------------------------------------------#
-should   = require 'should'
-assert   = require 'assert'
-fs       = require 'fs'
-path     = require 'path'
-HOMEDIR  = path.join(__dirname,'..')
-LIB_COV  = path.join(HOMEDIR,'lib-cov')
-LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
-AsyncUtil = require(path.join(LIB_DIR,'async-util')).AsyncUtil
-Sequencer = require(path.join(LIB_DIR,'async-util')).Sequencer
+should               = require 'should' # consider the use of 'should' here to be deprecated; use 'assert' instead
+assert               = require 'assert'
+fs                   = require 'fs'
+path                 = require 'path'
+HOME_DIR             = path.join(__dirname,'..')
+LIB_COV              = path.join(HOME_DIR,'lib-cov')
+LIB_DIR              = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
+#------------------------------------------------------------------------------#
+AsyncUtil            = require(path.join(LIB_DIR,'async-util')).AsyncUtil
+Sequencer            = require(path.join(LIB_DIR,'async-util')).Sequencer
+ExceptionThrownError = require(path.join(LIB_DIR,'exception-thrown-error')).ExceptionThrownError
+TimeoutError         = require(path.join(LIB_DIR,'timeout-error')).TimeoutError
+#------------------------------------------------------------------------------#
 
 describe 'AsyncUtil',->
 
@@ -28,6 +32,7 @@ describe 'AsyncUtil',->
   it "invoke_with_timeout will call-back if the given method takes too long to complete", (done)=>
     cb = (timed_out, err, msg)->
       assert.ok timed_out?
+      assert.ok timed_out instanceof TimeoutError
       done()
     method = (arg1, arg2, callback)->
       AsyncUtil.wait 100, ()->
@@ -39,6 +44,7 @@ describe 'AsyncUtil',->
   it "invoke_with_timeout will call-back if the given method throws an error", (done)=>
     cb = (error_found, err, msg)->
       assert.ok error_found?
+      assert.ok error_found instanceof ExceptionThrownError
       done()
     method = (arg1, arg2, callback)->
       assert.equal arg1, "one"
@@ -514,6 +520,9 @@ describe 'AsyncUtil',->
           results[i][0].should.equal i
         else
           errors[i].should.be.ok
+          assert.ok errors[i] instanceof ExceptionThrownError
+          assert.ok errors[i].exception?
+          assert.ok errors[i].error?
       for elt, i in running
         elt.should.not.be.ok
       for elt, i in ran
@@ -555,6 +564,7 @@ describe 'AsyncUtil',->
           results[i][0].should.equal i
         else
           errors[i].should.be.ok
+          assert.ok errors[i] instanceof TimeoutError
       for elt, i in running
         elt.should.not.be.ok
       for elt, i in ran
