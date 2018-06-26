@@ -4,6 +4,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+  - [Release 1.15.2 (26 June 2018)](#release-1152-26-june-2018)
   - [Release 1.15.1 (9 May 2018)](#release-1151-9-may-2018)
   - [Release 1.15.0 (7 May 2018)](#release-1150-7-may-2018)
   - [Release 1.14.2 (15 February 2018)](#release-1142-15-february-2018)
@@ -68,9 +69,15 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- tocstop -->
 
+## Release 1.15.2 (26 June 2018)
+
+ * Added optional `options` parameter to several `AsyncUtil` methods, accepting `timeout` and `catch_exceptions`.
+ * Added `TimeoutError` and `ExceptionThrownError` (related to the above).
+ * Added `AsyncUtil.invoke_with_timeout` and `AsyncUtil.maybe_invoke_with_timeout`.
+
 ## Release 1.15.1 (9 May 2018)
 
- * Some minor performance enhancements to `NetUtil.resolve_hostname`.
+* Some minor performance enhancements to `NetUtil.resolve_hostname`.
 
 ## Release 1.15.0 (7 May 2018)
 
