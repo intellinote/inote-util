@@ -227,9 +227,12 @@ class AsyncUtil
 
   # **for_each_async** - *executes an asynchronous `forEach` loop.*
   #
-  # Accepts 3 parameters:
+  # Accepts 3 (or 4) parameters:
   #  * `list` - the array to iterate over
   #  * `action` - the function with the signature (value,index,list,next) indicating the action to take; the provided function `next` *must* be called at the end of processing
+  #  * `options`: (optional)
+  #      * `timeout` - timeout in milliseconds, or `true`
+  #      * `catch_exceptions` - boolean
   #  * `whendone` - called at the end of the loop
   #
   # For example, the loop:
@@ -276,8 +279,10 @@ class AsyncUtil
   # Run the given array of methods asynchronously, invoking `callback` when done
   # - `methods` - an array of methods
   # - `args_for_methods` - an array of arrays; the contents of each array (plus a callback method) with be passed to the corresponding `method` when invoked
+  #  * `options`: (optional)
+  #      * `timeout` - timeout in milliseconds, or `true`
+  #      * `catch_exceptions` - boolean
   # - `callback` - the method called when all methods have completed; the single argument passed to `callback` will be an array containing the arguments passed to each method's callback (as an array)
-  # TODO add support for timeout and catch_exceptions options
   @fork:(methods, args_for_methods, options, callback)->
     if (not callback?) and typeof options is 'function'
       callback = options
@@ -334,19 +339,11 @@ class AsyncUtil
               callback(results, errors)
             else
               run_more()
-          try
-            AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
-              if timed_out?
-                after_method timed_out
-              else
-                after_method undefined, callback_args...
-          catch err
-            catch_exceptions = options?.catch_exceptions ? options?.catchExceptions ? false
-            if catch_exceptions
-              after_method new ExceptionThrownError(err, method)
+          AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
+            if timed_out?
+              after_method timed_out
             else
-              throw err
-
+              after_method undefined, callback_args...
     run_more()
 
 

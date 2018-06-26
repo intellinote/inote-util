@@ -127,7 +127,22 @@ describe 'AsyncUtil',->
     id2 = AsyncUtil.wait DELAY*1.5, fn2
     assert.ok id1?
     assert.ok id2?
-    AsyncUtil.cancel_wait id1
+    AsyncUtil.clear_wait id1
+
+  it "wait returns a timer-id that can be used to cancel the timer (cancelWait case)", (done)=>
+    DELAY = 20
+    fn1_called = false
+    fn1 = ()->
+      fn1_called = true
+      assert.fail "Expected this function to be cancelled."
+    fn2 = ()->
+      assert.ok not fn1_called, "Expected fn1 to be cancelled but it was called instead."
+      done()
+    id1 = AsyncUtil.wait DELAY, fn1
+    id2 = AsyncUtil.wait DELAY*1.5, fn2
+    assert.ok id1?
+    assert.ok id2?
+    AsyncUtil.clearWait id1
 
   it "set_timeout returns a timer-id that can be used to cancel the timer", (done)=>
     DELAY = 20
@@ -142,7 +157,22 @@ describe 'AsyncUtil',->
     id2 = AsyncUtil.set_timeout DELAY*1.5, fn2
     assert.ok id1?
     assert.ok id2?
-    AsyncUtil.cancel_wait id1
+    AsyncUtil.clear_timeout id1
+
+  it "setTimeout returns a timer-id that can be used to cancel the timer", (done)=>
+    DELAY = 20
+    fn1_called = false
+    fn1 = ()->
+      fn1_called = true
+      assert.fail "Expected this function to be cancelled."
+    fn2 = ()->
+      assert.ok not fn1_called, "Expected fn1 to be cancelled but it was called instead."
+      done()
+    id1 = AsyncUtil.setTimeout DELAY, fn1
+    id2 = AsyncUtil.setTimeout DELAY*1.5, fn2
+    assert.ok id1?
+    assert.ok id2?
+    AsyncUtil.clearTimeout id1
 
   it "interval is like setInterval but with a more coffee-friendly API", (done)=>
     DELAY = 15
@@ -172,7 +202,7 @@ describe 'AsyncUtil',->
       call_count += 1
       if call_count is 2
         stop_time = Date.now()
-        AsyncUtil.cancel_interval id
+        AsyncUtil.clear_interval id
         assert.ok stop_time-start_time >= DELAY*2
         assert.ok stop_time-start_time <= DELAY*3
         assert.equal arg1, "arg-one"
