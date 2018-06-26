@@ -225,10 +225,10 @@ stew.select_first html, "#stats", (err,node)->
     nodes = nodes.map (x)->stew.dom_util.to_text(x)
     console.log ""
     console.log "\x1b[1mTEST COVERAGE SUMMARY\x1b[0m"
-    console.log "\x1b[1m  Coverage: \x1b[0m",pad(nodes[0],5)
-    console.log "\x1b[1m      SLOC: \x1b[0m",pad(nodes[1],5)
-    console.log "\x1b[1m      Hits: \x1b[0m",pad(nodes[2],5)
-    console.log "\x1b[1m    Misses: \x1b[0m",pad(nodes[3],5)
+    console.log "\x1b[1m  Coverage: \x1b[0m",pad(nodes[0] ? -1 , 5)
+    console.log "\x1b[1m      SLOC: \x1b[0m",pad(nodes[1] ? -1 , 5)
+    console.log "\x1b[1m      Hits: \x1b[0m",pad(nodes[2] ? -1 , 5)
+    console.log "\x1b[1m    Misses: \x1b[0m",pad(nodes[3] ? -1 , 5)
     console.log ""
 endef
 export COVERAGE_SUMMARY
@@ -242,11 +242,11 @@ coverage: $(COFFEE_SRCS) $(COFFEE_TEST_SRCS) $(MOCHA_TESTS) $(NODE_MODULES)
 	$(COVERAGE_EXE) $(COVERAGE_ARGS) $(COVERAGE_TMP_DIR) $(LIB_COV)
 	@mkdir -p `dirname $(COVERAGE_REPORT)`
 	@echo "\x1b[1mRunning Unit Tests\x1b[0m"
-	$(MOCHA_EXE) $(MOCHA_COV_ARGS) $(MOCHA_TESTS) > $(COVERAGE_REPORT)
+	($(MOCHA_EXE) $(MOCHA_COV_ARGS) $(MOCHA_TESTS) > $(COVERAGE_REPORT) 2>/dev/null) || true
 	@echo "\x1b[1mComputing Summary\x1b[0m"
+	@$(COFFEE_EXE) -e "$$COVERAGE_SUMMARY"
 	@rm -rf $(COVERAGE_TMP_DIR)
 	@rm -rf $(LIB_COV)
-	@$(COFFEE_EXE) -e "$$COVERAGE_SUMMARY"
 	@echo "Detailed coverage report generated at \x1b[1m$(COVERAGE_REPORT)\x1b[0m."
 	@echo "USE \x1b[1mopen $(COVERAGE_REPORT)\x1b[0m TO OPEN (ON OSX)"
 
