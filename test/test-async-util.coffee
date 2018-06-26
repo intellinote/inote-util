@@ -52,6 +52,53 @@ describe 'AsyncUtil',->
       throw new Error("dummy error")
     AsyncUtil.invoke_with_timeout method, ["one", 2], cb
 
+  it "maybe_invoke_with_timeout will execute the given method (with timeout case)", (done)=>
+    cb = (timed_out, err, msg)->
+      assert.ok not timed_out?, timed_out
+      assert.ok not err?, err
+      assert.equal msg, "OK"
+      done()
+    method = (arg1, arg2, callback)->
+      AsyncUtil.wait 100, ()->
+        assert.equal arg1, "one"
+        assert.equal arg2, 2
+        callback(undefined,"OK")
+    AsyncUtil.maybe_invoke_with_timeout method, ["one", 2], true, cb
+
+  it "maybe_invoke_with_timeout will call-back if the given method takes too long to complete (with timeout case)", (done)=>
+    cb = (timed_out, err, msg)->
+      assert.ok timed_out?
+      assert.ok timed_out instanceof TimeoutError
+      done()
+    method = (arg1, arg2, callback)->
+      AsyncUtil.wait 100, ()->
+        assert.equal arg1, "one"
+        assert.equal arg2, 2
+        callback(undefined,"OK")
+    AsyncUtil.maybe_invoke_with_timeout method, ["one", 2], 50, cb
+
+  it "maybe_invoke_with_timeout will call-back if the given method throws an error (without timeout case)", (done)=>
+    cb = (error_found, err, msg)->
+      assert.ok error_found?
+      assert.ok error_found instanceof ExceptionThrownError
+      done()
+    method = (arg1, arg2, callback)->
+      assert.equal arg1, "one"
+      assert.equal arg2, 2
+      throw new Error("dummy error")
+    AsyncUtil.maybe_invoke_with_timeout method, ["one", 2], undefined, cb
+
+  it "maybe_invoke_with_timeout will call-back if the given method throws an error (without timeout case)", (done)=>
+    cb = (error_found, err, msg)->
+      assert.ok error_found?
+      assert.ok error_found instanceof ExceptionThrownError
+      done()
+    method = (arg1, arg2, callback)->
+      assert.equal arg1, "one"
+      assert.equal arg2, 2
+      throw new Error("dummy error")
+    AsyncUtil.maybe_invoke_with_timeout method, ["one", 2], false, cb
+
   it "wait is like setTimeout but with a more coffee-friendly API", (done)=>
     DELAY = 20
     start_time = Date.now()
