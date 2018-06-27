@@ -13,6 +13,7 @@ hold
 *.tar
 inote-util-v*
 .npmrc
+package-lock
 # GENERAL
 #---------------------------------------------------------------------
 $RECYCLE.BIN/
