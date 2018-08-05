@@ -4,6 +4,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+  - [Release 1.16.0 (5 Aug 2018)](#release-11609-5-aug-2018)
   - [Release 1.15.2 (26 June 2018)](#release-1152-26-june-2018)
   - [Release 1.15.1 (9 May 2018)](#release-1151-9-may-2018)
   - [Release 1.15.0 (7 May 2018)](#release-1150-7-may-2018)
@@ -68,6 +69,11 @@ This file summarizes the changes bundled in each release of `inote-util`.
   - [Release 0.1.1 (30 September 2014)](#release-011-30-september-2014)
 
 <!-- tocstop -->
+
+## Release 1.16.0 (5 Aug 2018)
+
+ * Added `Util.get_funky_json` (and `Util.gfj`).
+ * Fixed potential encapsulation issue with `AsyncUtil.fork` and `AsyncUtil.throttled_fork`.
 
 ## Release 1.15.2 (26 June 2018)
 

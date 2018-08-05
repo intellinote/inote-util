@@ -571,6 +571,7 @@ console.log(timer.label,"Elapsed Time:",timer.elapsed_time);
 *[Back to Index](#feature-index)*
 
 ### Util
+* **get_funky_json(json,keys...)** -t he call `get_funky_json(json, "foo", "bar")` will return `Xyzzy` for `{ foo: { bar: "Xyzzy" } }` and `{ foo: { bar: {$:"Xyzzy" } } }` and `{ foo: { @bar: "Xyzzy" } }`, etc. This is used to mask the differences between certain XML-to-JSON translators.  This method is also aliased as **gfj**.
 * **version_satisfies([version_string,\]range_string)** - returns `true` if the given `version_string` satisfies the [semver criteria](https://www.npmjs.com/package/semver) specified in `range_string`.  When `version_string` is omitted, the Node version (the value of `process.version`) is used.  E.g., `if(!Util.version_satisifes(">=0.12.3")) { console.error("Expected version 0.12.3 or later."); }`.
 * **slow_equals(a,b)** - constant-time comparison of two buffers for equality.
 * **compare(a,b)** - a minimally-smart comparision function (allows `null`, uses `localeCompare` when available, folds case so that both `A` and `a` appear before `B`, etc.).
