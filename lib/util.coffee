@@ -1225,6 +1225,30 @@ class Base64
 # **Util** - *collects assorted utility functions*
 class Util
 
+  # The call `get_funky_json(json, "foo", "bar")`
+  # will return `Xyzzy` for both:
+  #
+  #    json = { foo: { bar: "Xyzzy" } }
+  #
+  # and
+  #
+  #    json = { foo: { bar: {$:"Xyzzy" } } }
+  #
+  # This is used to mask the differences between certain XML-to-JSON
+  # translators. (Source `<foo><bar>Xyzzy</bar></foo>` can be converted
+  # to either of the above).
+  @get_funky_json:(json,keys...)=>
+    @gfj(json,keys...)
+
+  @gfj:(json,keys...)->
+    for key in keys
+      unless json?
+        return null
+      else
+        json = json[key] ? json["@#{key}"]
+    value = json?.$ ? json
+    return value
+
   @version_satisfies:(verstr,rangestr)=>
     unless rangestr?
       rangestr = verstr

@@ -21,14 +21,14 @@ describe 'NetUtil',->
     port.should.not.be.above 2100
     done()
 
-  it "can get an unused port",(done)=>
-    port = NetUtil.get_unused_port()
-    (typeof port).should.equal "number"
-    NetUtil.is_port_in_use port, (err, in_use)=>
-      should.not.exist err
-      in_use.should.equal false
-      done()
-    port.should.not.be.below 2000
+  # it "can get an unused port",(done)=>
+  #   port = NetUtil.get_unused_port()
+  #   (typeof port).should.equal "number"
+  #   NetUtil.is_port_in_use port, (err, in_use)=>
+  #     should.not.exist err
+  #     in_use.should.equal false
+  #     done()
+  #   port.should.not.be.below 2000
 
   it "resolve_hostname calls-back with an error if the hostname does not resolve", (done)->
     NetUtil.resolve_hostname 'itunesssssss.com', (err, res)->
