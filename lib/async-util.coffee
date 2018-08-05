@@ -294,17 +294,21 @@ class AsyncUtil
     results = []
     errors = []
     remaining_callbacks = methods.length
-    for method, index in methods
-      do (method,index)->
-        method_args = args_for_methods?[index] ? []
-        unless Array.isArray(method_args)
-          method_args = [method_args]
-        AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
-          results[index] = callback_args
-          errors[index] = timed_out
+    run_method = (method, index)->
+      method_args = args_for_methods?[index] ? []
+      unless Array.isArray(method_args)
+        method_args = [method_args]
+      called_back = false
+      AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
+        results[index] = callback_args
+        errors[index] = timed_out
+        if not called_back
+          called_back = true
           remaining_callbacks--
           if remaining_callbacks is 0
             callback(results,errors)
+    for method, index in methods
+      run_method(method, index)
 
   # Just like `fork` save that at most `max_parallel` methods will run at any one time
   @throttled_fork:(max_parallel, methods, args_for_methods, options, callback)->
