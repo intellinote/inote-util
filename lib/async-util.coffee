@@ -324,30 +324,33 @@ class AsyncUtil
     currently_running = 0
     next_to_run = 0
     remaining_callbacks = methods.length
+    #
+    run_method = run_more = null
+    #
     run_more = ()->
       while (currently_running < max_parallel) and (next_to_run < methods.length)
         index = next_to_run
         currently_running++
         next_to_run++
-        do (index)->
-          method_args = args_for_methods?[index] ? []
-          unless Array.isArray(method_args)
-            method_args = [method_args]
-          method = methods[index]
-          after_method = (err, callback_args...)->
-            results[index] = callback_args
-            errors[index] = err
-            currently_running--
-            remaining_callbacks--
-            if remaining_callbacks is 0
-              callback(results, errors)
-            else
-              run_more()
-          AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
-            if timed_out?
-              after_method timed_out
-            else
-              after_method undefined, callback_args...
+        run_method methods[index], index
+    #
+    run_method = (method, index)->
+      method_args = args_for_methods?[index] ? []
+      unless Array.isArray(method_args)
+        method_args = [method_args]
+      called_back = false
+      AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
+        results[index] = callback_args
+        errors[index] = timed_out
+        if not called_back
+          called_back = true
+          currently_running--
+          remaining_callbacks--
+          if remaining_callbacks is 0
+            callback(results,errors)
+          else
+            run_more()
+    #
     run_more()
 
 
