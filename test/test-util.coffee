@@ -17,6 +17,28 @@ should     = require 'should'
 
 describe 'Util',->
 
+  it "can get_funky_json data",(done)->
+    tests = [
+      [ {foo:{bar:true}}, ["foo", "bar"],  true ]
+      [ {foo:{bar:true}}, ["foox", "bar"],  undefined ]
+      [ {foo:{bar:true}}, ["foo", "barx"],  undefined ]
+      [ {foo:{bar:true}}, ["foo", "bar", "x"],  undefined ]
+      [ {foo:{bar:"str"}}, ["foo", "bar"],  "str" ]
+      [ {foo:{bar:{$:"str"}}}, ["foo", "bar"],  "str" ]
+      [ {foo:{"@bar":"str"}}, ["foo", "bar"],  "str" ]
+      [ {foo:{bar:true}}, ["foo"],  {bar:true} ]
+      [ {foo:{bar:true}}, [],  {foo:{bar:true}} ]
+    ]
+    for test in tests
+      json = test[0]
+      path = test[1]
+      expected = test[2]
+      found = Util.get_funky_json(json, path...)
+      assert.deepEqual found, expected
+      found = Util.gfj(json, path...)
+      assert.deepEqual found, expected
+    done()
+
   it "can check semver ranges",(done)->
     tests = [
       [ "v0.10.33", ">=0.10.45", false ]
