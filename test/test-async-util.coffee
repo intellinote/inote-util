@@ -8,13 +8,14 @@ HOME_DIR             = path.join(__dirname,'..')
 LIB_COV              = path.join(HOME_DIR,'lib-cov')
 LIB_DIR              = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
 #------------------------------------------------------------------------------#
+StringUtil           = require(path.join(LIB_DIR,'string-util')).StringUtil
 AsyncUtil            = require(path.join(LIB_DIR,'async-util')).AsyncUtil
 Sequencer            = require(path.join(LIB_DIR,'async-util')).Sequencer
 ExceptionThrownError = require(path.join(LIB_DIR,'exception-thrown-error')).ExceptionThrownError
 TimeoutError         = require(path.join(LIB_DIR,'timeout-error')).TimeoutError
 #------------------------------------------------------------------------------#
 
-describe 'AsyncUtil',->
+describe 'AsyncUtil', ()->
 
   it "invoke_with_timeout will execute the given method", (done)=>
     cb = (timed_out, err, msg)->
@@ -719,3 +720,59 @@ describe 'AsyncUtil',->
       for elt, i in ran
         assert.equal elt, (not (i in DELAY_FOR))
       done()
+
+if StringUtil.truthy_string process.env.SLOW_TESTS
+  describe 'AsyncUtil (slow tests)', ()->
+    NUM_TESTS = 5
+    for test_num in [1..NUM_TESTS]
+      it "randomized thottled_fork tests (#{test_num})", (done)->
+        @timeout(60*1000)
+        num_elements = 1+Math.round((Math.random()*20))
+        console.log num_elements
+        elements = [0...num_elements]
+        wait_times = elements.map ()->1+Math.round(Math.random()*200)
+        response_to_send = elements.map (e)->[null, "one", "b", 3, e]
+        action = (elt, index, list, callback)->
+          AsyncUtil.wait wait_times[elt], ()->
+            callback response_to_send[elt]...
+        num_threads_range = [1...(num_elements+2)]
+        test_action = (num_threads, index, list, next_test)->
+          AsyncUtil.throttled_fork_for_each_async num_threads, elements, action, (responses)->
+            for i in [0...num_elements]
+              assert.ok responses[i]?
+              assert.equal responses[i][4], i
+            next_test()
+        AsyncUtil.fork_for_each_async num_threads_range, test_action, ()->
+          done()
+    for test_num in [1..NUM_TESTS]
+      it "randomized thottled_fork tests with timeouts (#{test_num})", (done)->
+        @timeout(60*1000)
+        num_elements = 1+Math.round((Math.random()*20))
+        elements = [0...num_elements]
+        wait_times = elements.map ()->1+Math.round(Math.random()*200)
+        response_to_send = elements.map (e)->
+          switch Math.round(Math.random()*1)
+            when 0
+              return "timeout"
+            else
+              return [null, "one", "b", 3, e]
+        action = (elt, index, list, callback)->
+          if response_to_send[elt] is "timeout"
+            # don't callback at all, just hang indefintely
+          else
+            AsyncUtil.wait wait_times[elt], ()->
+              callback response_to_send[elt]...
+        num_threads_range = [1...(num_elements+2)]
+        test_action = (num_threads, index, list, next_test)->
+          AsyncUtil.throttled_fork_for_each_async num_threads, elements, action, {timeout:250}, (responses, errors)->
+            for i in [0...num_elements]
+              if response_to_send[i] is "timeout"
+                assert.ok errors[i]?
+                assert.ok ((not responses[i]?) or (responses[i].length is 0))
+              else
+                assert.ok not errors[i]?
+                assert.ok responses[i]?
+                assert.equal responses[i][4], i
+            next_test()
+        AsyncUtil.fork_for_each_async num_threads_range, test_action, ()->
+          done()
