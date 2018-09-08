@@ -356,7 +356,10 @@ describe 'AsyncUtil', ()->
     method_two_finished = false
     method_two_val_one = null
     method_two_val_two = null
+    method_one_started_at = null
+    method_two_started_at = null
     method_one = (val, next)=>
+      method_one_started_at = Date.now()
       method_one_started = true
       method_one_val = val
       AsyncUtil.wait 10, ()=>
@@ -368,6 +371,7 @@ describe 'AsyncUtil', ()->
         method_one_finished = true
         next("ABC",val)
     method_two = (val1, val2, next)=>
+      method_two_started_at = Date.now()
       method_two_started = true
       method_two_val_one = val1
       method_two_val_two = val2
@@ -390,15 +394,71 @@ describe 'AsyncUtil', ()->
       results[1][2].should.equal "yz"
       method_one_finished.should.be.ok
       method_two_finished.should.be.ok
+      assert (method_two_started_at - method_one_started_at) < 20
       done()
     methods = [ method_one, method_two ]
     args = [ [ "abc" ], ["x","yz"] ]
     AsyncUtil.fork methods, args, when_done
 
+  it "fork accepts a delay between methods in parallel", (done)=>
+    method_one_started = false
+    method_one_val = null
+    method_one_finished = false
+    method_two_started = false
+    method_two_finished = false
+    method_two_val_one = null
+    method_two_val_two = null
+    method_one_started_at = null
+    method_two_started_at = null
+    method_one = (val, next)=>
+      method_one_started_at = Date.now()
+      method_one_started = true
+      method_one_val = val
+      AsyncUtil.wait 10, ()=>
+        method_two_started.should.be.ok
+        method_two_finished.should.not.be.ok
+      AsyncUtil.wait 400, ()=>
+        method_two_started.should.be.ok
+        method_two_finished.should.be.ok
+        method_one_finished = true
+        next("ABC",val)
+    method_two = (val1, val2, next)=>
+      method_two_started_at = Date.now()
+      method_two_started = true
+      method_two_val_one = val1
+      method_two_val_two = val2
+      AsyncUtil.wait 10, ()=>
+        method_one_started.should.be.ok
+        method_one_finished.should.not.be.ok
+      AsyncUtil.wait 200, ()=>
+        method_one_started.should.be.ok
+        method_one_finished.should.not.be.ok
+        method_two_finished = true
+        next("XYZ",val1, val2)
+    when_done = (results)=>
+      results.length.should.equal 2
+      results[0].length.should.equal 2
+      results[0][0].should.equal "ABC"
+      results[0][1].should.equal "abc"
+      results[1].length.should.equal 3
+      results[1][0].should.equal "XYZ"
+      results[1][1].should.equal "x"
+      results[1][2].should.equal "yz"
+      method_one_finished.should.be.ok
+      method_two_finished.should.be.ok
+      method_two_finished.should.be.ok
+      assert (method_two_started_at - method_one_started_at) > 20
+      done()
+    methods = [ method_one, method_two ]
+    args = [ [ "abc" ], ["x","yz"] ]
+    AsyncUtil.fork methods, args, {delay:30}, when_done
+
   it "fork_for_each_async works", (done)=>
     args = [0...5]
+    started_at = new Array()
     ran = args.map ()->false
     action = (elt, index, list, next)=>
+      started_at[index] = Date.now()
       elt.should.equal index
       ran[elt].should.not.be.ok
       ran[elt] = true
@@ -406,10 +466,32 @@ describe 'AsyncUtil', ()->
     when_done = (results)=>
       for i in args
         results[i][0].should.equal i
+        if i > 0
+          assert (started_at[i] - started_at[i-1]) < 20
       for elt in ran
         elt.should.be.ok
       done()
     AsyncUtil.fork_for_each_async args, action, when_done
+
+  it "fork_for_each_async accepts a delay between methods in parallel", (done)=>
+    args = [0...5]
+    started_at = new Array()
+    ran = args.map ()->false
+    action = (elt, index, list, next)=>
+      started_at[index] = Date.now()
+      elt.should.equal index
+      ran[elt].should.not.be.ok
+      ran[elt] = true
+      next(elt)
+    when_done = (results)=>
+      for i in args
+        results[i][0].should.equal i
+        if i > 0
+          assert (started_at[i] - started_at[i-1]) > 20
+      for elt in ran
+        elt.should.be.ok
+      done()
+    AsyncUtil.fork_for_each_async args, action, {delay:30}, when_done
 
   it "fork_for_each_async works even when one of the methods times out", (done)=>
     args = [0...5]
@@ -460,6 +542,7 @@ describe 'AsyncUtil', ()->
 
   it "throttled_fork_for_each_async works", (done)=>
     args = [0...10]
+    started_at = new Array(args.length)
     ran = args.map ()->false
     running = args.map ()->false
     num_true = (list)->
@@ -469,6 +552,7 @@ describe 'AsyncUtil', ()->
           count++
       return count
     action = (elt, index, list, next)=>
+      started_at[index] = Date.now()
       elt.should.equal index
       running[elt] = true
       num_true(running).should.be.below 5
@@ -481,12 +565,48 @@ describe 'AsyncUtil', ()->
     when_done = (results)=>
       for i in args
         results[i][0].should.equal i
+        unless i%4 is 0
+          assert.ok (started_at[i] - started_at[i-1]) < 20, "#{i} #{started_at[i]}  #{started_at[i-1]}  #{started_at[i]-started_at[i-1]}"
       for elt in ran
         elt.should.be.ok
       for elt in running
         elt.should.not.be.ok
       done()
     AsyncUtil.throttled_fork_for_each_async 4, args, action, when_done
+
+  it "throttled_fork_for_each_async accepts a delay", (done)=>
+    args = [0...10]
+    started_at = new Array(args.length)
+    ran = args.map ()->false
+    running = args.map ()->false
+    num_true = (list)->
+      count = 0
+      for elt in list
+        if elt
+          count++
+      return count
+    action = (elt, index, list, next)=>
+      started_at[index] = Date.now()
+      elt.should.equal index
+      running[elt] = true
+      num_true(running).should.be.below 5
+      ran[elt].should.not.be.ok
+      AsyncUtil.wait 50, ()->
+        num_true(running).should.be.below 5
+        ran[elt] = true
+        running[elt] = false
+        next(elt)
+    when_done = (results)=>
+      for i in args
+        results[i][0].should.equal i
+        unless i is 0
+          assert.ok (started_at[i] - started_at[i-1]) > 20, "#{i} #{started_at[i]}  #{started_at[i-1]}  #{started_at[i]-started_at[i-1]}"
+      for elt in ran
+        elt.should.be.ok
+      for elt in running
+        elt.should.not.be.ok
+      done()
+    AsyncUtil.throttled_fork_for_each_async 4, args, action, {delay:30}, when_done
 
   it "throttled_fork_for_each_async works even when one of the methods throws an exception", (done)=>
     args = [0...10]

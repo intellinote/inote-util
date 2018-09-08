@@ -282,6 +282,7 @@ class AsyncUtil
   #  * `options`: (optional)
   #      * `timeout` - timeout in milliseconds, or `true`
   #      * `catch_exceptions` - boolean
+  #      * `delay` - delay before launching each successive "thread", or `true`
   # - `callback` - the method called when all methods have completed; the single argument passed to `callback` will be an array containing the arguments passed to each method's callback (as an array)
   @fork:(methods, args_for_methods, options, callback)->
     if (not callback?) and typeof options is 'function'
@@ -289,28 +290,43 @@ class AsyncUtil
       options = undefined
     if (not callback?) and (typeof args_for_methods is 'function')
       callback = args_for_methods
-      args_for_methods = null
+      args_for_methods = undefined
+    if (not options?) and not Array.isArray(args_for_methods)
+      options = args_for_methods
+      args_for_methods = undefined
     if methods.length is 0
       callback [], []
     else
       timeout = options?.timeout
+      #
+      delay = options?.delay
+      if delay is true
+        delay = 10
+      maybe_delay = (index, cb)=>
+        if delay >= 0
+          process.nextTick ()=>
+            @wait index*delay, cb
+        else
+          cb()
+      #
       results = []
       errors = []
       remaining_callbacks = methods.length
       run_method = (index)->
-        method = methods[index]
-        method_args = args_for_methods?[index] ? []
-        unless Array.isArray(method_args)
-          method_args = [method_args]
-        called_back = false
-        AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
-          results[index] = callback_args
-          errors[index] = timed_out
-          if not called_back
-            called_back = true
-            remaining_callbacks--
-            if remaining_callbacks is 0
-              callback(results, errors)
+        maybe_delay index, ()->
+          method = methods[index]
+          method_args = args_for_methods?[index] ? []
+          unless Array.isArray(method_args)
+            method_args = [method_args]
+          called_back = false
+          AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
+            results[index] = callback_args
+            errors[index] = timed_out
+            if not called_back
+              called_back = true
+              remaining_callbacks--
+              if remaining_callbacks is 0
+                callback(results, errors)
       for index in [0...methods.length]
         run_method(index)
 
@@ -329,7 +345,9 @@ class AsyncUtil
         max_parallel = methods.length
       else unless max_parallel > 0
         max_parallel = 4
+      #
       timeout = options?.timeout
+      #
       results = []
       errors = []
       currently_running = 0
@@ -345,23 +363,34 @@ class AsyncUtil
           next_to_run++
           run_method index
       #
+      delay = options?.delay
+      if delay is true
+        delay = 20
+      maybe_delay = (index, cb)=>
+        if delay >= 0
+          process.nextTick ()=>
+            @wait index*delay, cb
+        else
+          cb()
+      #
       run_method = (index)->
-        method = methods[index]
-        method_args = args_for_methods?[index] ? []
-        unless Array.isArray(method_args)
-          method_args = [method_args]
-        called_back = false
-        AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
-          results[index] = callback_args
-          errors[index] = timed_out
-          if not called_back
-            called_back = true
-            currently_running--
-            remaining_callbacks--
-            if remaining_callbacks is 0
-              callback(results,errors)
-            else
-              run_more()
+        maybe_delay index, ()->
+          method = methods[index]
+          method_args = args_for_methods?[index] ? []
+          unless Array.isArray(method_args)
+            method_args = [method_args]
+          called_back = false
+          AsyncUtil.maybe_invoke_with_timeout method, method_args, options, (timed_out, callback_args...)->
+            results[index] = callback_args
+            errors[index] = timed_out
+            if not called_back
+              called_back = true
+              currently_running--
+              remaining_callbacks--
+              if remaining_callbacks is 0
+                callback(results,errors)
+              else
+                run_more()
       #
       run_more()
 
