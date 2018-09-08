@@ -96,6 +96,7 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
   * `action` - the action to take (a single callback function is passed and should be invoked at the end of the action, no return value is expected);
   * `increment` - called at the end of every `action`, prior to `condition` (no arguments passed, no return value is expected);
   * `options` - optional options map
+    * `delay` - time added before each successive invocation, in milliseconds
     * `timeout` - max time to wait for an action to complete, in milliseconds
     * `catch_exceptions` - boolean
   * `whendone` - called at the end of the loop (when `condition` returns `false`), (no arguments passed, no return value is expected).
@@ -103,10 +104,15 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
   * `list` - the array to iterate over;
   * `action` - a function with the signature `(value,index,list,next)` indicating the action to take for each element (*must* call `next` for processing to continue);
   * `options` - optional options map
+    * `delay` - time added before each successive invocation, in milliseconds
     * `timeout` - max time to wait for an action to complete, in milliseconds
     * `catch_exceptions` - boolean
   * `whendone` - called at the end of the loop.
-* **fork(methods,args_for_methods[,options],callback)** - runs the given array of methods "simultaneously" (asynchronously), invoking `callback` when they are *all* complete.
+* **fork(methods,args_for_methods[,options],callback)** - runs the given array of methods "simultaneously" (asynchronously), invoking `callback` when they are *all* complete:
+  * `options` - optional options map
+    * `delay` - time added before each successive invocation, in milliseconds
+    * `timeout` - max time to wait for an action to complete, in milliseconds
+    * `catch_exceptions` - boolean
 * **throttled_fork(max_parallel,methods,args_for_methods[,options],callback)** - just like `fork`, but never running more than `max_parallel` functions at the same time.
 * **fork_for_each_async(list,action[,options],whendone)** - like `for_each_async` but running `action` in parallel for each element of the `list`.  The `whendone` callback is provided with a list of "responses", in the same order as the original list.
 * **throttled_fork_for_each_async(max_parallel,list,action[,options],whendone)** - like `fork_for_each_async` but running at most `max_parallel` methods at any one time.
@@ -436,7 +442,7 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 
 ### LogUtil
 * Some notes on configuration:
-  * `require('inote-util').LogUtil` yields a "singleton" object with a default configuration.  
+  * `require('inote-util').LogUtil` yields a "singleton" object with a default configuration.
   * `require('inote-util').LogUtil.init` is a function that invokes the `LogUtil` constructor
   * `require('inote-util').LogUtil.LogUtil` and `require('inote-util').LogUtil.constructor` provide direct access to the `LogUtil` constructor.
   * Both **LogUtil.init** and the **LogUtil.LogUtil** constructor accept a single "configuration" object, a map with the following (optional) attributes:
