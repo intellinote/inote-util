@@ -111,18 +111,22 @@ class ObjectUtil
 
   # **remove_null** - *`delete` any attribute whose value evaluates to null*
   # Returns a new map or array, with `null` values removed.
-  @remove_null:(map)=>
+  @remove_null:(map, recurse=false)=>
     unless map?
       return null
     else if Array.isArray(map)
       new_array = []
       for elt in map
+        if recurse
+          elt = @remove_null(elt, true)
         if elt?
           new_array.push elt
       return new_array
     else if typeof map is 'object'
       new_map = {}
       for n,v of map
+        if recurse
+          v = @remove_null(v, true)
         if v?
           new_map[n] = v
       return new_map
@@ -131,22 +135,24 @@ class ObjectUtil
 
   # **remove_falsey** - *`delete` any attribute whose value evaluates to false*
   # Returns a new map or array, with "falsey" values removed.
-  @remove_falsey:(map)=>
+  @remove_falsey:(map, recurse=false)=>
     unless map?
       return map
     else if Array.isArray(map)
       new_array = []
       for elt in map
+        elt = @remove_falsey(elt, true)
         if elt
           new_array.push elt
       return new_array
     else if typeof map is 'object'
       new_map = {}
       for n,v of map
+        v = @remove_falsey(v, true)
         if v
           new_map[n] = v
       return new_map
-    else unless  map
+    else unless map
       return null
     else
       return map

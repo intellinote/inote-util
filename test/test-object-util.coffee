@@ -202,6 +202,9 @@ describe 'ObjectUtil',->
     ObjectUtil.remove_null("foo").should.equal "foo"
     ObjectUtil.remove_null(8).should.equal 8
     should.not.exist ObjectUtil.remove_null(null)
+    ObjectUtil.remove_null("foo",true).should.equal "foo"
+    ObjectUtil.remove_null(8,true).should.equal 8
+    should.not.exist ObjectUtil.remove_null(null,true)
     done()
 
   it "remove_null removes null values from maps",(done)->
@@ -209,11 +212,52 @@ describe 'ObjectUtil',->
       foo:null
       undef:undefined
       bar:0
+      a: [0,1,2,null,4,{value:5,foo:null}]
+      m: {
+        x: null
+        y: true
+      }
     }
-    output =  ObjectUtil.remove_null(input)
-    should.not.exist output.foo
-    should.not.exist output.undef
+    output = ObjectUtil.remove_null(input)
+    keys = Object.keys(output)
+    assert.ok not ("foo" in keys)
+    assert.ok not ("undef" in keys)
+    assert.ok ("bar" in keys)
+    assert.ok ("a" in keys)
+    assert.ok ("m" in keys)
+    assert.deepEqual input.a, output.a
+    assert.deepEqual input.m, output.m
     output.bar.should.equal 0
+    done()
+
+  it "remove_null(*,true) removes null values from maps and arrays recursively",(done)->
+    input = {
+      foo:null
+      undef:undefined
+      bar:0
+      a: [0,1,2,null,4,{value:5,foo:null}]
+      m: {
+        x: null
+        y: true
+        z: [0,null,2]
+      }
+    }
+    output = ObjectUtil.remove_null(input, true)
+    keys = Object.keys(output)
+    assert.ok not ("foo" in keys)
+    assert.ok not ("undef" in keys)
+    assert.ok ("bar" in keys)
+    assert.ok ("a" in keys)
+    assert.ok ("m" in keys)
+    output.bar.should.equal 0
+    assert.equal output.a.length, input.a.length - 1
+    assert.equal output.a[4].value, 5
+    assert.ok not ("foo" in Object.keys(output.a[4]))
+    assert.ok ("value" in Object.keys(output.a[4]))
+    assert.ok not ("x" in Object.keys(output.m))
+    assert.ok ("y" in Object.keys(output.m))
+    assert.ok ("z" in Object.keys(output.m))
+    assert.equal output.m.z.length, input.m.z.length - 1
     done()
 
   it "remove_null removes null values from arrays",(done)->
