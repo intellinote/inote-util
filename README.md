@@ -487,8 +487,8 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
   * `{foo:{bar:1}}`, `{foo:{bar:2}}` yields `{foo:{bar:'c'}}` (value of `foo.bar` has `c`hanged.
   * `{foo:{bar:null}}`, `{foo:{bar:2}}` yields `{foo:{bar:'a'}}` (value of `foo.bar` was `a`dded.
   * `{foo:{bar:1}}`, `{foo:{x:true}}` yields `{foo:{bar:'d',x:'a'}}` (value of `foo.bar` was `d`eleted and value of `foo.x` was `a`dded).
-* **remove_null(map)** - generates a (shallow) *clone* of the map, with `null` entries removed.
-* **remove_falsey(map)** - generates a (shallow) *clone* of the map, with "falsey" entries removed (see `falsey_string`).
+* **remove_null(map,recurse=false)** - generates a (shallow) *clone* of the map or array, with `null` entries removed; when `recurse` is `true` the action is repeated for each map or array-value element or attribute
+* **remove_falsey(map,recurse=false)** - generates a (shallow) *clone* of the map, with "falsey" entries removed (see `falsey_string`); when `recurse` is `true` the action is repeated for each map or array-value element or attribute
 * **merge(maps...)** - given two or more maps `a` and `b`, creates new new map containing the union of elements from each. If `a` and `b` share a key, the value in `b` will overwrite the value in `a`.
 * **deep_merge(maps...)** - just like `merge` except that sub-maps are recursively merged (e.g., merging `{a:{a1:1}}` and `{a:{a2:2}}` yields `{a:{a1:1,a2:2}}` rather than `{a:{a2:2}}`).
 * **shallow_clone(obj)** - create a shallow clone of the given map or array.

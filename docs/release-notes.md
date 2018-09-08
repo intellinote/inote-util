@@ -4,8 +4,9 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
-  - [Release 1.16.1 (8 September 2018)](#release-1611-8-september-2018)
-  - [Release 1.16.0 (5 August 2018)](#release-11609-5-august-2018)
+  - [Release 1.16.2 (8 September 2018)](#release-1162-8-september-2018)
+  - [Release 1.16.1 (8 September 2018)](#release-1161-8-september-2018)
+  - [Release 1.16.0 (5 August 2018)](#release-1160-5-august-2018)
   - [Release 1.15.2 (26 June 2018)](#release-1152-26-june-2018)
   - [Release 1.15.1 (9 May 2018)](#release-1151-9-may-2018)
   - [Release 1.15.0 (7 May 2018)](#release-1150-7-may-2018)
@@ -70,6 +71,10 @@ This file summarizes the changes bundled in each release of `inote-util`.
   - [Release 0.1.1 (30 September 2014)](#release-011-30-september-2014)
 
 <!-- tocstop -->
+
+## Release 1.16.2 (8 September 2018)
+
+  * Added `recurse` parameter to `ObjectUtil.remove_null` and `ObjectUtil.remove_falsey`.
 
 ## Release 1.16.1 (8 September 2018)
 
