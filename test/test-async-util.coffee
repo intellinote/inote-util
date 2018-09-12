@@ -4,6 +4,9 @@ should               = require 'should' # consider the use of 'should' here to b
 assert               = require 'assert'
 fs                   = require 'fs'
 path                 = require 'path'
+request              = require 'request'
+http                 = require 'http'
+url                  = require 'url'
 HOME_DIR             = path.join(__dirname,'..')
 LIB_COV              = path.join(HOME_DIR,'lib-cov')
 LIB_DIR              = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOME_DIR,'lib')
@@ -843,6 +846,65 @@ describe 'AsyncUtil', ()->
 
 if StringUtil.truthy_string process.env.SLOW_TESTS
   describe 'AsyncUtil (slow tests)', ()->
+
+    it "throttled_fork_for_each_async works with the request library", (done)=>
+      counter = 0
+      http.createServer( (request, response) =>
+        random_wait = Math.floor(Math.random()*100)
+        AsyncUtil.wait random_wait, ()->
+          query = url.parse(request.url, true).query;
+          response.writeHead(200)
+          response.end(query.index)
+      ).listen(8125)
+
+      args = [0...10]
+      action = (payload, index, list, next)=>
+        request.get "http://localhost:8125/foo?index=#{index}", (err, resp)=>
+          assert.equal resp.body, index
+          counter += 1 
+          next(payload)
+      when_done = (results)=>
+        assert.equal counter, 10
+        counter = 0
+        done()
+      AsyncUtil.throttled_fork_for_each_async 10, args, action, when_done
+
+    NUM_TESTS = 15
+    for test_num in [1..NUM_TESTS]
+      it "throttled_fork_for_each_async works with the xsi requests ", (done)=>
+        # args = [0...10]
+        # started_at = new Array(args.length)
+        # ran = args.map ()->false
+        # running = args.map ()->false
+        # num_true = (list)->
+        #   count = 0
+        #   for elt in list
+        #     if elt
+        #       count++
+        #   return count
+        # action = (elt, index, list, next)=>
+        #   started_at[index] = Date.now()
+        #   elt.should.equal index
+        #   running[elt] = true
+        #   num_true(running).should.be.below 5
+        #   ran[elt].should.not.be.ok
+        #   AsyncUtil.wait 50, ()->
+        #     num_true(running).should.be.below 5
+        #     ran[elt] = true
+        #     running[elt] = false
+        #     next(elt)
+        # when_done = (results)=>
+        #   for i in args
+        #     results[i][0].should.equal i
+        #     unless i%4 is 0
+        #       assert.ok (started_at[i] - started_at[i-1]) < 20, "#{i} #{started_at[i]}  #{started_at[i-1]}  #{started_at[i]-started_at[i-1]}"
+        #   for elt in ran
+        #     elt.should.be.ok
+        #   for elt in running
+        #     elt.should.not.be.ok
+          done()
+        # AsyncUtil.throttled_fork_for_each_async 4, args, action, when_done
+
     NUM_TESTS = 5
     for test_num in [1..NUM_TESTS]
       it "randomized thottled_fork tests (#{test_num})", (done)->
