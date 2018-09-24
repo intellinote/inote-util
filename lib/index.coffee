@@ -35,6 +35,7 @@ sources = [
   'net-util'
   'object-util'
   's3-model'
+  'simple-cache'
   'stopwatch'
   'string-util'
   'timeout-error'

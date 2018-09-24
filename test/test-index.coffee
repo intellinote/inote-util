@@ -16,6 +16,10 @@ describe "index",->
     index.Sequencer.should.exist
     done()
 
+  it "exports SimpleCache", (done)->
+    index.SimpleCache.should.exist
+    done()
+
   it "exports Stopwatch", (done)->
     index.Stopwatch.should.exist
     done()

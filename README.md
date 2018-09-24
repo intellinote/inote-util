@@ -61,6 +61,7 @@ var gup = require(“note-util”).NetUtil.get_unused_port;
 [NumberUtil](#numberutil) |
 [ObjectUtil](#objectutil) |
 [RandomUtil](#randomutil) |
+[SimpleCache](#simplecache) |
 [Stopwatch](#stopwatch) |
 [StringUtil](#stringutil) |
 [Util](#util) |
@@ -516,6 +517,22 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
 * **random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).
 * **shuffle(list)** - performs an in-place shuffle of the given list
+
+*[Back to Index](#feature-index)*
+
+### SimpleCache
+
+* **new SimpleCache([{default_ttl:, default_value:, purge_interval:}])**
+* **cache.put(key, value, [{ttl:}])**
+* **cache.get(key, [{ignore_ttl:, default:}])** / **cache.set(key, [{ignore_ttl:, default:}])**
+* **cache.get_put(key, value, [{ttl:, ignore_ttl:, default:}])** / **cache.get_set(key, value, [{ttl:, ignore_ttl:, default:}])**
+* **cache.clear(key)**
+* **cache.get_clear(key, [{ignore_ttl:, default:}])**
+* **cache.clear_all()**
+* **cache.clear_matching(/regexp/)**
+* **cache.keys([{ignore_ttl:}])**
+* **cache.values([{ignore_ttl:}])**
+* **cache.pairs([{ignore_ttl:}])**
 
 *[Back to Index](#feature-index)*
 
