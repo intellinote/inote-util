@@ -8,6 +8,8 @@ LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib'
 #------------------------------------------------------------------------------#
 assert     = require 'assert'
 should     = require 'should'
+Stream     = require 'stream'
+zipstream  = require 'zipstream'
 #------------------------------------------------------------------------------#
 RandomUtil = require(path.join(LIB_DIR,'index')).RandomUtil
 
@@ -126,7 +128,7 @@ describe 'RandomUtil',->
     done()
 
   it "random_alphanumeric returns base-36 values (seed_rng case)",(done)->
-    Util.set_rng(RandomUtil.seed_rng("hello."))
+    RandomUtil.set_rng(RandomUtil.seed_rng("hello."))
     for c in [0,1,3,117]
       str = RandomUtil.random_alphanumeric(c)
       (/^[0-9a-z]*$/.test str).should.be.ok
@@ -279,11 +281,102 @@ describe 'RandomUtil',->
       str2 = RandomUtil.random_alphanumeric(64,rng2)
       str3 = RandomUtil.random_alphanumeric(64,rng3)
       str4 = RandomUtil.random_alphanumeric(64,rng4)
+      str5 = RandomUtil.random_alphanumeric(64)
+      str6 = RandomUtil.random_alphanumeric(64)
       str1.should.equal str2
       str2.should.not.equal str3
       str3.should.equal str4
+      str5.should.not.equal str6
       str1.should.not.equal old1
       str3.should.not.equal old3
       old1 = str1
       old3 = str3
+      #
+      val1 = RandomUtil.random_value(0,1,rng1)
+      val2 = RandomUtil.random_value(0,1,rng2)
+      val3 = RandomUtil.random_value(0,1,rng3)
+      val4 = RandomUtil.random_value(0,1,rng4)
+      val5 = RandomUtil.random_value(0,1)
+      val6 = RandomUtil.random_value(0,1)
+      #
+      val1.should.equal val2
+      val3.should.equal val4
+      val1.should.not.equal val3
+      val5.should.not.equal val6
+    done()
+
+  it "random_value returns a value within the specified range", (done)->
+    tests = [
+      [[], [0, 1]]
+      [[1], [0, 1]]
+      [[undefined,1], [0, 1]]
+      [[0,1], [0, 1]]
+      [[1,0], [0, 1]]
+      [[1,100], [1, 100]]
+      [[100,1], [1, 100]]
+      [[-100], [-100, 0]]
+      [[-200,-300], [-300, -200]]
+      [[-300,-200], [-300, -200]]
+      [[-10,10], [-10, 10]]
+    ]
+    rng2 = RandomUtil.seed_rng(1234567)
+    rng3 = RandomUtil.seed_rng(1234567)
+    for i in [0...100]
+      for [inputs, [min, max]] in tests
+        value = RandomUtil.random_value inputs...
+        assert.ok min <= value <= max
+        value2 = RandomUtil.random_value inputs..., rng2
+        assert.ok min <= value2 <= max
+        value3 = RandomUtil.random_value inputs..., rng3
+        assert.equal value2, value3
+    done()
+
+  it "randomly_assign provides a random but consistent way of assigining an identifier to a category", (done)->
+    @timeout 6000
+    range = 3000
+    users = [100000...(100000+range)].map((x)->"user#{x}")
+    tests = [
+      [[ users ], [0.45, 0.55, true]]
+      [[ users, [true, false] ], [0.45, 0.55, true]]
+      [[ users, [false, true] ], [0.45, 0.55, true]]
+      [[ users, 0.5 ], [0.45, 0.55, true]]
+      #
+      [[ users ], [0.45, 0.55, false]]
+      [[ users, [true, false] ], [0.45, 0.55, false]]
+      [[ users, [false, true] ], [0.45, 0.55, false]]
+      [[ users, 0.5 ], [0.45, 0.55, false]]
+      #
+      [[ users, ["A", "B"] ], [0.45, 0.55, "A"]]
+      [[ users, ["A", "B"] ], [0.45, 0.55, "B"]]
+      #
+      [[ users, 0.66 ], [0.590, 0.730, true]]
+      [[ users, 0.66 ], [0.297, 0.363, false]]
+      #
+      [[ users, ["A","B","C","D","E"] ], [0.180, 0.220, "A"]]
+      [[ users, ["A","B","C","D","E"] ], [0.180, 0.220, "B"]]
+      [[ users, ["A","B","C","D","E"] ], [0.180, 0.220, "C"]]
+      [[ users, ["A","B","C","D","E"] ], [0.180, 0.220, "D"]]
+      [[ users, ["A","B","C","D","E"] ], [0.180, 0.220, "E"]]
+      [[ users, ["A","A","C","D","E"] ], [0.360, 0.440, "A"]]
+      [[ users, ["A","A","A","D","E"] ], [0.540, 0.660, "A"]]
+      [[ users, ["A","A","A","A","E"] ], [0.720, 0.880, "A"]]
+      [[ users, ["A","A","A","A","A"] ], [1.0, 1.0, "A"]]
+      [[ users, ["A","A","A","A","A"] ], [0, 0, "B"]]
+      [[ users, [0...100] ], [0.008, 0.012, 1]]
+      [[ users, [0...100] ], [0.008, 0.012, 16]]
+      [[ users, [0...100] ], [0.008, 0.012, 92]]
+      [[ users, [0...1000] ], [0.0005, 0.0015, 16]]
+      [[ users, [0...1000] ], [0.0005, 0.0015, 356]]
+    ]
+    for [[users, categories], [min_freq, max_freq, expected_value]] in tests
+      count_in = 0
+      count_out = 0
+      for user in users
+        result = RandomUtil.randomly_assign user, categories
+        if result is expected_value
+          count_in++
+        else
+          count_out++
+        assert.equal result, RandomUtil.randomly_assign user, categories
+      assert.ok min_freq <= count_in/(count_in+count_out) <= max_freq, [categories, expected_value, min_freq, max_freq, expected_value, count_in, count_out, count_in/(count_in+count_out)].join(",")
     done()

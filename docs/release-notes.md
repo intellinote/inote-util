@@ -4,6 +4,7 @@ This file summarizes the changes bundled in each release of `inote-util`.
 
 <!-- toc -->
 
+  - [Release 1.17.1 (24 September 2018)](#release-1171-24-september-2018)
   - [Release 1.17.0 (24 September 2018)](#release-1170-24-september-2018)
   - [Release 1.16.2 (8 September 2018)](#release-1162-8-september-2018)
   - [Release 1.16.1 (8 September 2018)](#release-1161-8-september-2018)
@@ -72,6 +73,11 @@ This file summarizes the changes bundled in each release of `inote-util`.
   - [Release 0.1.1 (30 September 2014)](#release-011-30-september-2014)
 
 <!-- tocstop -->
+
+## Release 1.17.0 (22 September 2018)
+
+  * Added `RandomUtil.random_value(min,max,rng)`.
+  * Added `RandomUtil.randomly_assign(id, categories)`
 
 ## Release 1.17.0 (22 September 2018)
 

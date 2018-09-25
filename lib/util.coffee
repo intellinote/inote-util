@@ -635,8 +635,10 @@ class RandomUtil
     else
       return bytes.toString(enc)
 
-  @seed_rng:(seed)->new Math.seedrandom(seed)
-  @set_rng:(rng = Math.random)=>@rng = rng
+  @seed_rng:(seed)->
+    return new Math.seedrandom(seed)
+  @set_rng:(rng)=>
+    @rng = rng ? new Math.seedrandom()
   @rng:Math.random
 
   # **random_hex** - *generate a string of `count` pseudo-random characters from the set ``[0-9a-f]``.
@@ -768,6 +770,47 @@ class RandomUtil
         list[i] = list[j]
         list[j] = x
     return list
+
+  @random_value:(min,max,rng)=>
+    if typeof max is 'function' and not rng?
+      rng = max
+      max = undefined
+    if typeof min is 'function' and not rng?
+      rng = min
+      min = undefined
+    if typeof min is 'number' and not max?
+      max = min
+      min = undefined
+    min ?= 0
+    max ?= 1
+    if max < min
+      [min, max] = [max, min]
+    rng ?= @rng ? Math.random
+    range = max - min
+    value = min + (rng()*range)
+    return value
+
+  # Assign the given (non-null) identifier to a randomly selected category such that:
+  # 1. For a given collection of identifiers results will be randomly distributed among the categories.
+  # 2. For a given identifier the result will be the same every time the method is called.
+  # The `categories` parameter is optional:
+  #  - when missing, identifiers will be randomly assigned to either `true` or `false`
+  #  - when an value between 0 and 1, identifiers will be assigned to either `true` or `false`, with `true` appearing `100*value` % of the time
+  #  - when an array, identifiers will be assigned to an element of the array with equal probability
+  @randomly_assign:(id, categories)=>
+    categories ?= [true, false]
+    if typeof categories is 'number'
+      if categories < 0 or categories > 1
+        throw new Error("Expected a value between 0 and 1 (inlcusive). Found #{categories}.")
+      else
+        value = @random_value 0, 1, @seed_rng(id)
+        return value <= categories
+    else if Array.isArray(categories)
+      value = @random_element categories, @seed_rng(id)
+    else
+      throw new Error("Expected a number or an array. Found #{typeof categories}: #{categories}")
+
+
 
 ################################################################################
 
@@ -1307,6 +1350,7 @@ class Util
   @seed_rng:              RandomUtil.seed_rng
   @set_rng:               RandomUtil.set_rng
   @random_digits:         RandomUtil._random_digits
+  @random_value:          RandomUtil.random_value
   @shuffle:               RandomUtil.shuffle
 
   @validate_hashed_password:PasswordUtil.validate_hashed_password

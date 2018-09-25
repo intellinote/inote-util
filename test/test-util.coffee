@@ -8,10 +8,7 @@ LIB_COV    = path.join(HOMEDIR,'lib-cov')
 LIB_DIR    = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 Util       = require(path.join(LIB_DIR,'index')).Util
 WebUtil    = require(path.join(LIB_DIR,'index')).WebUtil
-RandomUtil = require(path.join(LIB_DIR,'index')).RandomUtil
 ArrayUtil  = require(path.join(LIB_DIR,'index')).ArrayUtil
-Stream     = require 'stream'
-zipstream  = require 'zipstream'
 assert     = require 'assert'
 should     = require 'should'
 

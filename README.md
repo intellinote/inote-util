@@ -516,6 +516,8 @@ Note that it is not necessarily the case that `get_ext_for_mime(get_mime_for_ext
 * **random_Alpha([count=32[,rng]])** - returns `count` random digits from the set `[a-zA-Z]` (using the given random number generator if provided).
 * **random_ALPHA([count=32[,rng]])** - returns `count` random digits from the set `[A-Z]` (using the given random number generator if provided).
 * **random_element(collection[,rng])** - returns a random element from an array, or `[key,value]` pair given a map (using the given random number generator if provided).
+* **random_value([min],[max],[rng])** - returns a random float between `min` and `max`, inclusive; `min` defaults to `0`, `max` defaults to `1`
+* **randomly_assign(id[,categories])** - assign the given (non-null) identifier to a randomly selected category such that (A) fgor a given collection of identifiers results will be randomly distributed among the categories and (B) for a given identifier the result will be the same every time the method is called. The `categories` parameter is optional: when missing, identifiers will be randomly assigned to either `true` or `false`; when an value between 0 and 1, identifiers will be assigned to either `true` or `false`, with `true` appearing `100*value` % of the time; when an array, identifiers will be assigned to an element of the array with equal probability
 * **shuffle(list)** - performs an in-place shuffle of the given list
 
 *[Back to Index](#feature-index)*
