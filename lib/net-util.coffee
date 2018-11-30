@@ -199,24 +199,28 @@ class NetUtil
             next()
           else                                                                  #   Otherwise attempt a GET request to see if the IP address is live.
             client = if opts.protocol is 'http:' then http else https
-            client.get({
-              protocol: opts.protocol
-              host: ip_address
-              port: opts.port
-              path: opts.path
-              headers: {
-                Host: host
-              }
-              timeout: opts.timeout
-              rejectUnauthorized: opts.reject_unauthorized
-            }, (res) ->
-              if res?.statusCode? and res?.socket?.remoteAddress?               #   If it worked...
-                if not called_back                                              #   ...and we haven't called back yet...
-                  callback null, res.socket.remoteAddress                       #   ...callback with the discovered IP address...
-                  called_back = true                                            #   ...note that we've called back, and we're done.
-              else                                                              #   Otherwise just keep going.
-                next()
-            ).on 'error', next                                                  #   Also keep going in case of error
+            random_val = Math.floor((Math.random() * 900) + 100)
+            # console.log "Changed the logic here to set the wait period ranging from 100ms to 1000ms: ", random_val
+            AsyncUtil.wait (Math.round(Math.random()*random_val)), ()=>
+              client.get({
+                protocol: opts.protocol
+                host: ip_address
+                port: opts.port
+                path: opts.path
+                headers: {
+                  Host: host
+                }
+                timeout: opts.timeout
+                rejectUnauthorized: opts.reject_unauthorized
+              }, (res) ->
+                # console.log " response for IP address: ",ip_address, res.socket.remoteAddress
+                if res?.statusCode? and res?.socket?.remoteAddress?               #   If it worked...
+                  if not called_back                                              #   ...and we haven't called back yet...
+                    callback null, res.socket.remoteAddress                       #   ...callback with the discovered IP address...
+                    called_back = true                                            #   ...note that we've called back, and we're done.
+                else                                                              #   Otherwise just keep going.
+                  next()
+              ).on 'error', next                                                  #   Also keep going in case of error
         # Use that method to test the ip_addresses returned by `dns.resolve`.
         if ip_addresses? and Array.isArray(ip_addresses) and opts.shuffle
           ip_addresses = RandomUtil.shuffle([].concat(ip_addresses))
@@ -225,3 +229,13 @@ class NetUtil
             callback new Error("Unable to find live server for host '#{host}'.")
 
 exports.NetUtil = NetUtil
+
+# json_body  = {}
+# json_body.protocol = 'https:'
+# json_body.port = 443
+# json_body.path = '/'
+# NetUtil.resolve_hostname "xspl-api.hcomm.att.net", json_body, (err,new_hostname) ->
+#   if err?
+#     console.log "Error:  ", err
+#   else
+#     console.log "Callback response: ", new_hostname
