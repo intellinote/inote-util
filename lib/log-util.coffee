@@ -13,6 +13,8 @@ class LogUtil
     @logger.info ?= console.info
     @logger.warn ?= console.warn
     @prefix = config.prefix ? null
+    if config.class? and not @prefix?
+      @prefix = config.class.constructor?.name
     @_init_functions()
 
   # format a timestamp
