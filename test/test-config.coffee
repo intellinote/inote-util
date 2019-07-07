@@ -36,7 +36,7 @@ describe 'Config',=>
     delete require.cache[path.join(LIB_DIR,'config.js')]
     # purge nconf from required files
     for key, value of require.cache
-      if /\/node_modules\/nconf\//.test key
+      if /(\/|\\)node_modules(\/|\\)nconf(\/|\\)/.test key
         delete require.cache[key]
     done()
 
