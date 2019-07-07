@@ -55,5 +55,5 @@ describe 'NetUtil',->
   it "resolve_hostname returns an IP address in the single-entry DNS case.", (done)->
     NetUtil.resolve_hostname 'www.team-one.com', (err,res)->
       assert.ok not err?, err
-      assert.equal res, "52.6.110.31"
+      assert.ok /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/.test res
       done()
