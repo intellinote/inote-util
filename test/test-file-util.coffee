@@ -9,6 +9,7 @@ LIB_DIR  = if fs.existsSync(LIB_COV) then LIB_COV else path.join(HOMEDIR,'lib')
 FileUtil = require(path.join(LIB_DIR,'index')).FileUtil
 AsyncUtil = require(path.join(LIB_DIR,'index')).AsyncUtil
 TEST_FS  = path.join HOMEDIR, "test", "data", "test-fs"
+PSEP = path.sep ? "/"
 
 describe 'FileUtil',->
 
@@ -136,9 +137,9 @@ describe 'FileUtil',->
   it "can sanitize filenames",(done)->
     tests = [
       ["Foo.txt","Foo.txt"]
-      ["/home/rod/test/dir/Foo.txt","/home/rod/test/dir/Foo.txt"]
+      ["/home/rod/test/dir/Foo.txt","#{PSEP}home#{PSEP}rod#{PSEP}test#{PSEP}dir#{PSEP}Foo.txt"]
       ["Foo Bar.txt","Foo-Bar.txt"]
-      ["/home/rod w/test dir/Foo Bar.txt","/home/rod w/test dir/Foo-Bar.txt"]
+      ["/home/rod w/test dir/Foo Bar.txt","#{PSEP}home#{PSEP}rod w#{PSEP}test dir#{PSEP}Foo-Bar.txt"]
       ["xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.txt","xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.txt"]
       ["~!@#$%^&*()+=1.2.3.4.5.6.7.8.9.txt","-------------1-2-3-4-5-6-7-8-9.txt"]
     ]
@@ -182,8 +183,8 @@ describe 'FileUtil',->
       [ "foo.foo", "bar", "foo.bar" ]
       [ "foo.foo.foo", "bar", "foo.foo.bar" ]
       [ "foo.foo.foo", "bar.bar", "foo.foo.bar.bar" ]
-      [ "/foo/bar.xxx/file.ext", ".txt", "/foo/bar.xxx/file.txt" ]
-      [ "/foo/bar.xxx/file.ext", "txt", "/foo/bar.xxx/file.txt" ]
+      [ "/foo/bar.xxx/file.ext", ".txt", "#{PSEP}foo#{PSEP}bar.xxx#{PSEP}file.txt" ]
+      [ "/foo/bar.xxx/file.ext", "txt", "#{PSEP}foo#{PSEP}bar.xxx#{PSEP}file.txt" ]
     ]
     for test in tests
       FileUtil.replace_extension(test[0],test[1]).should.equal test[2]
@@ -193,9 +194,9 @@ describe 'FileUtil',->
     tests = [
       [ "foo.foo", "foo" ]
       [ "foo.foo.foo", "foo.foo" ]
-      [ "/foo/bar.xxx/file.ext", "/foo/bar.xxx/file" ]
-      [ "/foo/bar.xxx/file", "/foo/bar.xxx/file" ]
-      [ "/foo/bar.xxx-file", "/foo/bar" ]
+      [ "/foo/bar.xxx/file.ext", "#{PSEP}foo#{PSEP}bar.xxx#{PSEP}file" ]
+      [ "/foo/bar.xxx/file", "#{PSEP}foo#{PSEP}bar.xxx#{PSEP}file" ]
+      [ "/foo/bar.xxx-file", "#{PSEP}foo#{PSEP}bar" ]
     ]
     for test in tests
       FileUtil.strip_extension(test[0]).should.equal test[1]
